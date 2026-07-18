@@ -44,6 +44,18 @@ export default function App() {
   const [showExtractor, setShowExtractor] = useState<boolean>(false);
   const [prefilledTemplate, setPrefilledTemplate] = useState<ReelTemplate | null>(null);
 
+  // Premium Toast Notification State & Auto-dismiss (Delight Moment 3)
+  const [toast, setToast] = useState<{ message: string; sub: string; visible: boolean } | null>(null);
+
+  useEffect(() => {
+    if (toast && toast.visible) {
+      const timer = setTimeout(() => {
+        setToast(prev => prev ? { ...prev, visible: false } : null);
+      }, 2200);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
+
   // 1. Local Storage Hydration & Sync
   useEffect(() => {
     try {
@@ -144,27 +156,66 @@ export default function App() {
     setViewMode('watchlist');
     setShowExtractor(false);
     setPrefilledTemplate(null);
+
+    setToast({
+      message: "Extracted and Vaulted",
+      sub: `Added ${newMovies.length} recommendations directly onto your shelves!`,
+      visible: true
+    });
   };
 
   const handleToggleWatched = (id: string) => {
+    let movieTitle = '';
+    let isMarkedWatched = false;
+
     setMovies(prev => prev.map(m => {
       if (m.id === id) {
-        const nextWatched = !m.watched;
+        movieTitle = m.title;
+        isMarkedWatched = !m.watched;
         // If finishing watch, remove progress tracker value to clear Continue Watching state
-        const nextProgress = nextWatched ? undefined : m.progress;
+        const nextProgress = isMarkedWatched ? undefined : m.progress;
         return {
           ...m,
-          watched: nextWatched,
+          watched: isMarkedWatched,
           progress: nextProgress,
-          watchedAt: nextWatched ? new Date().toISOString() : undefined
+          watchedAt: isMarkedWatched ? new Date().toISOString() : undefined
         };
       }
       return m;
     }));
+
+    if (movieTitle) {
+      if (isMarkedWatched) {
+        setToast({
+          message: "Moved to Watched Archive",
+          sub: `"${movieTitle}" is now resting in your curated completed library.`,
+          visible: true
+        });
+      } else {
+        setToast({
+          message: "Returned to Watchlist",
+          sub: `"${movieTitle}" has been placed back in your active Watchlist queue.`,
+          visible: true
+        });
+      }
+    }
   };
 
   const handleDeleteMovie = (id: string) => {
     setMovies(prev => prev.filter(m => m.id !== id));
+  };
+
+  const handleAddSingleMovie = (newMovie: Omit<Movie, 'id' | 'addedAt' | 'watched'>) => {
+    if (movies.some(m => m.title.toLowerCase() === newMovie.title.toLowerCase())) {
+      return;
+    }
+    const decorated: Movie = {
+      ...newMovie,
+      id: `movie-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+      addedAt: new Date().toISOString(),
+      watched: false,
+    };
+    setMovies(prev => [decorated, ...prev]);
   };
 
   const handleToggleFavorite = (id: string) => {
@@ -265,7 +316,7 @@ export default function App() {
 
   if (!isLoaded) {
     return (
-      <div className="min-h-screen bg-[#09090b] flex flex-col items-center justify-center font-sans relative overflow-hidden">
+      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center font-sans relative overflow-hidden">
         {/* Soft background reflections */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-blue-500/10 rounded-full blur-[120px] pointer-events-none" />
         
@@ -335,27 +386,41 @@ export default function App() {
             </button>
 
             {/* Apple-quality segmented controller between Home & Library */}
-            <div className="bg-zinc-900/80 backdrop-blur-md border border-zinc-850 p-1 rounded-xl flex items-center">
+            <div className="bg-zinc-900/80 backdrop-blur-md border border-zinc-850 p-1 rounded-xl flex items-center relative">
               <button
                 onClick={() => setViewMode('home')}
-                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                className={`relative px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer z-10 ${
                   viewMode === 'home' 
-                    ? 'bg-zinc-800 text-white shadow-md' 
+                    ? 'text-white font-extrabold' 
                     : 'text-zinc-400 hover:text-zinc-200'
                 }`}
               >
+                {viewMode === 'home' && (
+                  <motion.div
+                    layoutId="mainNavIndicator"
+                    className="absolute inset-0 bg-zinc-800 rounded-lg shadow-md -z-10"
+                    transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                  />
+                )}
                 <Compass className="w-3.5 h-3.5" />
                 <span>Dashboard</span>
               </button>
               
               <button
                 onClick={() => setViewMode('watchlist')}
-                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                className={`relative px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer z-10 ${
                   viewMode === 'watchlist' 
-                    ? 'bg-zinc-800 text-white shadow-md' 
+                    ? 'text-white font-extrabold' 
                     : 'text-zinc-400 hover:text-zinc-200'
                 }`}
               >
+                {viewMode === 'watchlist' && (
+                  <motion.div
+                    layoutId="mainNavIndicator"
+                    className="absolute inset-0 bg-zinc-800 rounded-lg shadow-md -z-10"
+                    transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                  />
+                )}
                 <Tv className="w-3.5 h-3.5" />
                 <span>Watchlist Library</span>
               </button>
@@ -379,10 +444,10 @@ export default function App() {
           {viewMode === 'home' ? (
             <motion.div
               key="homescreen-view"
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ type: 'spring', stiffness: 350, damping: 30 }}
             >
               <HomeScreen
                 movies={movies}
@@ -390,19 +455,23 @@ export default function App() {
                 onDelete={handleDeleteMovie}
                 onSelectCollection={handleSelectCollection}
                 onViewAllWatchlist={() => setViewMode('watchlist')}
+                onSelectMovie={(id) => setSelectedMovieId(id)}
+                onOpenExtractor={() => setShowExtractor(true)}
+                onAddMovie={handleAddSingleMovie}
               />
             </motion.div>
           ) : (
             <motion.div
               key="watchlist-view"
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ type: 'spring', stiffness: 350, damping: 30 }}
               className="space-y-6 pt-2"
             >
               <WatchlistDashboard
                 movies={movies}
+                filteredMovies={filteredMovies}
                 stats={stats}
                 currentTab={currentTab}
                 onChangeTab={setCurrentTab}
@@ -421,77 +490,10 @@ export default function App() {
                 sortBy={sortBy}
                 onChangeSortBy={setSortBy}
                 onClearFilters={handleClearFilters}
+                onToggleWatched={handleToggleWatched}
+                onDelete={handleDeleteMovie}
+                onSelectMovie={(id) => setSelectedMovieId(id)}
               />
-
-              {/* Active Grid Header */}
-              <div className="flex items-center justify-between pt-4 border-t border-zinc-900">
-                <h2 className="text-xs font-bold uppercase tracking-widest text-zinc-500 font-mono">
-                  {currentTab === 'unwatched' && '🍿 Watch Next'}
-                  {currentTab === 'watched' && '✅ Watched Library'}
-                  {currentTab === 'all' && '🎬 All Curated Films'}
-                  <span className="text-zinc-600 font-normal ml-1.5">({filteredMovies.length} items)</span>
-                </h2>
-
-                {/* Quick Helper indicator */}
-                <span className="text-[10px] text-zinc-500 font-mono hidden sm:inline">
-                  * Click name to search trailers
-                </span>
-              </div>
-
-              {/* Core Watchlist Movies Grid / Empty States */}
-              <AnimatePresence mode="popLayout">
-                {filteredMovies.length > 0 ? (
-                  <motion.div
-                    layout
-                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-                  >
-                    {filteredMovies.map((movie) => (
-                      <motion.div
-                        layout
-                        key={movie.id}
-                      >
-                        <MovieCard
-                          movie={movie}
-                          onToggleWatched={handleToggleWatched}
-                          onDelete={handleDeleteMovie}
-                          onSelect={(m) => setSelectedMovieId(m.id)}
-                        />
-                      </motion.div>
-                    ))}
-                  </motion.div>
-                ) : (
-                  /* High-end Educational Empty States */
-                  <motion.div
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                    className="bg-zinc-950 border border-zinc-900/60 rounded-3xl p-12 text-center max-w-xl mx-auto space-y-5"
-                  >
-                    <div className="w-14 h-14 bg-zinc-900 rounded-2xl border border-zinc-850 flex items-center justify-center mx-auto shadow-md">
-                      <Film className="w-6 h-6 text-zinc-600 animate-pulse-slow" />
-                    </div>
-                    <div className="space-y-1.5">
-                      <h3 className="text-sm font-bold text-white uppercase tracking-wider font-mono">
-                        {hasActiveFilters ? 'No filtered matches' : 'Your Watchlist is Empty'}
-                      </h3>
-                      <p className="text-xs text-zinc-400 leading-relaxed max-w-md mx-auto">
-                        {hasActiveFilters 
-                          ? "Try resetting your search query or vibe category selectors in the refine panel." 
-                          : "We recommend choosing a pre-loaded Reel transcript on the Dashboard and hitting 'Extract' to experience the magic!"}
-                      </p>
-                    </div>
-
-                    {hasActiveFilters && (
-                      <button
-                        onClick={handleClearFilters}
-                        className="text-xs bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 text-zinc-300 font-semibold px-5 py-2.5 rounded-xl transition-all cursor-pointer"
-                      >
-                        Reset Active Filters
-                      </button>
-                    )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
             </motion.div>
           )}
         </AnimatePresence>
@@ -574,29 +576,33 @@ export default function App() {
           )}
         </AnimatePresence>
 
-        {/* Global Search Modal overlay */}
-        <GlobalSearchModal
-          isOpen={showSearchModal}
-          onClose={() => setShowSearchModal(false)}
-          movies={movies}
-          onSelectMovie={(id) => setSelectedMovieId(id)}
-          onSelectCollection={(collection) => {
-            handleSelectCollection(collection);
-            setViewMode('home');
-          }}
-          onApplySearchFilter={(search) => {
-            setSearchQuery(search);
-            setViewMode('watchlist');
-          }}
-          onApplyGenreFilter={(genre) => {
-            setSelectedGenre(genre);
-            setViewMode('watchlist');
-          }}
-          onApplyStreamFilter={(platform) => {
-            setSelectedStream(platform);
-            setViewMode('watchlist');
-          }}
-        />
+        {/* Global Search Modal overlay with proper mounting and exit animations */}
+        <AnimatePresence>
+          {showSearchModal && (
+            <GlobalSearchModal
+              isOpen={true}
+              onClose={() => setShowSearchModal(false)}
+              movies={movies}
+              onSelectMovie={(id) => setSelectedMovieId(id)}
+              onSelectCollection={(collection) => {
+                handleSelectCollection(collection);
+                setViewMode('home');
+              }}
+              onApplySearchFilter={(search) => {
+                setSearchQuery(search);
+                setViewMode('watchlist');
+              }}
+              onApplyGenreFilter={(genre) => {
+                setSelectedGenre(genre);
+                setViewMode('watchlist');
+              }}
+              onApplyStreamFilter={(platform) => {
+                setSelectedStream(platform);
+                setViewMode('watchlist');
+              }}
+            />
+          )}
+        </AnimatePresence>
 
         {/* Subtle, ultra-clean Footer */}
         <footer className="pt-16 border-t border-zinc-950 flex flex-col sm:flex-row items-center justify-between text-[11px] text-zinc-600 font-mono gap-4">
@@ -614,6 +620,30 @@ export default function App() {
             Powered by <span className="text-blue-500 font-bold">Gemini 3.5 Flash</span>
           </p>
         </footer>
+
+        {/* Custom Premium Notification Toast (Delight Moment 3) */}
+        <AnimatePresence>
+          {toast && toast.visible && (
+            <motion.div
+              initial={{ opacity: 0, y: 50, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 40, scale: 0.95 }}
+              className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-zinc-950/95 border border-emerald-500/25 text-white font-sans rounded-2xl shadow-[0_24px_50px_rgba(0,0,0,0.85),0_0_20px_rgba(16,185,129,0.04)] px-5 py-4 z-[9999] flex items-center gap-4 max-w-sm sm:max-w-md backdrop-blur-md border-b-2"
+            >
+              <div className="w-8.5 h-8.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
+                <Check className="w-4 h-4 text-emerald-400 stroke-[3px]" />
+              </div>
+              <div className="text-left space-y-0.5">
+                <p className="text-[10px] font-mono font-bold tracking-widest uppercase text-emerald-400 leading-none">
+                  {toast.message}
+                </p>
+                <p className="text-[11px] text-zinc-400 leading-normal font-medium pr-1">
+                  {toast.sub}
+                </p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
       </div>
     </div>

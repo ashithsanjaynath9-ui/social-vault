@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Sparkles, 
@@ -30,13 +30,16 @@ import {
   ArrowRight,
   Clock,
   Gauge,
-  Square,
-  CheckSquare,
-  SlidersHorizontal
+  SlidersHorizontal,
+  BookmarkCheck,
+  FolderHeart,
+  ChevronRight,
+  Database,
+  Tv2
 } from 'lucide-react';
 import { REEL_TEMPLATES, ReelTemplate } from '../data';
 import { Movie, SocialSource } from '../types';
-import { detectPlatform } from '../utils';
+import { detectPlatform, getTrailerUrl } from '../utils';
 
 interface AddMovieInputProps {
   onMoviesAdded: (newMovies: Omit<Movie, 'id' | 'addedAt' | 'watched'>[]) => void;
@@ -54,7 +57,6 @@ export default function AddMovieInput({
   const [inputText, setInputText] = useState('');
   const [inputUrl, setInputUrl] = useState('');
   const [isExtracting, setIsExtracting] = useState(false);
-  const [loadingStage, setLoadingStage] = useState<0 | 1 | 2>(0);
   const [error, setError] = useState<string | null>(null);
 
   // Platform tab state (can be clicked or auto-detected)
@@ -68,6 +70,13 @@ export default function AddMovieInput({
   // Multi-select and search state
   const [selectedIndices, setSelectedIndices] = useState<Record<number, boolean>>({});
   const [previewSearch, setPreviewSearch] = useState('');
+
+  // View mode for results: 'magical-shelves' or 'detailed-list'
+  const [viewMode, setViewMode] = useState<'magical-shelves' | 'detailed-list'>('magical-shelves');
+  const [isCommitting, setIsCommitting] = useState(false);
+
+  // Interactive step-by-step cinematic scanning stages
+  const [scanStage, setScanStage] = useState(0);
 
   // Inline editing state
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -91,6 +100,7 @@ export default function AddMovieInput({
       });
       setSelectedIndices(initialSelected);
       setPreviewSearch('');
+      setViewMode('magical-shelves'); // Reset to magic shelves on new extract
     } else {
       setSelectedIndices({});
     }
@@ -105,24 +115,29 @@ export default function AddMovieInput({
     }
   }, [inputText, inputUrl]);
 
-  // Sync loading stage sequence
+  // Sequential loading stage sequence for the magical scanning experience
   useEffect(() => {
     let timer1: any;
     let timer2: any;
+    let timer3: any;
     if (isExtracting) {
-      setLoadingStage(0);
+      setScanStage(0);
       timer1 = setTimeout(() => {
-        setLoadingStage(1);
-      }, 1500);
+        setScanStage(1);
+      }, 1200);
       timer2 = setTimeout(() => {
-        setLoadingStage(2);
-      }, 3200);
+        setScanStage(2);
+      }, 2400);
+      timer3 = setTimeout(() => {
+        setScanStage(3);
+      }, 3600);
     } else {
-      setLoadingStage(0);
+      setScanStage(0);
     }
     return () => {
       clearTimeout(timer1);
       clearTimeout(timer2);
+      clearTimeout(timer3);
     };
   }, [isExtracting]);
 
@@ -157,6 +172,9 @@ export default function AddMovieInput({
     setPreviewMovies(null);
     setEditingIndex(null);
 
+    // Keep active scanning for at least 4.8 seconds to allow the cinematic animation to breathe
+    const startTimestamp = Date.now();
+
     try {
       const response = await fetch('/api/extract', {
         method: 'POST',
@@ -176,6 +194,13 @@ export default function AddMovieInput({
 
       if (!data.movies || data.movies.length === 0) {
         throw new Error("We couldn't detect any specific movie titles or recommendations in that text. Try pasting a transcript that includes movie titles!");
+      }
+
+      // Wait a tiny bit more if needed to finish the scan story beautifully
+      const elapsedTime = Date.now() - startTimestamp;
+      const minAnimationDuration = 4800; // 4.8s
+      if (elapsedTime < minAnimationDuration) {
+        await new Promise(resolve => setTimeout(resolve, minAnimationDuration - elapsedTime));
       }
 
       // Add social platform and info if missing or needs override
@@ -200,10 +225,6 @@ export default function AddMovieInput({
     }
   };
 
-  const handleSavePreview = () => {
-    handleSaveAll();
-  };
-
   const handleSaveSelected = () => {
     if (previewMovies && previewMovies.length > 0) {
       const selected = previewMovies.filter((_, index) => selectedIndices[index]);
@@ -211,30 +232,34 @@ export default function AddMovieInput({
         setError('Please select at least one movie to save, or click "Save All".');
         return;
       }
-      onMoviesAdded(selected);
-      // Reset input state
-      setInputText('');
-      setInputUrl('');
-      setPreviewMovies(null);
-      setEditingIndex(null);
-      setSelectedTemplate(null);
-      onClearPrefill?.();
-      onCloseDrawer?.();
+      setIsCommitting(true);
+      setTimeout(() => {
+        onMoviesAdded(selected);
+        setIsCommitting(false);
+        resetExtractor();
+      }, 1100);
     }
   };
 
   const handleSaveAll = () => {
     if (previewMovies && previewMovies.length > 0) {
-      onMoviesAdded(previewMovies);
-      // Reset input state
-      setInputText('');
-      setInputUrl('');
-      setPreviewMovies(null);
-      setEditingIndex(null);
-      setSelectedTemplate(null);
-      onClearPrefill?.();
-      onCloseDrawer?.();
+      setIsCommitting(true);
+      setTimeout(() => {
+        onMoviesAdded(previewMovies);
+        setIsCommitting(false);
+        resetExtractor();
+      }, 1100);
     }
+  };
+
+  const resetExtractor = () => {
+    setInputText('');
+    setInputUrl('');
+    setPreviewMovies(null);
+    setEditingIndex(null);
+    setSelectedTemplate(null);
+    onClearPrefill?.();
+    onCloseDrawer?.();
   };
 
   const handleToggleSelect = (index: number) => {
@@ -307,145 +332,203 @@ export default function AddMovieInput({
     setEditingIndex(null);
   };
 
+  // Group movies by vibe or genre for the shelf organization
+  const shelfCollections = useMemo<Record<string, Omit<Movie, 'id' | 'addedAt' | 'watched'>[]>>(() => {
+    if (!previewMovies) return {};
+    const groups: Record<string, Omit<Movie, 'id' | 'addedAt' | 'watched'>[]> = {};
+    
+    previewMovies.forEach(movie => {
+      // Prioritize movie vibe, fallback to first genre, fallback to 'Uncategorized'
+      const key = movie.vibe || (movie.genres && movie.genres[0]) || 'Cinema Favorites';
+      if (!groups[key]) {
+        groups[key] = [];
+      }
+      groups[key].push(movie);
+    });
+    
+    return groups;
+  }, [previewMovies]);
+
   return (
-    <div className="w-full max-w-3xl mx-auto" id="movie-extractor-component">
+    <div className="w-full max-w-4xl mx-auto" id="movie-extractor-component">
       <AnimatePresence mode="wait">
         
-        {/* Stage 1: Active Extracting Loading Overlay */}
+        {/* Stage 1: Magical Scanning & Storytelling Overlay (No Traditional Spinners) */}
         {isExtracting ? (
           <motion.div
             key="extraction-loading"
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className="bg-zinc-950 border border-zinc-800 rounded-2xl p-8 shadow-2xl text-center space-y-8 relative overflow-hidden"
+            exit={{ opacity: 0, scale: 0.98 }}
+            className="bg-zinc-950 border border-zinc-900 rounded-3xl p-8 md:p-12 shadow-2xl text-center space-y-12 relative overflow-hidden"
           >
-            {/* Immersive cinematic glowing lights */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-80 h-80 bg-blue-500/10 rounded-full blur-[100px] pointer-events-none" />
-            <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-purple-500/5 rounded-full blur-[100px] pointer-events-none" />
+            {/* Ambient theatrical backlighting */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-purple-500/10 rounded-full blur-[140px] pointer-events-none" />
+            <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-purple-500/5 rounded-full blur-[120px] pointer-events-none" />
 
-            <div className="flex flex-col items-center justify-center space-y-6 pt-6">
-              {/* Spinning orbital radar */}
-              <div className="relative w-24 h-24 flex items-center justify-center">
-                <div className="absolute inset-0 rounded-full border-2 border-blue-500/20" />
+            {/* Glowing moving laser scanline */}
+            <div className="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-purple-500 to-transparent top-0 animate-scanline pointer-events-none opacity-45" />
+
+            <div className="flex flex-col items-center justify-center space-y-8 pt-4">
+              {/* Pulsing film aperture / lens visual */}
+              <div className="relative w-28 h-28 flex items-center justify-center">
+                <div className="absolute inset-0 rounded-full border border-purple-500/20 animate-ping opacity-30" />
+                <div className="absolute inset-2 rounded-full border-2 border-zinc-900 flex items-center justify-center bg-zinc-950 shadow-inner">
+                  <Film className="w-8 h-8 text-purple-400 animate-pulse" />
+                </div>
+                
+                {/* Scanning orbiters */}
                 <motion.div 
                   animate={{ rotate: 360 }}
-                  transition={{ repeat: Infinity, duration: 2.5, ease: 'linear' }}
-                  className="absolute inset-0 rounded-full border-t-2 border-l-2 border-blue-500"
+                  transition={{ repeat: Infinity, duration: 3, ease: 'linear' }}
+                  className="absolute inset-0 rounded-full border-t-2 border-purple-500/60"
                 />
                 <motion.div 
                   animate={{ rotate: -360 }}
-                  transition={{ repeat: Infinity, duration: 4, ease: 'linear' }}
-                  className="absolute inset-2 rounded-full border-b border-r border-purple-500/50"
+                  transition={{ repeat: Infinity, duration: 4.5, ease: 'linear' }}
+                  className="absolute inset-4 rounded-full border-b-2 border-purple-500/40"
                 />
-                <Film className="w-8 h-8 text-blue-400 animate-pulse" />
               </div>
 
               <div className="space-y-2">
-                <h3 className="text-lg font-display font-medium text-white tracking-wide">
-                  Gemini Deep Extraction
+                <h3 className="text-xl font-display font-bold text-white tracking-wide uppercase font-mono">
+                  Gemini Cinema Synthesizer
                 </h3>
-                <p className="text-xs text-zinc-400 max-w-sm mx-auto">
-                  Parsing transcription, validating metadata against high-quality streaming platforms.
+                <p className="text-xs text-zinc-500 max-w-sm mx-auto font-sans leading-relaxed">
+                  Extracting intelligence, parsing video transcripts, and organizing structured metadata...
                 </p>
               </div>
             </div>
 
-            {/* Steps feedback with custom tick marks */}
-            <div className="max-w-md mx-auto bg-zinc-900/50 border border-zinc-900 rounded-xl p-5 space-y-4 text-left font-mono">
+            {/* Real-time Narrative Milestones */}
+            <div className="max-w-md mx-auto bg-zinc-900/40 border border-zinc-900 rounded-2xl p-6 space-y-4 text-left font-mono">
               
-              {/* Step 1: Extracting movie titles */}
+              {/* Step 1: Scanning movie titles... */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  {loadingStage > 0 ? (
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  {scanStage > 0 ? (
+                    <div className="w-5 h-5 rounded-full bg-purple-500/10 flex items-center justify-center">
+                      <Check className="w-3 h-3 text-purple-400" />
+                    </div>
                   ) : (
-                    <div className="w-4 h-4 rounded-full border-2 border-blue-500 border-t-transparent animate-spin shrink-0" />
+                    <div className="w-5 h-5 rounded-full border border-zinc-800 flex items-center justify-center">
+                      <div className="w-2 h-2 bg-purple-500 rounded-full animate-ping" />
+                    </div>
                   )}
-                  <span className={`text-xs ${loadingStage >= 0 ? 'text-zinc-200 font-bold' : 'text-zinc-600'}`}>
-                    Extracting movie titles...
+                  <span className={`text-xs ${scanStage >= 0 ? 'text-zinc-200 font-bold' : 'text-zinc-600'}`}>
+                    Scanning movie titles...
                   </span>
                 </div>
-                <span className="text-[10px] text-zinc-500">
-                  {loadingStage > 0 ? 'COMPLETED' : 'PROCESSING'}
+                <span className={`text-[10px] font-bold uppercase tracking-wider ${scanStage > 0 ? 'text-purple-400' : 'text-zinc-500 animate-pulse'}`}>
+                  {scanStage > 0 ? 'SUCCESS' : 'SCANNING'}
                 </span>
               </div>
 
-              {/* Step 2: Finding streaming platforms */}
-              <div className="flex items-center justify-between border-t border-zinc-950/40 pt-3">
+              {/* Step 2: Finding posters... */}
+              <div className="flex items-center justify-between border-t border-zinc-900/60 pt-3">
                 <div className="flex items-center gap-3">
-                  {loadingStage > 1 ? (
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                  ) : loadingStage === 1 ? (
-                    <div className="w-4 h-4 rounded-full border-2 border-blue-500 border-t-transparent animate-spin shrink-0" />
+                  {scanStage > 1 ? (
+                    <div className="w-5 h-5 rounded-full bg-purple-500/10 flex items-center justify-center">
+                      <Check className="w-3 h-3 text-purple-400" />
+                    </div>
+                  ) : scanStage === 1 ? (
+                    <div className="w-5 h-5 rounded-full border border-zinc-800 flex items-center justify-center">
+                      <div className="w-2 h-2 bg-purple-500 rounded-full animate-ping" />
+                    </div>
                   ) : (
-                    <div className="w-4 h-4 rounded-full border border-zinc-800 shrink-0" />
+                    <div className="w-5 h-5 rounded-full border border-zinc-850" />
                   )}
-                  <span className={`text-xs ${loadingStage >= 1 ? 'text-zinc-200 font-bold' : 'text-zinc-500'}`}>
-                    Finding streaming platforms...
+                  <span className={`text-xs ${scanStage >= 1 ? 'text-zinc-200 font-bold' : 'text-zinc-600'}`}>
+                    Finding posters...
                   </span>
                 </div>
-                <span className="text-[10px] text-zinc-500">
-                  {loadingStage > 1 ? 'COMPLETED' : loadingStage === 1 ? 'PROCESSING' : 'PENDING'}
+                <span className={`text-[10px] font-bold uppercase tracking-wider ${scanStage > 1 ? 'text-purple-400' : scanStage === 1 ? 'text-zinc-500 animate-pulse' : 'text-zinc-700'}`}>
+                  {scanStage > 1 ? 'FOUND' : scanStage === 1 ? 'CRAWLING' : 'PENDING'}
                 </span>
               </div>
 
-              {/* Step 3: Organizing your collection */}
-              <div className="flex items-center justify-between border-t border-zinc-950/40 pt-3">
+              {/* Step 3: Checking streaming platforms... */}
+              <div className="flex items-center justify-between border-t border-zinc-900/60 pt-3">
                 <div className="flex items-center gap-3">
-                  {loadingStage === 2 ? (
-                    <div className="w-4 h-4 rounded-full border-2 border-blue-400 border-t-transparent animate-spin shrink-0" />
+                  {scanStage > 2 ? (
+                    <div className="w-5 h-5 rounded-full bg-purple-500/10 flex items-center justify-center">
+                      <Check className="w-3 h-3 text-purple-400" />
+                    </div>
+                  ) : scanStage === 2 ? (
+                    <div className="w-5 h-5 rounded-full border border-zinc-800 flex items-center justify-center">
+                      <div className="w-2 h-2 bg-purple-500 rounded-full animate-ping" />
+                    </div>
                   ) : (
-                    <div className="w-4 h-4 rounded-full border border-zinc-800 shrink-0" />
+                    <div className="w-5 h-5 rounded-full border border-zinc-850" />
                   )}
-                  <span className={`text-xs ${loadingStage >= 2 ? 'text-zinc-200 font-bold' : 'text-zinc-500'}`}>
-                    Organizing your collection...
+                  <span className={`text-xs ${scanStage >= 2 ? 'text-zinc-200 font-bold' : 'text-zinc-600'}`}>
+                    Checking streaming platforms...
                   </span>
                 </div>
-                <span className="text-[10px] text-zinc-500">
-                  {loadingStage === 2 ? 'PACKING' : 'PENDING'}
+                <span className={`text-[10px] font-bold uppercase tracking-wider ${scanStage > 2 ? 'text-purple-400' : scanStage === 2 ? 'text-zinc-500 animate-pulse' : 'text-zinc-700'}`}>
+                  {scanStage > 2 ? 'VERIFIED' : scanStage === 2 ? 'QUERIED' : 'PENDING'}
                 </span>
               </div>
+
+              {/* Step 4: Building your library... */}
+              <div className="flex items-center justify-between border-t border-zinc-900/60 pt-3">
+                <div className="flex items-center gap-3">
+                  {scanStage === 3 ? (
+                    <div className="w-5 h-5 rounded-full border border-zinc-800 flex items-center justify-center">
+                      <div className="w-2 h-2 bg-purple-500 rounded-full animate-ping" />
+                    </div>
+                  ) : (
+                    <div className="w-5 h-5 rounded-full border border-zinc-850" />
+                  )}
+                  <span className={`text-xs ${scanStage >= 3 ? 'text-zinc-200 font-bold' : 'text-zinc-600'}`}>
+                    Building your library...
+                  </span>
+                </div>
+                <span className={`text-[10px] font-bold uppercase tracking-wider ${scanStage === 3 ? 'text-purple-400 animate-pulse' : 'text-zinc-700'}`}>
+                  {scanStage === 3 ? 'PACKAGING' : 'PENDING'}
+                </span>
+              </div>
+
             </div>
 
-            {/* Glowing cinematic progress bar */}
-            <div className="w-full max-w-md mx-auto h-1 bg-zinc-900 rounded-full overflow-hidden">
+            {/* Seamless gradient progress loader bar */}
+            <div className="w-full max-w-md mx-auto h-1.5 bg-zinc-900 rounded-full overflow-hidden relative">
               <motion.div 
-                className="h-full bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500"
+                className="h-full bg-gradient-to-r from-purple-600 via-purple-500 to-purple-400"
                 initial={{ width: '0%' }}
                 animate={{ 
-                  width: loadingStage === 0 ? '33%' : loadingStage === 1 ? '66%' : '95%' 
+                  width: scanStage === 0 ? '25%' : scanStage === 1 ? '50%' : scanStage === 2 ? '75%' : '98%' 
                 }}
-                transition={{ duration: 1.5, ease: 'easeInOut' }}
+                transition={{ duration: 1.2, ease: 'easeInOut' }}
               />
             </div>
           </motion.div>
         ) : !previewMovies ? (
           
-          /* Stage 2: Main Input & Share Options form */
+          /* Stage 2: Input & Share Options Form (Initial state) */
           <motion.div
             key="input-form"
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -15 }}
             transition={{ duration: 0.3 }}
-            className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 shadow-2xl relative overflow-hidden"
+            className="bg-zinc-950 border border-zinc-900 rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden"
           >
-            {/* Ambient subtle glow background */}
-            <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/5 blur-[120px] rounded-full pointer-events-none" />
+            {/* Ambient visual backlights */}
+            <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-600/5 blur-[120px] rounded-full pointer-events-none" />
             <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-600/5 blur-[120px] rounded-full pointer-events-none" />
 
-            <div className="flex items-start justify-between gap-4 mb-5">
+            <div className="flex items-start justify-between gap-4 mb-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-500/10 rounded-xl border border-blue-500/20">
-                  <Sparkles className="w-5 h-5 text-blue-400" />
+                <div className="p-2.5 bg-purple-500/10 rounded-2xl border border-purple-500/15">
+                  <Sparkles className="w-5 h-5 text-purple-400" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-display font-medium text-white tracking-tight">
-                    Instant Movie Extractor
+                  <h2 className="text-xl font-display font-extrabold text-white tracking-tight leading-none">
+                    Instant Cinema Extractor
                   </h2>
-                  <p className="text-xs text-zinc-400">
-                    Paste recommendation texts or links to instantly extract curation intelligence
+                  <p className="text-xs text-zinc-500 mt-1 font-mono font-medium">
+                    Convert social recommendations into clean cinema watchlists
                   </p>
                 </div>
               </div>
@@ -454,22 +537,22 @@ export default function AddMovieInput({
                 <button
                   type="button"
                   onClick={onCloseDrawer}
-                  className="p-1.5 hover:bg-zinc-900 rounded-lg text-zinc-500 hover:text-white transition-colors cursor-pointer"
+                  className="p-2 hover:bg-zinc-900 rounded-xl text-zinc-500 hover:text-white transition-colors cursor-pointer"
                   aria-label="Close Extractor"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-4 h-4" />
                 </button>
               )}
             </div>
 
-            {/* Apple-quality premium segmented tab bar for social platforms */}
-            <div className="grid grid-cols-4 gap-1.5 p-1 bg-zinc-900/60 border border-zinc-850 rounded-xl mb-4">
+            {/* Platform Segmented Tabs */}
+            <div className="grid grid-cols-4 gap-1.5 p-1 bg-zinc-900/40 border border-zinc-900 rounded-2xl mb-4">
               <button
                 type="button"
                 onClick={() => setActiveTab('instagram')}
-                className={`py-2 px-1 rounded-lg text-center flex flex-col sm:flex-row items-center justify-center gap-1.5 font-mono text-[10px] font-bold tracking-wide transition-all cursor-pointer ${
+                className={`py-2.5 px-1 rounded-xl text-center flex flex-col sm:flex-row items-center justify-center gap-2 font-mono text-[10px] font-bold tracking-wide transition-all cursor-pointer ${
                   activeTab === 'instagram' 
-                    ? 'bg-zinc-800 text-pink-400 border border-zinc-700 shadow-md' 
+                    ? 'bg-zinc-900 text-pink-400 border border-zinc-800 shadow-md' 
                     : 'text-zinc-500 hover:text-zinc-300'
                 }`}
               >
@@ -480,9 +563,9 @@ export default function AddMovieInput({
               <button
                 type="button"
                 onClick={() => setActiveTab('youtube')}
-                className={`py-2 px-1 rounded-lg text-center flex flex-col sm:flex-row items-center justify-center gap-1.5 font-mono text-[10px] font-bold tracking-wide transition-all cursor-pointer ${
+                className={`py-2.5 px-1 rounded-xl text-center flex flex-col sm:flex-row items-center justify-center gap-2 font-mono text-[10px] font-bold tracking-wide transition-all cursor-pointer ${
                   activeTab === 'youtube' 
-                    ? 'bg-zinc-800 text-red-400 border border-zinc-700 shadow-md' 
+                    ? 'bg-zinc-900 text-red-400 border border-zinc-800 shadow-md' 
                     : 'text-zinc-500 hover:text-zinc-300'
                 }`}
               >
@@ -493,9 +576,9 @@ export default function AddMovieInput({
               <button
                 type="button"
                 onClick={() => setActiveTab('tiktok')}
-                className={`py-2 px-1 rounded-lg text-center flex flex-col sm:flex-row items-center justify-center gap-1.5 font-mono text-[10px] font-bold tracking-wide transition-all cursor-pointer ${
+                className={`py-2.5 px-1 rounded-xl text-center flex flex-col sm:flex-row items-center justify-center gap-2 font-mono text-[10px] font-bold tracking-wide transition-all cursor-pointer ${
                   activeTab === 'tiktok' 
-                    ? 'bg-zinc-800 text-cyan-400 border border-zinc-700 shadow-md' 
+                    ? 'bg-zinc-900 text-cyan-400 border border-zinc-800 shadow-md' 
                     : 'text-zinc-500 hover:text-zinc-300'
                 }`}
               >
@@ -506,9 +589,9 @@ export default function AddMovieInput({
               <button
                 type="button"
                 onClick={() => setActiveTab('manual')}
-                className={`py-2 px-1 rounded-lg text-center flex flex-col sm:flex-row items-center justify-center gap-1.5 font-mono text-[10px] font-bold tracking-wide transition-all cursor-pointer ${
+                className={`py-2.5 px-1 rounded-xl text-center flex flex-col sm:flex-row items-center justify-center gap-2 font-mono text-[10px] font-bold tracking-wide transition-all cursor-pointer ${
                   activeTab === 'manual' 
-                    ? 'bg-zinc-800 text-blue-400 border border-zinc-700 shadow-md' 
+                    ? 'bg-zinc-900 text-blue-400 border border-zinc-800 shadow-md' 
                     : 'text-zinc-500 hover:text-zinc-300'
                 }`}
               >
@@ -517,15 +600,15 @@ export default function AddMovieInput({
               </button>
             </div>
 
-            {/* Informative Platform Banner */}
-            <div className="bg-zinc-900/30 border border-zinc-900 rounded-xl px-4 py-2.5 mb-4 flex items-center justify-between">
-              <span className="text-[11px] text-zinc-400 flex items-center gap-2">
-                {activeTab === 'instagram' && <>🍿 Paste Instagram Reels transcripts, captions or share links</>}
-                {activeTab === 'youtube' && <>📺 Works with YouTube videos, Shorts transcripts, and recommendation posts</>}
-                {activeTab === 'tiktok' && <>🎵 Paste TikTok comments, tags, captions, or short links</>}
-                {activeTab === 'manual' && <>📝 Paste raw text, WhatsApp recommendations, or simple movie logs</>}
+            {/* Informational Platform Banner */}
+            <div className="bg-zinc-900/10 border border-zinc-900/60 rounded-xl px-4 py-2.5 mb-5 flex items-center justify-between">
+              <span className="text-[11px] text-zinc-400 flex items-center gap-2 font-sans">
+                {activeTab === 'instagram' && <>🍿 Paste Instagram Reel caption transcript or share URL</>}
+                {activeTab === 'youtube' && <>📺 Works with YouTube video descriptions or Shorts transcripts</>}
+                {activeTab === 'tiktok' && <>🎵 Paste TikTok comments, hashtags, captions, or short links</>}
+                {activeTab === 'manual' && <>📝 Paste recommendation list or chat transcripts directly</>}
               </span>
-              <span className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest bg-zinc-900 px-2 py-0.5 rounded border border-zinc-850">
+              <span className="text-[9px] font-mono font-extrabold text-zinc-500 uppercase tracking-widest bg-zinc-900 px-2 py-0.5 rounded border border-zinc-850">
                 {activeTab === 'manual' ? 'PASTE STATION' : `${activeTab} integrated`}
               </span>
             </div>
@@ -540,22 +623,22 @@ export default function AddMovieInput({
                   }}
                   placeholder={
                     activeTab === 'instagram' 
-                      ? "Paste Instagram text description (e.g. 'Must watch movie that will blow your mind on Netflix called Coherence!')" 
+                      ? "Paste Instagram text description (e.g. 'Must watch sci-fi movie that will bend your mind on Netflix called Coherence!')" 
                       : activeTab === 'youtube'
                       ? "Paste YouTube Shorts description or transcript with movie recommendations..."
                       : activeTab === 'tiktok'
                       ? "Paste TikTok content caption containing movie recommendations..."
-                      : "Paste recommendation text, a list, notes, or chat transcript..."
+                      : "Paste recommendation text, a list of movies, notes, or chat transcript..."
                   }
                   rows={4}
-                  className="w-full bg-zinc-900/50 hover:bg-zinc-900/80 focus:bg-zinc-900 border border-zinc-800 focus:border-blue-500/50 rounded-xl px-4 py-3 text-sm text-zinc-100 placeholder-zinc-500 outline-none transition-all resize-none font-sans leading-relaxed focus:ring-1 focus:ring-blue-500/20"
+                  className="w-full bg-zinc-900/20 hover:bg-zinc-900/40 focus:bg-zinc-900/80 border border-zinc-900 focus:border-zinc-700 rounded-2xl px-5 py-4 text-sm text-zinc-100 placeholder-zinc-500 outline-none transition-all resize-none font-sans leading-relaxed"
                 />
               </div>
 
               {/* Optional Link bar */}
-              <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex flex-col sm:flex-row gap-4">
                 <div className="relative flex-1">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <Link2 className="h-4 w-4 text-zinc-500" />
                   </div>
                   <input
@@ -564,14 +647,14 @@ export default function AddMovieInput({
                     onChange={(e) => setInputUrl(e.target.value)}
                     placeholder={`${
                       activeTab === 'instagram' 
-                        ? 'Instagram Reel / Post URL' 
+                        ? 'Instagram Reel Link' 
                         : activeTab === 'youtube'
-                        ? 'YouTube Shorts / Video URL'
+                        ? 'YouTube Shorts Link'
                         : activeTab === 'tiktok'
-                        ? 'TikTok URL'
-                        : 'Social Curation Reference URL'
+                        ? 'TikTok Video URL'
+                        : 'Social Curation Reference Link'
                     } (Optional)`}
-                    className="block w-full bg-zinc-900/50 hover:bg-zinc-900/80 focus:bg-zinc-900 border border-zinc-800 focus:border-blue-500/50 rounded-xl pl-9 pr-4 py-2.5 text-xs text-zinc-100 placeholder-zinc-500 outline-none transition-all outline-none focus:ring-1 focus:ring-blue-500/20"
+                    className="block w-full bg-zinc-900/20 hover:bg-zinc-900/40 focus:bg-zinc-900/80 border border-zinc-900 focus:border-zinc-700 rounded-2xl pl-10 pr-4 py-3.5 text-xs text-zinc-100 placeholder-zinc-500 outline-none transition-all"
                   />
                 </div>
 
@@ -579,7 +662,7 @@ export default function AddMovieInput({
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.98 }}
                   type="submit"
-                  className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-6 py-2.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-500/10 cursor-pointer"
+                  className="bg-blue-600 hover:bg-blue-500 text-white text-xs font-mono font-bold tracking-widest uppercase px-8 py-3.5 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-xl shadow-blue-500/15 cursor-pointer border border-blue-400/10"
                 >
                   <Sparkles className="w-4 h-4 text-white" />
                   <span>Extract Movies</span>
@@ -591,21 +674,21 @@ export default function AddMovieInput({
               <motion.div
                 initial={{ opacity: 0, y: 5 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mt-4 p-3.5 bg-red-500/10 border border-red-500/20 rounded-xl flex items-start gap-3"
+                className="mt-4 p-4 bg-red-500/5 border border-red-500/15 rounded-2xl flex items-start gap-3"
               >
-                <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
-                <p className="text-xs text-red-300 leading-normal">{error}</p>
+                <AlertCircle className="w-4.5 h-4.5 text-red-400 shrink-0 mt-0.5" />
+                <p className="text-xs text-red-300 leading-relaxed font-sans">{error}</p>
               </motion.div>
             )}
 
-            {/* Quick Demo Section (Bento Design) */}
-            <div className="mt-6 pt-5 border-t border-zinc-900">
+            {/* Quick Demo Section (Bento Design Templates) */}
+            <div className="mt-8 pt-6 border-t border-zinc-900">
               <button
                 onClick={() => setShowTemplates(!showTemplates)}
                 className="flex items-center justify-between w-full text-left py-1 text-zinc-400 hover:text-white transition-colors group cursor-pointer"
               >
-                <span className="text-xs font-semibold tracking-wider uppercase text-zinc-500">
-                  ⚡ Try Pre-loaded Reel Transcripts (Fast demo)
+                <span className="text-xs font-mono font-bold tracking-widest uppercase text-zinc-500">
+                  ⚡ Preloaded Reel Transcripts (For Fast Demo)
                 </span>
                 <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${showTemplates ? 'rotate-180' : ''}`} />
               </button>
@@ -616,28 +699,28 @@ export default function AddMovieInput({
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    className="overflow-hidden mt-3"
+                    className="overflow-hidden mt-4"
                   >
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       {REEL_TEMPLATES.map((tmpl) => {
                         const isSelected = selectedTemplate === tmpl.id;
                         return (
                           <button
                             key={tmpl.id}
                             onClick={() => handleApplyTemplate(tmpl)}
-                            className={`group relative text-left p-3.5 rounded-xl border transition-all duration-200 cursor-pointer ${
+                            className={`group relative text-left p-4 rounded-2xl border transition-all duration-200 cursor-pointer ${
                               isSelected
-                                ? 'bg-blue-600/10 border-blue-500/50 shadow-md shadow-blue-500/5'
-                                : 'bg-zinc-900/30 hover:bg-zinc-900/70 border-zinc-900 hover:border-zinc-800'
+                                ? 'bg-blue-600/10 border-blue-500/40 shadow-md shadow-blue-500/5'
+                                : 'bg-zinc-900/20 hover:bg-zinc-900/60 border-zinc-900/80 hover:border-zinc-800'
                             }`}
                           >
-                            <div className="flex items-center gap-2 mb-1.5">
+                            <div className="flex items-center gap-2 mb-2">
                               <span className="text-lg">{tmpl.icon}</span>
-                              <span className="text-[10px] font-mono font-medium text-zinc-500 group-hover:text-zinc-400 transition-colors uppercase">
+                              <span className="text-[9px] font-mono font-bold text-zinc-500 group-hover:text-zinc-400 transition-colors uppercase">
                                 {tmpl.platform} • {tmpl.creator}
                               </span>
                             </div>
-                            <h4 className="text-xs font-bold text-zinc-200 group-hover:text-white transition-colors line-clamp-1 mb-1">
+                            <h4 className="text-xs font-bold text-zinc-200 group-hover:text-white transition-colors line-clamp-1 mb-1 font-sans">
                               {tmpl.title}
                             </h4>
                             <p className="text-[11px] text-zinc-400 line-clamp-2 leading-relaxed">
@@ -654,437 +737,416 @@ export default function AddMovieInput({
           </motion.div>
         ) : (
           
-          /* Stage 3: Premium Extraction Results and Approval Screen */
+          /* Stage 3: Premium Extraction Results and Magical Shelf/Grid Presentation */
           <motion.div
             key="preview-stage"
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.98 }}
-            className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 shadow-2xl relative overflow-hidden"
+            className="bg-zinc-950 border border-zinc-900 rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden space-y-8"
           >
-            {/* Immersive backing atmosphere glow */}
-            <div className="absolute top-0 right-1/4 w-80 h-80 bg-emerald-500/5 rounded-full blur-[100px] pointer-events-none" />
-            <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-blue-500/5 rounded-full blur-[100px] pointer-events-none" />
+            {/* Theatrical visual elements */}
+            <div className="absolute top-0 right-1/4 w-96 h-96 bg-emerald-500/5 rounded-full blur-[140px] pointer-events-none" />
+            <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-[140px] pointer-events-none" />
 
             <div className="absolute top-0 right-0 p-4 z-10">
               <button
                 onClick={() => setPreviewMovies(null)}
-                className="p-1.5 hover:bg-zinc-900 rounded-lg text-zinc-500 hover:text-white transition-colors cursor-pointer"
-                title="Discard extraction"
+                className="p-2 hover:bg-zinc-900 rounded-xl text-zinc-500 hover:text-white transition-colors cursor-pointer"
+                title="Discard Curation"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Title Header with counters */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-5 border-b border-zinc-900">
+            {/* Stage Title and Summary */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-zinc-900">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                <div className="p-2.5 bg-emerald-500/10 rounded-2xl border border-emerald-500/20">
                   <Sparkles className="w-5 h-5 text-emerald-400" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-display font-medium text-white tracking-tight flex items-center gap-2">
-                    Extracted Recommendations
-                    <span className="text-[10px] bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-2.5 py-0.5 rounded-full font-mono font-medium">
-                      {previewMovies.length} Found
+                  <h2 className="text-xl font-display font-extrabold text-white tracking-tight flex items-center gap-2">
+                    {previewMovies.length} Movies Extracted
+                    <span className="text-[9px] bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-2.5 py-0.5 rounded-full font-mono font-bold uppercase tracking-wider">
+                      Ready for Vault
                     </span>
                   </h2>
-                  <p className="text-xs text-zinc-400">
-                    Review, search, multi-select, and edit movie details before saving to your watchlist.
+                  <p className="text-xs text-zinc-500 mt-1 font-mono">
+                    Structured with streaming services, metadata, and curation descriptions automatically.
                   </p>
                 </div>
               </div>
-            </div>
 
-            {/* Sub-header controls (Search & Multi-select helper) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5 items-center">
-              {/* Search Bar */}
-              <div className="relative">
-                <Search className="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  value={previewSearch}
-                  onChange={(e) => setPreviewSearch(e.target.value)}
-                  placeholder="Search title, genre, synopsis, or vibe..."
-                  className="w-full bg-zinc-900/60 hover:bg-zinc-900/90 focus:bg-zinc-900 border border-zinc-850 focus:border-zinc-700 text-xs text-white rounded-xl pl-9 pr-8 py-2.5 outline-none transition-all"
-                />
-                {previewSearch && (
-                  <button
-                    onClick={() => setPreviewSearch('')}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 hover:bg-zinc-800 rounded text-zinc-400 hover:text-white"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                )}
-              </div>
-
-              {/* Selection Summary and Toggle All */}
-              <div className="flex items-center justify-between md:justify-end gap-4 bg-zinc-900/30 border border-zinc-900 rounded-xl px-4 py-2">
-                <div className="text-xs font-mono text-zinc-400">
-                  Selected:{' '}
-                  <span className="text-emerald-400 font-bold">
-                    {previewMovies.filter((_, idx) => selectedIndices[idx]).length}
-                  </span>{' '}
-                  of{' '}
-                  <span className="text-white font-bold">{previewMovies.length}</span>
-                </div>
-
+              {/* View Switcher: Shelves vs Detailed */}
+              <div className="flex items-center gap-2 bg-zinc-900/60 p-1 border border-zinc-900 rounded-xl w-fit">
                 <button
-                  onClick={handleToggleSelectAll}
-                  className="text-[10px] font-mono font-bold uppercase tracking-wider text-blue-400 hover:text-blue-300 transition-colors bg-zinc-900 hover:bg-zinc-850 px-3 py-1.5 rounded-lg border border-zinc-800 cursor-pointer"
+                  onClick={() => setViewMode('magical-shelves')}
+                  className={`px-3 py-1.5 rounded-lg text-[10px] font-mono font-bold tracking-wider uppercase transition-all cursor-pointer ${
+                    viewMode === 'magical-shelves' 
+                      ? 'bg-zinc-950 text-blue-400 border border-zinc-800' 
+                      : 'text-zinc-500 hover:text-zinc-300'
+                  }`}
                 >
-                  {previewMovies.every((_, idx) => selectedIndices[idx]) ? 'Deselect All' : 'Select All'}
+                  🎭 Shelves View
+                </button>
+                <button
+                  onClick={() => setViewMode('detailed-list')}
+                  className={`px-3 py-1.5 rounded-lg text-[10px] font-mono font-bold tracking-wider uppercase transition-all cursor-pointer ${
+                    viewMode === 'detailed-list' 
+                      ? 'bg-zinc-950 text-blue-400 border border-zinc-800' 
+                      : 'text-zinc-500 hover:text-zinc-300'
+                  }`}
+                >
+                  📝 Detailed List
                 </button>
               </div>
             </div>
 
-            {/* List of previewed movies with custom robust cards */}
-            <div className="space-y-4 max-h-[460px] overflow-y-auto pr-1 mb-6 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent">
-              <motion.div
-                variants={{
-                  hidden: { opacity: 0 },
-                  show: {
-                    opacity: 1,
-                    transition: {
-                      staggerChildren: 0.1
-                    }
-                  }
-                }}
-                initial="hidden"
-                animate="show"
-                className="space-y-4"
-              >
-                {previewMovies.map((movie, index) => {
-                  const isEditing = editingIndex === index;
-                  const isSelected = !!selectedIndices[index];
-                  
-                  // Filter based on search query
-                  if (previewSearch.trim()) {
-                    const query = previewSearch.toLowerCase();
-                    const matchesTitle = movie.title.toLowerCase().includes(query);
-                    const matchesSynopsis = movie.synopsis.toLowerCase().includes(query);
-                    const matchesVibe = movie.vibe.toLowerCase().includes(query);
-                    const matchesDirector = movie.director.toLowerCase().includes(query);
-                    const matchesGenre = movie.genres.some(g => g.toLowerCase().includes(query));
-                    if (!matchesTitle && !matchesSynopsis && !matchesVibe && !matchesDirector && !matchesGenre) {
-                      return null;
-                    }
-                  }
+            {/* INTERACTIVE EXPERIENCE A: THE MAGICAL SHELVES COLLECTION (SMILE PRODUCER) */}
+            <AnimatePresence mode="wait">
+              {viewMode === 'magical-shelves' ? (
+                <motion.div
+                  key="magical-shelves-view"
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -15 }}
+                  className="space-y-12 py-4"
+                >
+                  {(Object.entries(shelfCollections) as [string, Omit<Movie, 'id' | 'addedAt' | 'watched'>[]][]).map(([category, list], shelfIdx) => (
+                    <div key={category} className="space-y-4">
+                      {/* Category Shelf Header */}
+                      <div className="flex items-center gap-2">
+                        <span className="w-1.5 h-4 bg-blue-500 rounded-full" />
+                        <h3 className="text-xs font-mono font-bold uppercase tracking-widest text-zinc-400">
+                          {category}
+                        </h3>
+                        <span className="text-[10px] text-zinc-600 font-mono">({list.length} item{list.length > 1 ? 's' : ''})</span>
+                      </div>
 
-                  const confidenceVal = movie.confidence || 95;
-                  const confidenceColor = confidenceVal >= 92 
-                    ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' 
-                    : confidenceVal >= 80 
-                    ? 'text-amber-400 bg-amber-500/10 border-amber-500/20' 
-                    : 'text-rose-400 bg-rose-500/10 border-rose-500/20';
-
-                  return (
-                    <motion.div
-                      layout
-                      key={index}
-                      variants={{
-                        hidden: { opacity: 0, y: 15, scale: 0.98 },
-                        show: { 
-                          opacity: 1, 
-                          y: 0, 
-                          scale: 1,
-                          transition: { type: 'spring', stiffness: 100, damping: 15 } 
-                        }
-                      }}
-                      className={`border rounded-2xl p-4 md:p-5 transition-all relative overflow-hidden ${
-                        isEditing 
-                          ? 'border-blue-500/50 bg-zinc-900/90 shadow-xl ring-1 ring-blue-500/20' 
-                          : isSelected
-                          ? 'border-emerald-500/30 bg-zinc-900/50 shadow-md shadow-emerald-950/10 hover:border-emerald-500/50'
-                          : 'border-zinc-900/80 bg-zinc-900/20 hover:border-zinc-800 hover:bg-zinc-900/40 opacity-60 hover:opacity-90'
-                      }`}
-                    >
-                      {isEditing ? (
-                        /* Premium Full Inline Form Editor */
-                        <div className="space-y-4">
-                          <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
-                            <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-blue-400 flex items-center gap-1.5">
-                              <Edit3 className="w-3.5 h-3.5 animate-pulse" />
-                              <span>Edit Cinema Curation Metadata</span>
-                            </h4>
-                            <div className="flex gap-2">
-                              <button
-                                type="button"
-                                onClick={handleCancelEdit}
-                                className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-750 text-zinc-300 text-[10px] font-mono font-bold rounded-lg cursor-pointer transition-colors"
-                              >
-                                CANCEL
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleSaveEdit(index)}
-                                className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-mono font-bold rounded-lg flex items-center gap-1.5 cursor-pointer transition-all shadow-md shadow-blue-500/10"
-                              >
-                                <Save className="w-3.5 h-3.5" />
-                                <span>SAVE CHANGES</span>
-                              </button>
-                            </div>
-                          </div>
-
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-                            <div className="md:col-span-2">
-                              <label className="block text-[10px] font-mono text-zinc-500 uppercase font-bold mb-1 tracking-wider">Movie Title</label>
-                              <input
-                                type="text"
-                                value={editTitle}
-                                onChange={(e) => setEditTitle(e.target.value)}
-                                className="w-full bg-zinc-950 border border-zinc-850 focus:border-blue-500 rounded-xl px-3 py-2 text-xs text-white outline-none focus:ring-1 focus:ring-blue-500/20 transition-all font-sans font-medium"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-[10px] font-mono text-zinc-500 uppercase font-bold mb-1 tracking-wider">Release Year</label>
-                              <input
-                                type="number"
-                                value={editYear}
-                                onChange={(e) => setEditYear(Number(e.target.value))}
-                                className="w-full bg-zinc-950 border border-zinc-850 focus:border-blue-500 rounded-xl px-3 py-2 text-xs text-white outline-none focus:ring-1 focus:ring-blue-500/20 transition-all font-mono"
-                              />
-                            </div>
-                          </div>
-
-                          <div className="grid grid-cols-1 md:grid-cols-4 gap-3.5">
-                            <div className="md:col-span-2">
-                              <label className="block text-[10px] font-mono text-zinc-500 uppercase font-bold mb-1 tracking-wider">Director</label>
-                              <input
-                                type="text"
-                                value={editDirector}
-                                onChange={(e) => setEditDirector(e.target.value)}
-                                className="w-full bg-zinc-950 border border-zinc-850 focus:border-blue-500 rounded-xl px-3 py-2 text-xs text-white outline-none focus:ring-1 focus:ring-blue-500/20 transition-all font-sans"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-[10px] font-mono text-zinc-500 uppercase font-bold mb-1 tracking-wider">Runtime</label>
-                              <input
-                                type="text"
-                                value={editRuntime}
-                                onChange={(e) => setEditRuntime(e.target.value)}
-                                placeholder="e.g. 112 mins"
-                                className="w-full bg-zinc-950 border border-zinc-850 focus:border-blue-500 rounded-xl px-3 py-2 text-xs text-white outline-none focus:ring-1 focus:ring-blue-500/20 transition-all font-mono"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-[10px] font-mono text-zinc-500 uppercase font-bold mb-1 tracking-wider">Confidence (0-100)</label>
-                              <input
-                                type="number"
-                                min="0"
-                                max="100"
-                                value={editConfidence}
-                                onChange={(e) => setEditConfidence(Number(e.target.value))}
-                                className="w-full bg-zinc-950 border border-zinc-850 focus:border-blue-500 rounded-xl px-3 py-2 text-xs text-white outline-none focus:ring-1 focus:ring-blue-500/20 transition-all font-mono"
-                              />
-                            </div>
-                          </div>
-
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                            <div>
-                              <label className="block text-[10px] font-mono text-zinc-500 uppercase font-bold mb-1 tracking-wider">Vibe Tag</label>
-                              <input
-                                type="text"
-                                value={editVibe}
-                                onChange={(e) => setEditVibe(e.target.value)}
-                                className="w-full bg-zinc-950 border border-zinc-850 focus:border-blue-500 rounded-xl px-3 py-2 text-xs text-white outline-none focus:ring-1 focus:ring-blue-500/20 transition-all"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-[10px] font-mono text-zinc-500 uppercase font-bold mb-1 tracking-wider">Rating Score</label>
-                              <input
-                                type="text"
-                                value={editRating}
-                                onChange={(e) => setEditRating(e.target.value)}
-                                className="w-full bg-zinc-950 border border-zinc-850 focus:border-blue-500 rounded-xl px-3 py-2 text-xs text-white outline-none focus:ring-1 focus:ring-blue-500/20 transition-all font-mono"
-                              />
-                            </div>
-                          </div>
-
-                          <div>
-                            <label className="block text-[10px] font-mono text-zinc-500 uppercase font-bold mb-1 tracking-wider">Plot Synopsis</label>
-                            <textarea
-                              value={editSynopsis}
-                              onChange={(e) => setEditSynopsis(e.target.value)}
-                              rows={2}
-                              className="w-full bg-zinc-950 border border-zinc-850 focus:border-blue-500 rounded-xl px-3 py-2 text-xs text-white outline-none resize-none focus:ring-1 focus:ring-blue-500/20 transition-all leading-relaxed"
-                            />
-                          </div>
-
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                            <div>
-                              <label className="block text-[10px] font-mono text-zinc-500 uppercase font-bold mb-1 tracking-wider">Genres (comma separated)</label>
-                              <input
-                                type="text"
-                                value={editGenres}
-                                onChange={(e) => setEditGenres(e.target.value)}
-                                className="w-full bg-zinc-950 border border-zinc-850 focus:border-blue-500 rounded-xl px-3 py-2 text-xs text-white outline-none"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-[10px] font-mono text-zinc-500 uppercase font-bold mb-1 tracking-wider">Streaming Outlets (comma separated)</label>
-                              <input
-                                type="text"
-                                value={editStreaming}
-                                onChange={(e) => setEditStreaming(e.target.value)}
-                                className="w-full bg-zinc-950 border border-zinc-850 focus:border-blue-500 rounded-xl px-3 py-2 text-xs text-white outline-none"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        /* High-Fidelity Interactive Movie Card */
-                        <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-5">
-                          {/* Left Column: Multi-select Switcher & Movie Poster */}
-                          <div className="flex items-center sm:items-start gap-3 w-full sm:w-auto shrink-0">
-                            {/* Checkbox button */}
-                            <button
-                              type="button"
-                              onClick={() => handleToggleSelect(index)}
-                              className="p-1 hover:bg-zinc-900 rounded-lg transition-colors cursor-pointer"
-                              title={isSelected ? 'Deselect movie' : 'Select movie'}
+                      {/* The physical cinematic shelf container */}
+                      <div className="relative pt-6 pb-2 px-6 bg-gradient-to-b from-zinc-950/20 to-zinc-950/80 border border-zinc-900 rounded-3xl overflow-hidden shadow-inner">
+                        
+                        {/* Posters grid standing on the shelf */}
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 relative z-10">
+                          {list.map((movie, movieIdx) => (
+                            <motion.div
+                              key={movie.title}
+                              initial={{ opacity: 0, y: -60, rotate: -3 }}
+                              animate={{ opacity: 1, y: 0, rotate: 0 }}
+                              transition={{ 
+                                delay: (shelfIdx * 0.2) + (movieIdx * 0.15),
+                                type: "spring",
+                                stiffness: 90,
+                                damping: 14
+                              }}
+                              className="group relative flex flex-col items-center justify-end"
                             >
-                              {isSelected ? (
-                                <CheckSquare className="w-5.5 h-5.5 text-emerald-400 fill-emerald-500/10" />
-                              ) : (
-                                <Square className="w-5.5 h-5.5 text-zinc-600 hover:text-zinc-400" />
-                              )}
-                            </button>
+                              {/* Glowing background reflect under the card */}
+                              <div className="absolute -bottom-4 w-12 h-6 bg-blue-500/20 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
 
-                            {/* Poster container with hover dynamic zoom */}
-                            <div 
-                              onClick={() => handleToggleSelect(index)}
-                              className="w-16 h-24 rounded-xl overflow-hidden bg-zinc-900 border border-zinc-800 shadow-md relative group/poster cursor-pointer shrink-0"
-                            >
-                              <img
-                                src={movie.posterUrl}
-                                alt={movie.title}
-                                referrerPolicy="no-referrer"
-                                className="w-full h-full object-cover transition-transform duration-300 group-hover/poster:scale-110"
-                              />
-                              {/* Soft checkbox highlight overlay */}
-                              {isSelected && (
-                                <div className="absolute inset-0 bg-emerald-500/10 border-2 border-emerald-400/35 rounded-xl pointer-events-none" />
-                              )}
-                            </div>
-                          </div>
-
-                          {/* Right Column: Complete movie details */}
-                          <div className="flex-1 min-w-0 space-y-2.5">
-                            <div className="flex items-start justify-between gap-3">
-                              <div onClick={() => handleToggleSelect(index)} className="cursor-pointer">
-                                <h3 className="text-base font-bold text-white tracking-wide truncate flex items-center gap-2 group-hover:text-emerald-400 transition-colors">
-                                  {movie.title}
-                                  <span className="text-xs font-mono font-medium text-zinc-500">
-                                    ({movie.year})
+                              {/* Poster Wrapper */}
+                              <div className="relative w-full aspect-[2/3] rounded-xl overflow-hidden border border-zinc-800 shadow-xl group-hover:scale-[1.03] transition-all duration-300">
+                                <img 
+                                  src={movie.posterUrl} 
+                                  alt={movie.title} 
+                                  referrerPolicy="no-referrer"
+                                  className="w-full h-full object-cover" 
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent" />
+                                
+                                {/* Stream logo tag */}
+                                {movie.streamingServices && movie.streamingServices.length > 0 && (
+                                  <span className="absolute bottom-2 left-2 text-[8px] font-mono font-bold bg-zinc-950/90 border border-zinc-850 px-2 py-0.5 rounded text-blue-400 uppercase">
+                                    {movie.streamingServices[0]}
                                   </span>
-                                </h3>
-                                <p className="text-xs text-zinc-400 font-medium font-sans">
-                                  Directed by <span className="text-zinc-300">{movie.director}</span>
+                                )}
+
+                                {/* Rating stamp */}
+                                <span className="absolute top-2 right-2 text-[8px] font-mono font-bold bg-black/80 px-1.5 py-0.2 rounded text-amber-400">
+                                  ★ {movie.rating}
+                                </span>
+                              </div>
+
+                              {/* Simple floating label */}
+                              <div className="w-full text-center mt-2.5 space-y-0.5 px-1 pb-1">
+                                <h4 className="text-[11px] font-bold text-zinc-200 group-hover:text-white truncate">
+                                  {movie.title}
+                                </h4>
+                                <p className="text-[9px] text-zinc-500 font-mono font-semibold uppercase leading-none">
+                                  {movie.year}
                                 </p>
                               </div>
+                            </motion.div>
+                          ))}
+                        </div>
 
-                              {/* Interactive controls */}
-                              <div className="flex items-center gap-1.5 shrink-0">
-                                <button
-                                  onClick={() => handleStartEdit(index)}
-                                  className="p-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-blue-400 rounded-lg transition-all cursor-pointer"
-                                  title="Edit movie info"
-                                >
-                                  <Edit3 className="w-3.5 h-3.5" />
-                                </button>
-                                <button
-                                  onClick={() => handleRemoveFromPreview(index)}
-                                  className="p-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-red-400 rounded-lg transition-all cursor-pointer"
-                                  title="Remove from extraction list"
-                                >
-                                  <Trash className="w-3.5 h-3.5" />
-                                </button>
-                              </div>
-                            </div>
+                        {/* Physical Wood/Metallic Shelf Base Line */}
+                        <div className="mt-2 h-2.5 w-full bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-900 border-t border-zinc-700/60 rounded-full shadow-[0_4px_10px_rgba(0,0,0,0.5)]" />
+                      </div>
+                    </div>
+                  ))}
+                </motion.div>
+              ) : (
+                
+                /* INTERACTIVE EXPERIENCE B: DETAILED LIST & MANUAL FIELD ADJUSTMENT BOARD */
+                <motion.div
+                  key="detailed-list-view"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="space-y-4"
+                >
+                  {/* Search and control subheader */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                    <div className="relative">
+                      <Search className="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="text"
+                        value={previewSearch}
+                        onChange={(e) => setPreviewSearch(e.target.value)}
+                        placeholder="Search title, genre, synopsis, or vibe..."
+                        className="w-full bg-zinc-900/40 border border-zinc-900 focus:border-zinc-850 text-xs text-white rounded-xl pl-9 pr-8 py-2.5 outline-none transition-all"
+                      />
+                      {previewSearch && (
+                        <button
+                          onClick={() => setPreviewSearch('')}
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 hover:bg-zinc-850 rounded text-zinc-400"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
 
-                            {/* Synopsis / recommendation highlight */}
-                            <p className="text-xs text-zinc-300 leading-relaxed font-sans font-normal line-clamp-2">
-                              {movie.synopsis}
-                            </p>
+                    <div className="flex items-center justify-between md:justify-end gap-4 bg-zinc-900/20 border border-zinc-900/60 rounded-xl px-4 py-2">
+                      <div className="text-xs font-mono text-zinc-400">
+                        Selected:{' '}
+                        <span className="text-emerald-400 font-bold">
+                          {previewMovies.filter((_, idx) => selectedIndices[idx]).length}
+                        </span>{' '}
+                        of{' '}
+                        <span className="text-white font-bold">{previewMovies.length}</span>
+                      </div>
 
-                            {/* Grid Metadata row: Genre, Vibe, Rating, Runtime, Confidence */}
-                            <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                              {/* Vibe tag */}
-                              <span className="text-[10px] font-mono font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded-md uppercase tracking-wider">
-                                {movie.vibe}
-                              </span>
+                      <button
+                        onClick={handleToggleSelectAll}
+                        className="text-[9px] font-mono font-bold uppercase tracking-wider text-blue-400 hover:text-blue-300 transition-colors bg-zinc-900/80 px-2.5 py-1 rounded-lg border border-zinc-800"
+                      >
+                        {previewMovies.every((_, idx) => selectedIndices[idx]) ? 'Deselect All' : 'Select All'}
+                      </button>
+                    </div>
+                  </div>
 
-                              {/* Genre pills */}
-                              {movie.genres.map((g) => (
-                                <span 
-                                  key={g} 
-                                  className="text-[10px] font-sans font-medium bg-zinc-900 text-zinc-400 px-2 py-0.5 rounded-md border border-zinc-850"
-                                >
-                                  {g}
-                                </span>
-                              ))}
+                  {/* List of cards */}
+                  <div className="space-y-4 max-h-[460px] overflow-y-auto pr-1">
+                    {previewMovies.map((movie, index) => {
+                      const isEditing = editingIndex === index;
+                      const isSelected = !!selectedIndices[index];
+                      
+                      if (previewSearch.trim()) {
+                        const query = previewSearch.toLowerCase();
+                        const matchesTitle = movie.title.toLowerCase().includes(query);
+                        const matchesSynopsis = movie.synopsis.toLowerCase().includes(query);
+                        const matchesVibe = movie.vibe.toLowerCase().includes(query);
+                        if (!matchesTitle && !matchesSynopsis && !matchesVibe) return null;
+                      }
 
-                              {/* Rating */}
-                              <span className="text-[10px] font-mono font-semibold text-amber-400 bg-amber-500/5 px-2 py-0.5 rounded-md border border-amber-500/15 flex items-center gap-1">
-                                ⭐ {movie.rating}
-                              </span>
+                      const confidenceVal = movie.confidence || 95;
+                      const confidenceColor = confidenceVal >= 92 
+                        ? 'text-emerald-400 bg-emerald-500/5 border-emerald-500/10' 
+                        : 'text-amber-400 bg-amber-500/5 border-amber-500/10';
 
-                              {/* Runtime display with Clock */}
-                              {movie.runtime && (
-                                <span className="text-[10px] font-mono font-medium text-purple-400 bg-purple-500/5 px-2 py-0.5 rounded-md border border-purple-500/15 flex items-center gap-1">
-                                  <Clock className="w-3 h-3" />
-                                  {movie.runtime}
-                                </span>
-                              )}
-
-                              {/* Confidence Score display with Indicator Gauge */}
-                              <span className={`text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md border flex items-center gap-1.5 ${confidenceColor}`}>
-                                <Gauge className="w-3 h-3" />
-                                <span>{confidenceVal}% Match</span>
-                              </span>
-                            </div>
-
-                            {/* OTT Badge Services row */}
-                            {movie.streamingServices && movie.streamingServices.length > 0 && (
-                              <div className="pt-1.5 flex items-center gap-2">
-                                <span className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-wider shrink-0">
-                                  Streams On:
-                                </span>
-                                <div className="flex flex-wrap gap-1">
-                                  {movie.streamingServices.map((srv) => (
-                                    <span 
-                                      key={srv} 
-                                      className="bg-zinc-900 text-zinc-300 border border-zinc-800 hover:border-zinc-700 transition-colors px-2 py-0.5 rounded-md font-mono text-[9px] font-semibold uppercase tracking-wider"
-                                    >
-                                      {srv}
-                                    </span>
-                                  ))}
+                      return (
+                        <div
+                          key={index}
+                          className={`border rounded-2xl p-4 md:p-5 transition-all relative ${
+                            isEditing 
+                              ? 'border-blue-500 bg-zinc-900' 
+                              : isSelected
+                              ? 'border-zinc-800 bg-zinc-900/30'
+                              : 'border-zinc-900 bg-zinc-950/40 opacity-40 hover:opacity-100'
+                          }`}
+                        >
+                          {isEditing ? (
+                            /* Editing Block */
+                            <div className="space-y-4">
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div className="space-y-1">
+                                  <label className="text-[10px] font-mono text-zinc-500 uppercase">Movie Title</label>
+                                  <input 
+                                    type="text" 
+                                    value={editTitle} 
+                                    onChange={(e) => setEditTitle(e.target.value)} 
+                                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2 text-xs text-white" 
+                                  />
+                                </div>
+                                <div className="space-y-1">
+                                  <label className="text-[10px] font-mono text-zinc-500 uppercase">Year</label>
+                                  <input 
+                                    type="number" 
+                                    value={editYear} 
+                                    onChange={(e) => setEditYear(Number(e.target.value))} 
+                                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2 text-xs text-white" 
+                                  />
+                                </div>
+                                <div className="space-y-1">
+                                  <label className="text-[10px] font-mono text-zinc-500 uppercase">Director</label>
+                                  <input 
+                                    type="text" 
+                                    value={editDirector} 
+                                    onChange={(e) => setEditDirector(e.target.value)} 
+                                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2 text-xs text-white" 
+                                  />
                                 </div>
                               </div>
-                            )}
 
-                            {/* Highlighted reason */}
-                            {movie.whySave && (
-                              <div className="bg-zinc-900/40 border border-zinc-900/60 rounded-xl px-3 py-2 text-[11px] text-zinc-400 italic flex items-start gap-1.5 leading-relaxed">
-                                <span className="text-blue-400 font-bold font-serif">“</span>
-                                <span>{movie.whySave}</span>
-                                <span className="text-blue-400 font-bold font-serif">”</span>
+                              <div className="space-y-1">
+                                <label className="text-[10px] font-mono text-zinc-500 uppercase">Synopsis</label>
+                                <textarea 
+                                  value={editSynopsis} 
+                                  onChange={(e) => setEditSynopsis(e.target.value)} 
+                                  rows={2}
+                                  className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2 text-xs text-white resize-none" 
+                                />
                               </div>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                    </motion.div>
-                  );
-                })}
-              </motion.div>
-            </div>
 
-            {/* Premium CTA Bottom Actions Panel */}
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-5 border-t border-zinc-900">
-              <div className="text-left w-full md:w-auto">
-                <p className="text-[10px] text-zinc-500 uppercase tracking-widest font-mono font-bold">
+                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                <div className="space-y-1">
+                                  <label className="text-[10px] font-mono text-zinc-500 uppercase">Vibe</label>
+                                  <input 
+                                    type="text" 
+                                    value={editVibe} 
+                                    onChange={(e) => setEditVibe(e.target.value)} 
+                                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2 text-xs text-white" 
+                                  />
+                                </div>
+                                <div className="space-y-1">
+                                  <label className="text-[10px] font-mono text-zinc-500 uppercase">Rating</label>
+                                  <input 
+                                    type="text" 
+                                    value={editRating} 
+                                    onChange={(e) => setEditRating(e.target.value)} 
+                                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2 text-xs text-white" 
+                                  />
+                                </div>
+                                <div className="space-y-1">
+                                  <label className="text-[10px] font-mono text-zinc-500 uppercase">Genres</label>
+                                  <input 
+                                    type="text" 
+                                    value={editGenres} 
+                                    onChange={(e) => setEditGenres(e.target.value)} 
+                                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2 text-xs text-white" 
+                                  />
+                                </div>
+                                <div className="space-y-1">
+                                  <label className="text-[10px] font-mono text-zinc-500 uppercase">Streaming</label>
+                                  <input 
+                                    type="text" 
+                                    value={editStreaming} 
+                                    onChange={(e) => setEditStreaming(e.target.value)} 
+                                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2 text-xs text-white" 
+                                  />
+                                </div>
+                              </div>
+
+                              <div className="flex justify-end gap-2 pt-2">
+                                <button 
+                                  onClick={handleCancelEdit} 
+                                  className="px-3 py-1.5 rounded bg-zinc-850 hover:bg-zinc-800 text-xs font-mono font-bold uppercase tracking-wider text-zinc-400"
+                                >
+                                  Cancel
+                                </button>
+                                <button 
+                                  onClick={() => handleSaveEdit(index)} 
+                                  className="px-4 py-1.5 rounded bg-blue-600 hover:bg-blue-500 text-xs font-mono font-bold uppercase tracking-wider text-white"
+                                >
+                                  Save Change
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            /* Standard Card Display */
+                            <div className="flex gap-4">
+                              <div className="flex items-start pt-1">
+                                <button
+                                  type="button"
+                                  onClick={() => handleToggleSelect(index)}
+                                  className={`p-1 rounded-lg border transition-all cursor-pointer ${
+                                    isSelected 
+                                      ? 'border-emerald-500 text-emerald-400 bg-emerald-500/10' 
+                                      : 'border-zinc-800 text-zinc-600 hover:text-zinc-400'
+                                  }`}
+                                >
+                                  <Check className="w-4 h-4" />
+                                </button>
+                              </div>
+
+                              <div className="w-16 h-24 rounded-lg overflow-hidden shrink-0 border border-zinc-850 bg-zinc-900 shadow-md">
+                                <img src={movie.posterUrl} alt={movie.title} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+                              </div>
+
+                              <div className="flex-1 space-y-2 text-left">
+                                <div className="flex items-start justify-between gap-4">
+                                  <div>
+                                    <h4 className="text-sm font-bold text-white font-sans">{movie.title}</h4>
+                                    <p className="text-[10px] text-zinc-500 font-mono mt-0.5">
+                                      Directed by {movie.director} • {movie.year}
+                                    </p>
+                                  </div>
+
+                                  <div className="flex items-center gap-1.5 shrink-0">
+                                    <button
+                                      onClick={() => handleStartEdit(index)}
+                                      className="p-1.5 hover:bg-zinc-900 rounded-lg text-zinc-400 hover:text-white transition-colors"
+                                      title="Edit Movie details"
+                                    >
+                                      <Edit3 className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button
+                                      onClick={() => handleRemoveFromPreview(index)}
+                                      className="p-1.5 hover:bg-zinc-900 rounded-lg text-rose-500 hover:text-rose-400 transition-colors"
+                                      title="Remove from selection"
+                                    >
+                                      <Trash className="w-3.5 h-3.5" />
+                                    </button>
+                                  </div>
+                                </div>
+
+                                <p className="text-xs text-zinc-400 leading-relaxed">
+                                  {movie.synopsis}
+                                </p>
+
+                                <div className="flex flex-wrap items-center gap-1.5">
+                                  <span className="text-[9px] font-mono font-bold bg-blue-500/10 text-blue-400 border border-blue-500/15 px-2 py-0.5 rounded uppercase">
+                                    {movie.vibe}
+                                  </span>
+                                  {movie.genres.slice(0, 2).map(g => (
+                                    <span key={g} className="text-[9px] font-sans bg-zinc-900 border border-zinc-850 px-2 py-0.5 rounded text-zinc-400 font-medium">
+                                      {g}
+                                    </span>
+                                  ))}
+                                  <span className="text-[9px] font-mono text-amber-400 bg-amber-500/5 px-2 py-0.5 border border-amber-500/15 rounded font-bold">
+                                    ⭐ {movie.rating}
+                                  </span>
+                                  <span className={`text-[9px] font-mono font-bold px-2 py-0.5 rounded border ${confidenceColor}`}>
+                                    {confidenceVal}% Match
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Bottom Actions Panel */}
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-6 border-t border-zinc-900">
+              <div className="text-left w-full md:w-auto space-y-0.5">
+                <p className="text-[9px] text-zinc-500 uppercase tracking-widest font-mono font-bold">
                   Extracted Social Source
                 </p>
                 <p className="text-xs text-zinc-300 font-medium truncate max-w-[280px]">
@@ -1092,35 +1154,85 @@ export default function AddMovieInput({
                 </p>
               </div>
 
-              {/* Save Selected and Save All actions */}
-              <div className="flex flex-wrap sm:flex-nowrap gap-2.5 w-full md:w-auto">
+              <div className="flex flex-wrap sm:flex-nowrap gap-3 w-full md:w-auto">
                 <button
                   type="button"
                   onClick={() => setPreviewMovies(null)}
-                  className="flex-1 sm:flex-none border border-zinc-800 hover:bg-zinc-900 text-zinc-300 hover:text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition-all cursor-pointer"
+                  className="flex-1 sm:flex-none border border-zinc-800 hover:bg-zinc-900 text-zinc-300 hover:text-white text-xs font-mono font-bold uppercase tracking-wider px-5 py-3 rounded-2xl transition-all cursor-pointer"
                 >
                   Discard All
                 </button>
 
-                <button
-                  type="button"
-                  onClick={handleSaveSelected}
-                  className="flex-1 sm:flex-none bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 hover:border-zinc-700 text-white text-xs font-semibold px-5 py-2.5 rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer"
-                >
-                  <Check className="w-4 h-4 text-emerald-400" />
-                  <span>
-                    Save Selected ({previewMovies.filter((_, idx) => selectedIndices[idx]).length})
-                  </span>
-                </button>
+                {viewMode === 'detailed-list' && (
+                  <button
+                    type="button"
+                    onClick={handleSaveSelected}
+                    className="flex-1 sm:flex-none bg-zinc-900 hover:bg-zinc-850 border border-zinc-850 text-white text-xs font-mono font-bold uppercase tracking-wider px-5 py-3 rounded-2xl flex items-center justify-center gap-2 transition-all cursor-pointer"
+                  >
+                    <Check className="w-4 h-4 text-emerald-400" />
+                    <span>Save Selected ({previewMovies.filter((_, idx) => selectedIndices[idx]).length})</span>
+                  </button>
+                )}
 
                 <button
                   type="button"
                   onClick={handleSaveAll}
-                  className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-6 py-2.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-500/15 cursor-pointer hover:shadow-blue-500/25"
+                  className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-500 text-white text-xs font-mono font-bold tracking-widest uppercase px-8 py-3.5 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-xl shadow-blue-500/20 cursor-pointer border border-blue-400/10 hover:scale-[1.01]"
                 >
-                  <Sparkles className="w-4 h-4 text-white" />
-                  <span>Save All ({previewMovies.length})</span>
+                  <Sparkles className="w-4 h-4 text-white animate-spin-slow" />
+                  <span>Commit to Cinema Vault ({previewMovies.length})</span>
                 </button>
+              </div>
+            </div>
+
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 1.2s Flight Vaulting Animation Overlay (Delight Moment 1) */}
+      <AnimatePresence>
+        {isCommitting && previewMovies && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-zinc-950/95 backdrop-blur-md z-[100] flex flex-col items-center justify-center p-6"
+          >
+            <div className="text-center space-y-6 relative">
+              {/* Dynamic Vault Lock Sparkle */}
+              <div className="relative w-16 h-16 mx-auto flex items-center justify-center">
+                <div className="absolute inset-0 rounded-full border border-dashed border-purple-500/35 animate-spin-slow" />
+                <Sparkles className="w-6 h-6 text-purple-400 animate-pulse" />
+              </div>
+              
+              <div className="space-y-1.5">
+                <h3 className="text-sm font-display font-bold tracking-widest text-white uppercase leading-none">Vaulting Cinema...</h3>
+                <p className="text-[10px] text-zinc-500 font-mono uppercase tracking-wider">Securing social reels directly to shelves</p>
+              </div>
+
+              {/* Poster thumbnails sailing upwards */}
+              <div className="flex gap-4 items-center justify-center pt-4 overflow-hidden h-36">
+                {previewMovies.slice(0, 4).map((movie, idx) => (
+                  <motion.div
+                    key={movie.title + idx}
+                    initial={{ y: 120, scale: 0.7, opacity: 0, rotate: idx % 2 === 0 ? -10 : 10 }}
+                    animate={{ 
+                      y: [120, 0, -200], 
+                      scale: [0.7, 1.05, 0.25], 
+                      opacity: [0, 1, 0],
+                      rotate: idx % 2 === 0 ? [ -10, 0, 15 ] : [ 10, 0, -15 ]
+                    }}
+                    transition={{
+                      duration: 1.1,
+                      times: [0, 0.35, 1],
+                      ease: "easeInOut",
+                      delay: idx * 0.1
+                    }}
+                    className="w-14 h-20 rounded-lg overflow-hidden border border-zinc-800 shadow-2xl relative shrink-0 bg-zinc-900"
+                  >
+                    <img src={movie.posterUrl} alt="" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+                  </motion.div>
+                ))}
               </div>
             </div>
           </motion.div>

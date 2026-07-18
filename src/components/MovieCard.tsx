@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React from 'react';
-import { motion } from 'motion/react';
+import React, { useState } from 'react';
+import { motion, useMotionValue, useTransform } from 'motion/react';
 import { 
   Check, 
   Trash2, 
@@ -34,6 +34,29 @@ interface MovieCardProps {
 }
 
 export default function MovieCard({ movie, onToggleWatched, onDelete, onSelect }: MovieCardProps) {
+  // 3D Tilt motion state
+  const x = useMotionValue(0.5);
+  const y = useMotionValue(0.5);
+
+  const rotateX = useTransform(y, [0, 1], [6, -6]);
+  const rotateY = useTransform(x, [0, 1], [-6, 6]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = e.currentTarget;
+    const rect = el.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    x.set(mouseX / width);
+    y.set(mouseY / height);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0.5);
+    y.set(0.5);
+  };
+
   // Map social platforms to specific tailwind styles and glowing accents
   const getSocialStyle = (platform: Movie['socialSource']['platform']) => {
     switch (platform) {
@@ -97,14 +120,38 @@ export default function MovieCard({ movie, onToggleWatched, onDelete, onSelect }
       initial={{ opacity: 0, scale: 0.95, y: 15 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95, y: 15 }}
-      whileHover={{ y: -6, transition: { duration: 0.25, ease: 'easeOut' } }}
+      whileHover={{ y: -8, scale: 1.015, transition: { type: 'spring', stiffness: 400, damping: 25 } }}
+      whileTap={{ scale: 0.985 }}
+      style={{
+        rotateX,
+        rotateY,
+        transformStyle: 'preserve-3d',
+      }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
       onClick={() => onSelect(movie)}
-      className={`group relative bg-zinc-950 border rounded-2xl overflow-hidden transition-all duration-300 flex flex-col h-[520px] cursor-pointer ${
+      className={`group relative bg-[rgba(24,24,24,0.92)] border border-[rgba(255,255,255,0.05)] rounded-[24px] overflow-hidden transition-all duration-300 flex flex-col h-[520px] cursor-pointer hover:bg-[#202020] hover:shadow-[0px_18px_40px_rgba(0,0,0,0.35)] ${
         movie.watched 
-          ? 'border-zinc-900/80 shadow-none opacity-50 hover:opacity-80' 
-          : 'border-zinc-900 hover:border-zinc-700/60 shadow-xl hover:shadow-2xl'
-      } ${social.hoverGlow}`}
+          ? 'opacity-50 hover:opacity-80' 
+          : ''
+      }`}
     >
+      {/* 3D Glass shine-sweep on hover */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden z-20">
+        <div className="absolute -inset-y-12 -left-1/2 w-12 bg-white/10 blur-[16px] rotate-[30deg] transform translate-x-[-100%] group-hover:translate-x-[400%] transition-transform duration-[1.2s] ease-out" />
+      </div>
+
+      {/* Holographic light reflection overlay guided by mouse */}
+      <motion.div 
+        className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-[0.06] transition-opacity duration-300 bg-gradient-to-tr from-white via-transparent to-white z-20"
+        style={{
+          background: useTransform(
+            [x, y],
+            ([currX, currY]) => `radial-gradient(circle at ${(currX as number) * 100}% ${(currY as number) * 100}%, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 65%)`
+          )
+        }}
+      />
+
       {/* 1. Large Poster Section (Pinterest-meets-Spotify Cover style) */}
       <div className="relative h-64 shrink-0 overflow-hidden bg-zinc-900 group-hover:shadow-[0_20px_50px_rgba(0,0,0,0.8)] transition-all">
         <img
@@ -245,7 +292,7 @@ export default function MovieCard({ movie, onToggleWatched, onDelete, onSelect }
           {/* Quick Specifications: Language, Runtime, Genres */}
           <div className="flex flex-wrap gap-1.5 pt-1">
             {/* Language */}
-            <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-purple-400 bg-purple-500/10 border border-purple-500/20 px-2 py-0.5 rounded flex items-center gap-1">
+            <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-blue-400 bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded flex items-center gap-1">
               <Languages className="w-2.5 h-2.5" />
               {movie.language || 'English'}
             </span>

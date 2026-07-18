@@ -10,6 +10,61 @@
   --animate-shimmer: shimmer 2.5s infinite linear;
   --animate-pulse-slow: pulse-slow 3s infinite ease-in-out;
 
+  /* Premium Cinematic Dark design tokens */
+  --color-zinc-950: #090909;
+  --color-zinc-900: #111111;
+  --color-zinc-850: #161616;
+  --color-zinc-800: #1C1C1C;
+  --color-zinc-700: #222222;
+  --color-black: #090909;
+
+  /* Premium High-Contrast Typography design tokens */
+  --color-white: #F5F5F5;
+  --color-zinc-50: #F5F5F5;
+  --color-zinc-100: #F5F5F5;
+  --color-zinc-200: #D0D0D0;
+  --color-zinc-300: #D0D0D0;
+  --color-zinc-400: #B0B0B0;
+  --color-zinc-500: #7B7B7B;
+  --color-zinc-600: #555555;
+
+  /* Cinema Gold Palette overriding blue, indigo, and purple */
+  --color-blue-50: #FCF9F2;
+  --color-blue-100: #F5EDD0;
+  --color-blue-200: #ECDBA5;
+  --color-blue-300: #E5C65A; /* Hover */
+  --color-blue-400: #E5C65A; /* Hover */
+  --color-blue-500: #D4AF37; /* Primary Gold */
+  --color-blue-600: #D4AF37; /* Primary Gold */
+  --color-blue-700: #B99124; /* Pressed */
+  --color-blue-800: #B99124; /* Pressed */
+  --color-blue-900: #886815;
+  --color-blue-950: #1C1505;
+
+  --color-indigo-50: #FCF9F2;
+  --color-indigo-100: #F5EDD0;
+  --color-indigo-200: #ECDBA5;
+  --color-indigo-300: #E5C65A; /* Hover */
+  --color-indigo-400: #E5C65A; /* Hover */
+  --color-indigo-500: #D4AF37; /* Primary Gold */
+  --color-indigo-600: #D4AF37; /* Primary Gold */
+  --color-indigo-700: #B99124; /* Pressed */
+  --color-indigo-800: #B99124; /* Pressed */
+  --color-indigo-900: #886815;
+  --color-indigo-950: #1C1505;
+
+  --color-purple-50: #FAF5FF;
+  --color-purple-100: #F3E8FF;
+  --color-purple-200: #E9D5FF;
+  --color-purple-300: #B48BFF; /* Hover */
+  --color-purple-400: #B48BFF; /* Hover */
+  --color-purple-500: #9F6BFF; /* Primary Purple */
+  --color-purple-600: #9F6BFF; /* Primary Purple */
+  --color-purple-700: #8040FF; /* Pressed */
+  --color-purple-800: #6620FF; /* Pressed */
+  --color-purple-900: #4C0DF5;
+  --color-purple-950: #1A0066;
+
   @keyframes shimmer {
     0% { background-position: -200% 0; }
     100% { background-position: 200% 0; }
@@ -22,8 +77,8 @@
 
 /* Beautiful custom styling overrides for premium feels */
 body {
-  background-color: #09090b;
-  color: #f4f4f5;
+  background-color: #090909;
+  color: #D0D0D0;
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
@@ -35,13 +90,189 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #09090b;
+  background: #090909;
 }
 ::-webkit-scrollbar-thumb {
-  background: #27272a;
+  background: #1C1C1C;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #3f3f46;
+  background: #222222;
 }
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* --- PREMIUM USER COMPLIANT INPUTS & BUTTONS OVERRIDES --- */
+
+/* All standard text/search/URL/number inputs and textareas and select dropdown containers */
+input[type="text"]:not([class*="bg-transparent"]),
+input[type="number"]:not([class*="bg-transparent"]),
+input[type="url"]:not([class*="bg-transparent"]),
+input[type="search"]:not([class*="bg-transparent"]),
+input[type="password"]:not([class*="bg-transparent"]),
+input[type="email"]:not([class*="bg-transparent"]),
+input:not([type]):not([class*="bg-transparent"]),
+textarea:not([class*="bg-transparent"]),
+select:not([class*="bg-transparent"]),
+.custom-input {
+  background-color: #141414 !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  color: #F5F5F5 !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+/* Filter select container divs in the Library refine panel */
+div.flex.items-center.bg-zinc-900\/50 {
+  background-color: #141414 !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  transition: all 0.2s ease-in-out !important;
+}
+div.flex.items-center.bg-zinc-900\/50:hover,
+div.flex.items-center.bg-zinc-900\/50:focus-within {
+  border-color: #D4AF37 !important;
+}
+
+/* Focused border color state */
+input[type="text"]:not([class*="bg-transparent"]):focus,
+input[type="number"]:not([class*="bg-transparent"]):focus,
+input[type="url"]:not([class*="bg-transparent"]):focus,
+input[type="search"]:not([class*="bg-transparent"]):focus,
+input[type="password"]:not([class*="bg-transparent"]):focus,
+input[type="email"]:not([class*="bg-transparent"]):focus,
+input:not([type]):not([class*="bg-transparent"]):focus,
+textarea:not([class*="bg-transparent"]):focus,
+select:not([class*="bg-transparent"]):focus,
+.custom-input:focus {
+  border-color: #D4AF37 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 1px #D4AF37 !important;
+}
+
+/* Placholder styling matching requirements exactly */
+input::placeholder,
+textarea::placeholder,
+.custom-input::placeholder {
+  color: #6D6D6D !important;
+  opacity: 1 !important; /* browser override */
+}
+
+/* Primary Button Styling */
+button.bg-blue-600,
+button.bg-indigo-600,
+button.bg-white:not([class*="bg-zinc-950"]):not([class*="rounded-full"]),
+button.bg-emerald-600,
+button.bg-gradient-to-r,
+a.bg-blue-600,
+a.bg-indigo-600,
+a.bg-white:not([class*="bg-zinc-950"]),
+div.bg-blue-600,
+[class*="bg-blue-600"],
+[class*="bg-indigo-600"],
+.btn-primary {
+  background-color: #D4AF37 !important;
+  background-image: none !important; /* clear secondary gradients */
+  color: #090909 !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* Primary Button Hover Styling */
+button.bg-blue-600:hover,
+button.bg-indigo-600:hover,
+button.bg-white:not([class*="bg-zinc-950"]):not([class*="rounded-full"]):hover,
+button.bg-emerald-600:hover,
+button.bg-gradient-to-r:hover,
+a.bg-blue-600:hover,
+a.bg-indigo-600:hover,
+a.bg-white:not([class*="bg-zinc-950"]):hover,
+[class*="bg-blue-600"]:hover,
+[class*="bg-indigo-600"]:hover,
+.btn-primary:hover {
+  background-color: #E7C75F !important;
+  background-image: none !important;
+  color: #090909 !important;
+}
+
+/* Ensure text and SVG icons inside primary buttons turn dark #090909 */
+button.bg-blue-600 svg,
+button.bg-indigo-600 svg,
+button.bg-white:not([class*="bg-zinc-950"]):not([class*="rounded-full"]) svg,
+button.bg-emerald-600 svg,
+button.bg-gradient-to-r svg,
+a.bg-blue-600 svg,
+a.bg-indigo-600 svg,
+a.bg-white:not([class*="bg-zinc-950"]) svg,
+[class*="bg-blue-600"] svg,
+[class*="bg-indigo-600"] svg,
+.btn-primary svg {
+  color: #090909 !important;
+  stroke: #090909 !important;
+}
+
+/* Secondary Button Styling */
+button.bg-zinc-900,
+button.bg-zinc-950,
+button.border-zinc-800,
+button.border-zinc-850,
+button.bg-zinc-900\/80,
+button.bg-zinc-900\/60,
+button.bg-zinc-900\/40,
+a.bg-zinc-900,
+a.bg-zinc-950,
+a.border-zinc-800,
+a.border-zinc-850,
+a.bg-zinc-900\/80,
+button[class*="border-zinc-"]:not([class*="rounded-full"]),
+button[class*="bg-zinc-"]:not([class*="rounded-full"]),
+a[class*="border-zinc-"],
+a[class*="bg-zinc-"],
+.btn-secondary {
+  background-color: #181818 !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  color: #F5F5F5 !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* Secondary Button Hover Styling */
+button.bg-zinc-900:hover,
+button.bg-zinc-950:hover,
+button.border-zinc-800:hover,
+button.border-zinc-850:hover,
+button.bg-zinc-900\/80:hover,
+button.bg-zinc-900\/60:hover,
+button.bg-zinc-900\/40:hover,
+a.bg-zinc-900:hover,
+a.bg-zinc-950:hover,
+a.border-zinc-800:hover,
+a.border-zinc-850:hover,
+a.bg-zinc-900\/80:hover,
+button[class*="border-zinc-"]:not([class*="rounded-full"]):hover,
+button[class*="bg-zinc-"]:not([class*="rounded-full"]):hover,
+a[class*="border-zinc-"]:hover,
+a[class*="bg-zinc-"]:hover,
+.btn-secondary:hover {
+  background-color: #202020 !important;
+  color: #F5F5F5 !important;
+}
+
+/* Ensure icons inside secondary buttons are high-contrast off-white #F5F5F5 */
+button.bg-zinc-900 svg,
+button.bg-zinc-950 svg,
+button.border-zinc-800 svg,
+button.border-zinc-850 svg,
+[class*="bg-zinc-"] svg,
+[class*="border-zinc-"] svg,
+.btn-secondary svg {
+  color: #F5F5F5 !important;
+  stroke: #F5F5F5 !important;
+}
+
 

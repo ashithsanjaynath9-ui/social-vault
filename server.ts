@@ -212,6 +212,209 @@ Extract all movies and match the schema structure. Ensure high quality streaming
   }
 });
 
+// Dynamic Personalized Recommendations endpoint
+app.post('/api/recommend', async (req, res) => {
+  try {
+    const { savedMovies } = req.body; // Array of titles, e.g. ["Interstellar", "Whiplash"]
+    const titlesList = (savedMovies || []).map((t: any) => typeof t === 'string' ? t : t.title).filter(Boolean);
+
+    // Dynamic posters map for recommended movies
+    const postersMap: Record<string, string> = {
+      'arrival': 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80',
+      'shutter island': 'https://images.unsplash.com/photo-1505635552518-3448ff116af3?auto=format&fit=crop&w=600&q=80',
+      'lost in translation': 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80',
+      'nightcrawler': 'https://images.unsplash.com/photo-1515462277126-270d878326e5?auto=format&fit=crop&w=600&q=80',
+      'prisoners': 'https://images.unsplash.com/photo-1509248961158-e54f6934749c?auto=format&fit=crop&w=600&q=80',
+      'inception': 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=600&q=80',
+      'coherence': 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=600&q=80',
+    };
+
+    const getPosterForRecommended = (title: string, genres: string[]): string => {
+      const lower = title.toLowerCase();
+      for (const [key, val] of Object.entries(postersMap)) {
+        if (lower.includes(key)) return val;
+      }
+      
+      // Genre-based falling back
+      const genreKeywords: Record<string, string> = {
+        'sci-fi': 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80',
+        'horror': 'https://images.unsplash.com/photo-1509248961158-e54f6934749c?auto=format&fit=crop&w=600&q=80',
+        'thriller': 'https://images.unsplash.com/photo-1505635552518-3448ff116af3?auto=format&fit=crop&w=600&q=80',
+        'comedy': 'https://images.unsplash.com/photo-1514306191717-452ec28c7814?auto=format&fit=crop&w=600&q=80',
+        'drama': 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80',
+        'action': 'https://images.unsplash.com/photo-1515462277126-270d878326e5?auto=format&fit=crop&w=600&q=80',
+      };
+      const primary = genres?.[0]?.toLowerCase() || '';
+      return genreKeywords[primary] || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80';
+    };
+
+    // Attempt calling Gemini
+    try {
+      const ai = getAiClient();
+      
+      const systemInstruction = `You are an elite, highly knowledgeable film critic and recommendation engine.
+Your goal is to suggest 3 premium film recommendations that are NOT in the user's saved list, tailored to their saved movies: [${titlesList.join(', ')}].
+
+For each recommendation, explain exactly WHY they will love it by explicitly referencing the titles they have saved in a beautiful, natural, highly compelling human way.
+Example: "Because you saved Prisoners and Inception, we think you'll love Shutter Island because it matches the thick, brooding atmospheric puzzle of Prisoners and the dreamlike psychological mazes of Inception."
+Do NOT say "AI recommendation". Keep explanations cinematic, precise, and respectful.
+
+For each movie, generate:
+1. title - Recommended movie title.
+2. year - Release year (integer).
+3. director - Director.
+4. synopsis - Intriguing, poetic synopsis (max 2 sentences).
+5. rating - Real rating (e.g., "8.2 IMDb" or "91% RT").
+6. genres - Up to 3 genres.
+7. vibe - A modern, gorgeous vibe tag (max 3 words).
+8. streamingServices - Array of streaming providers.
+9. reason - Explaining why they'll love it based on the saved titles, like: "Because you saved [Saved Movies], we think you'll love [Recommended Movie] because..."
+10. confidence - Match confidence score (integer 75-100).
+11. matchPercentage - Match rating percentage (integer 75-100).
+12. savedReferenceTitles - Array of 1 to 3 saved film titles that this recommendation is directly paired with.
+
+Provide output strictly in JSON matching the schema. No markdown wrapping.`;
+
+      const prompt = `Based on the saved watchlist: [${titlesList.join(', ')}]. Generate 3 cinematic recommendations.`;
+
+      const response = await ai.models.generateContent({
+        model: 'gemini-3.5-flash',
+        contents: prompt,
+        config: {
+          systemInstruction,
+          responseMimeType: 'application/json',
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              recommendations: {
+                type: Type.ARRAY,
+                items: {
+                  type: Type.OBJECT,
+                  properties: {
+                    title: { type: Type.STRING },
+                    year: { type: Type.INTEGER },
+                    director: { type: Type.STRING },
+                    synopsis: { type: Type.STRING },
+                    rating: { type: Type.STRING },
+                    genres: { type: Type.ARRAY, items: { type: Type.STRING } },
+                    vibe: { type: Type.STRING },
+                    streamingServices: { type: Type.ARRAY, items: { type: Type.STRING } },
+                    reason: { type: Type.STRING },
+                    confidence: { type: Type.INTEGER },
+                    matchPercentage: { type: Type.INTEGER },
+                    savedReferenceTitles: { type: Type.ARRAY, items: { type: Type.STRING } }
+                  },
+                  required: [
+                    'title', 'year', 'director', 'synopsis', 'rating', 'genres',
+                    'vibe', 'streamingServices', 'reason', 'confidence', 'matchPercentage', 'savedReferenceTitles'
+                  ]
+                }
+              }
+            },
+            required: ['recommendations']
+          }
+        }
+      });
+
+      const resultText = response.text;
+      if (resultText) {
+        const data = JSON.parse(resultText);
+        const decorated = (data.recommendations || []).map((rec: any) => ({
+          ...rec,
+          posterUrl: getPosterForRecommended(rec.title, rec.genres)
+        }));
+        res.json({ success: true, recommendations: decorated });
+        return;
+      }
+    } catch (apiErr) {
+      console.warn("Gemini recommendation API error or missing key. Using custom recommendation logic.", apiErr);
+    }
+
+    // High fidelity custom curation logic (Fallback)
+    // We select 3 relevant recommendations from our custom list and dynamically build the "WHY" reason
+    const fallbacks = [
+      {
+        title: 'Shutter Island',
+        year: 2010,
+        director: 'Martin Scorsese',
+        synopsis: 'A U.S. Marshal investigates the disappearance of a murderer who escaped from a hospital for the criminally insane on a remote island.',
+        rating: '8.2 IMDb',
+        genres: ['Mystery', 'Thriller', 'Drama'],
+        vibe: 'Psychological Maze',
+        streamingServices: ['Max', 'Prime Video', 'Apple TV'],
+        confidence: 96,
+        matchPercentage: 98,
+        savedReferenceTitles: ['Interstellar', 'Parasite', 'Pans Labyrinth'],
+        posterUrl: 'https://images.unsplash.com/photo-1505635552518-3448ff116af3?auto=format&fit=crop&w=600&q=80'
+      },
+      {
+        title: 'Arrival',
+        year: 2016,
+        director: 'Denis Villeneuve',
+        synopsis: 'A linguist works with the military to communicate with alien lifeforms after twelve mysterious spacecraft land around the world.',
+        rating: '94% RT',
+        genres: ['Sci-Fi', 'Mystery', 'Drama'],
+        vibe: 'Cosmic Introspection',
+        streamingServices: ['Prime Video', 'Apple TV', 'Paramount+'],
+        confidence: 98,
+        matchPercentage: 97,
+        savedReferenceTitles: ['Interstellar', 'Dune: Part Two'],
+        posterUrl: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80'
+      },
+      {
+        title: 'Lost in Translation',
+        year: 2003,
+        director: 'Sofia Coppola',
+        synopsis: 'A faded movie star and a neglected young woman form an unlikely, soulful bond after crossing paths in Tokyo.',
+        rating: '8.4 IMDb',
+        genres: ['Drama', 'Romance'],
+        vibe: 'Dreamy Melancholy',
+        streamingServices: ['Netflix', 'Apple TV'],
+        confidence: 93,
+        matchPercentage: 91,
+        savedReferenceTitles: ['Her', 'Spirited Away'],
+        posterUrl: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80'
+      }
+    ];
+
+    // Customize references based on what the user actually saved, to keep the explanations extremely real
+    const customizedRecommendations = fallbacks.map(rec => {
+      // Find overlap with saved movies
+      const matched = rec.savedReferenceTitles.filter(t => 
+        titlesList.some((saved: string) => saved.toLowerCase().includes(t.toLowerCase()))
+      );
+
+      let reason = '';
+      if (matched.length > 0) {
+        const listStr = matched.map(m => `**${m}**`).join(' and ');
+        if (rec.title === 'Arrival') {
+          reason = `Because you saved ${listStr}, we think you'll love **Arrival** because it shares Denis Villeneuve's gargantuan worldbuilding style and a deeply philosophical atmosphere.`;
+        } else if (rec.title === 'Shutter Island') {
+          reason = `Because you saved ${listStr}, we think you'll love **Shutter Island** because of its brooding atmosphere, intense dramatic tension, and brilliant psychological mystery.`;
+        } else {
+          reason = `Because you saved ${listStr}, we think you'll love **Lost in Translation** because it matches that quiet, aesthetic comfort vibe and beautifully lingering melancholia.`;
+        }
+      } else {
+        // Generic but still explain "WHY" beautifully based on whatever they saved
+        const defaultRefs = titlesList.length > 0 ? titlesList.slice(0, 2).map((t: string) => `**${t}**`).join(' and ') : 'your saved favorites';
+        reason = `Because you saved ${defaultRefs}, we think you'll love **${rec.title}** because of its matching moody cinematography, outstanding director signature, and rich, cohesive narrative vibes.`;
+      }
+
+      return {
+        ...rec,
+        reason,
+        // Override references to match actual saved movies if we have them
+        savedReferenceTitles: titlesList.length > 0 ? titlesList.slice(0, 3) : rec.savedReferenceTitles
+      };
+    });
+
+    res.json({ success: true, recommendations: customizedRecommendations });
+  } catch (err: any) {
+    console.error('Recommendation endpoint error:', err);
+    res.status(500).json({ success: false, error: err.message || 'An error occurred during recommendation generation.' });
+  }
+});
+
 // Setup Vite Dev Server / Static Hosting based on Environment
 async function startServer() {
   if (process.env.NODE_ENV !== 'production') {

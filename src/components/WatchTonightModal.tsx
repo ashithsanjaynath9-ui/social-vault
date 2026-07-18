@@ -59,16 +59,23 @@ export default function WatchTonightModal({ movies, onClose, onMarkWatched }: Wa
     : '#';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+    <motion.div 
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md"
+    >
       <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        transition={{ duration: 0.3, ease: 'easeOut' }}
+        variants={{
+          initial: { opacity: 0, scale: 0.95, y: 20 },
+          animate: { opacity: 1, scale: 1, y: 0 },
+          exit: { opacity: 0, scale: 0.95, y: 20 }
+        }}
+        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
         className="relative w-full max-w-2xl bg-zinc-950 border border-zinc-800 rounded-3xl p-6 sm:p-8 overflow-hidden shadow-2xl"
       >
         {/* Abstract cinematic vector graphics */}
-        <div className="absolute top-[-100px] left-[-100px] w-96 h-96 bg-blue-500/10 blur-[150px] rounded-full pointer-events-none" />
+        <div className="absolute top-[-100px] left-[-100px] w-96 h-96 bg-purple-500/10 blur-[150px] rounded-full pointer-events-none" />
         <div className="absolute bottom-[-100px] right-[-100px] w-96 h-96 bg-purple-500/10 blur-[150px] rounded-full pointer-events-none" />
 
         {/* Close Button */}
@@ -91,7 +98,7 @@ export default function WatchTonightModal({ movies, onClose, onMarkWatched }: Wa
               className="space-y-6"
             >
               <div className="text-center sm:text-left">
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-500/10 border border-blue-500/20 text-blue-400 rounded-full text-xs font-mono font-medium mb-3">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-500/10 border border-purple-500/20 text-purple-400 rounded-full text-xs font-mono font-medium mb-3">
                   <Sparkles className="w-3.5 h-3.5" />
                   No more searching. Just watching.
                 </div>
@@ -252,7 +259,7 @@ export default function WatchTonightModal({ movies, onClose, onMarkWatched }: Wa
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-[10px] font-mono bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2.5 py-0.5 rounded-full font-bold">
+                    <span className="text-[10px] font-mono bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2.5 py-0.5 rounded-full font-bold">
                       ✦ {matchResult.vibe}
                     </span>
                     <span className="text-[10px] font-mono text-amber-400 bg-amber-500/5 px-2 py-0.5 rounded border border-amber-500/10">
@@ -270,8 +277,8 @@ export default function WatchTonightModal({ movies, onClose, onMarkWatched }: Wa
                   </p>
 
                   {/* Why you saved it citation */}
-                  <div className="bg-blue-600/5 border border-blue-500/10 rounded-xl p-3 text-xs text-zinc-300 italic">
-                    <p className="font-semibold text-blue-400 not-italic text-[10px] uppercase tracking-wider font-mono mb-1">
+                  <div className="bg-purple-500/5 border border-purple-500/10 rounded-xl p-3 text-xs text-zinc-300 italic">
+                    <p className="font-semibold text-purple-400 not-italic text-[10px] uppercase tracking-wider font-mono mb-1">
                       Why you saved this recommendation:
                     </p>
                     "{matchResult.whySave}"
@@ -325,6 +332,6 @@ export default function WatchTonightModal({ movies, onClose, onMarkWatched }: Wa
           )}
         </AnimatePresence>
       </motion.div>
-    </div>
+    </motion.div>
   );
 }

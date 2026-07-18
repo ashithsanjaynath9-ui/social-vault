@@ -203,8 +203,6 @@ export default function GlobalSearchModal({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
 
-  if (!isOpen) return null;
-
   const handleSelectMovieResult = (id: string) => {
     saveSearchTerm(query);
     onSelectMovie(id);
@@ -247,25 +245,34 @@ export default function GlobalSearchModal({
   };
 
   return (
-    <AnimatePresence>
-      <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[10vh] px-4 md:px-6" id="global-search-modal">
-        {/* Deep immersive backdrop */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={onClose}
-          className="absolute inset-0 bg-black/95 backdrop-blur-xl cursor-pointer"
-        />
+    <motion.div 
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      className="fixed inset-0 z-[100] flex items-start justify-center pt-[10vh] px-4 md:px-6" 
+      id="global-search-modal"
+    >
+      {/* Deep immersive backdrop */}
+      <motion.div
+        variants={{
+          initial: { opacity: 0 },
+          animate: { opacity: 1 },
+          exit: { opacity: 0 }
+        }}
+        onClick={onClose}
+        className="absolute inset-0 bg-black/95 backdrop-blur-xl cursor-pointer"
+      />
 
-        {/* Modal Main container */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.97, y: -10 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.97, y: -10 }}
-          transition={{ type: 'spring', damping: 24, stiffness: 220 }}
-          className="relative w-full max-w-3xl bg-zinc-950 border border-zinc-850 rounded-3xl shadow-2xl shadow-black/80 overflow-hidden flex flex-col max-h-[75vh] z-10"
-        >
+      {/* Modal Main container */}
+      <motion.div
+        variants={{
+          initial: { opacity: 0, scale: 0.97, y: -16 },
+          animate: { opacity: 1, scale: 1, y: 0 },
+          exit: { opacity: 0, scale: 0.97, y: -16 }
+        }}
+        transition={{ type: 'spring', damping: 28, stiffness: 240 }}
+        className="relative w-full max-w-3xl bg-zinc-950 border border-zinc-850 rounded-3xl shadow-2xl shadow-black/80 overflow-hidden flex flex-col max-h-[75vh] z-10"
+      >
           {/* Header Search Input */}
           <div className="relative p-5 border-b border-zinc-900 flex items-center gap-3">
             <Search className="w-5 h-5 text-zinc-400 shrink-0" />
@@ -572,7 +579,6 @@ export default function GlobalSearchModal({
             )}
           </div>
         </motion.div>
-      </div>
-    </AnimatePresence>
+      </motion.div>
   );
 }
