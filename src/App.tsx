@@ -10,7 +10,6 @@ import { Movie, AppStats } from './types';
 import { INITIAL_MOVIES, ReelTemplate } from './data';
 import { parseRuntimeMinutes } from './utils';
 import AddMovieInput from './components/AddMovieInput';
-import MovieCard from './components/MovieCard';
 import WatchlistDashboard from './components/WatchlistDashboard';
 import WatchTonightModal from './components/WatchTonightModal';
 import Onboarding from './components/Onboarding';
@@ -499,21 +498,23 @@ export default function App() {
         </AnimatePresence>
 
         {/* 5. Floating Action Share/Extractor Button (Apple Quality) */}
-        <div className="fixed bottom-6 right-6 z-40">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => {
-              setPrefilledTemplate(null);
-              setShowExtractor(true);
-            }}
-            className="bg-blue-600 hover:bg-blue-500 text-white font-mono font-bold text-xs uppercase tracking-widest px-5 py-4 rounded-full shadow-2xl flex items-center gap-2 border border-blue-400/20 cursor-pointer"
-            id="floating-share-button"
-          >
-            <Sparkles className="w-4 h-4 text-white animate-pulse" />
-            <span>⚡ AI Extractor</span>
-          </motion.button>
-        </div>
+        {viewMode === 'watchlist' && (
+          <div className="fixed bottom-6 right-6 z-40">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => {
+                setPrefilledTemplate(null);
+                setShowExtractor(true);
+              }}
+              className="bg-blue-600 hover:bg-blue-500 text-white font-mono font-bold text-xs uppercase tracking-widest px-5 py-4 rounded-full shadow-2xl flex items-center gap-2 border border-blue-400/20 cursor-pointer"
+              id="floating-share-button"
+            >
+              <Sparkles className="w-4 h-4 text-white" />
+              <span>Capture</span>
+            </motion.button>
+          </div>
+        )}
 
         {/* 6. Extractor Overlay Sheet (Apple Blur Backdrop Drawer) */}
         <AnimatePresence>

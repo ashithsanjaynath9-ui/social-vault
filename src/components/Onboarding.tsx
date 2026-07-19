@@ -525,15 +525,15 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
             >
               {/* Headline */}
               <div className="text-center space-y-3 max-w-xl">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-purple-500/10 border border-purple-500/15 text-purple-400 rounded-full text-[10px] font-mono font-semibold tracking-wider uppercase">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-zinc-900 border border-zinc-800 text-zinc-400 rounded-full text-[10px] font-mono font-semibold tracking-wider uppercase">
                   ZERO MANUAL WORK
                 </span>
                 <h1 className="text-3xl sm:text-5xl font-display font-extrabold text-white tracking-tight leading-[1.1]">
                   Instagram to Watchlist. <br />
-                  <span className="bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">In one action.</span>
+                  <span className="text-[#D4AF37]">In one action.</span>
                 </h1>
                 <p className="text-xs text-zinc-500 font-mono">
-                  Instantly structure descriptions & metadata on-the-fly.
+                  Instantly capture descriptions & metadata on-the-fly.
                 </p>
               </div>
 
@@ -567,13 +567,13 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                   </div>
 
                   {/* Right: Destination */}
-                  <div className="flex items-center gap-3 bg-zinc-900 border border-blue-500/30 rounded-2xl p-3 w-48 shadow-lg">
-                    <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center shadow-md">
+                  <div className="flex items-center gap-3 bg-zinc-900 border border-zinc-800 rounded-2xl p-3 w-48 shadow-lg">
+                    <div className="w-8 h-8 rounded-xl bg-zinc-800 flex items-center justify-center shadow-md">
                       <Film className="w-4 h-4 text-white" />
                     </div>
                     <div>
-                      <h4 className="text-xs font-bold text-blue-400">CineSave Vault</h4>
-                      <p className="text-[9px] font-mono text-green-400 font-extrabold">✓ 12 Movies Curated</p>
+                      <h4 className="text-xs font-bold text-zinc-300">CineSave Inbox</h4>
+                      <p className="text-[9px] font-mono text-zinc-400 font-extrabold">✓ 12 Movies Captured</p>
                     </div>
                   </div>
                 </div>
@@ -625,10 +625,10 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                 </button>
                 <button
                   onClick={onComplete}
-                  className="px-12 py-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-mono font-bold tracking-widest uppercase transition-all shadow-xl shadow-blue-500/20 flex items-center gap-2 cursor-pointer border border-blue-400/20 hover:scale-[1.02]"
+                  className="px-12 py-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-mono font-bold tracking-widest uppercase transition-all shadow-xl flex items-center gap-2 cursor-pointer hover:scale-[1.02]"
                 >
                   <span>Build My Library</span>
-                  <Sparkles className="w-4 h-4 text-white animate-spin-slow" />
+                  <Film className="w-4 h-4 text-white" />
                 </button>
               </div>
             </motion.div>
@@ -640,7 +640,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
       {/* Elegant minimalist Stepper dots base footer */}
       <footer className="flex justify-between items-center relative z-10 border-t border-zinc-950/60 pt-6">
         <div className="text-zinc-500 text-[10px] font-mono tracking-wider font-semibold uppercase">
-          ✦ APPLE COMPLIANT CINEMA ENGINE
+          Onboarding
         </div>
 
         {/* Dynamic Slide Counter dots */}

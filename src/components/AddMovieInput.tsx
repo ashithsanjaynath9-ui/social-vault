@@ -353,7 +353,7 @@ export default function AddMovieInput({
     <div className="w-full max-w-4xl mx-auto" id="movie-extractor-component">
       <AnimatePresence mode="wait">
         
-        {/* Stage 1: Magical Scanning & Storytelling Overlay (No Traditional Spinners) */}
+        {/* Stage 1: Scanning & Lookup Overlay (No Traditional Spinners) */}
         {isExtracting ? (
           <motion.div
             key="extraction-loading"
@@ -363,39 +363,39 @@ export default function AddMovieInput({
             className="bg-zinc-950 border border-zinc-900 rounded-3xl p-8 md:p-12 shadow-2xl text-center space-y-12 relative overflow-hidden"
           >
             {/* Ambient theatrical backlighting */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-purple-500/10 rounded-full blur-[140px] pointer-events-none" />
-            <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-purple-500/5 rounded-full blur-[120px] pointer-events-none" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-zinc-800/10 rounded-full blur-[140px] pointer-events-none" />
+            <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-zinc-900/5 rounded-full blur-[120px] pointer-events-none" />
 
             {/* Glowing moving laser scanline */}
-            <div className="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-purple-500 to-transparent top-0 animate-scanline pointer-events-none opacity-45" />
+            <div className="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-zinc-500 to-transparent top-0 animate-scanline pointer-events-none opacity-45" />
 
             <div className="flex flex-col items-center justify-center space-y-8 pt-4">
               {/* Pulsing film aperture / lens visual */}
               <div className="relative w-28 h-28 flex items-center justify-center">
-                <div className="absolute inset-0 rounded-full border border-purple-500/20 animate-ping opacity-30" />
+                <div className="absolute inset-0 rounded-full border border-zinc-800 animate-ping opacity-30" />
                 <div className="absolute inset-2 rounded-full border-2 border-zinc-900 flex items-center justify-center bg-zinc-950 shadow-inner">
-                  <Film className="w-8 h-8 text-purple-400 animate-pulse" />
+                  <Film className="w-8 h-8 text-zinc-400 animate-pulse" />
                 </div>
                 
                 {/* Scanning orbiters */}
                 <motion.div 
                   animate={{ rotate: 360 }}
                   transition={{ repeat: Infinity, duration: 3, ease: 'linear' }}
-                  className="absolute inset-0 rounded-full border-t-2 border-purple-500/60"
+                  className="absolute inset-0 rounded-full border-t-2 border-zinc-500"
                 />
                 <motion.div 
                   animate={{ rotate: -360 }}
                   transition={{ repeat: Infinity, duration: 4.5, ease: 'linear' }}
-                  className="absolute inset-4 rounded-full border-b-2 border-purple-500/40"
+                  className="absolute inset-4 rounded-full border-b-2 border-zinc-700"
                 />
               </div>
 
               <div className="space-y-2">
                 <h3 className="text-xl font-display font-bold text-white tracking-wide uppercase font-mono">
-                  Gemini Cinema Synthesizer
+                  Processing Recommendations
                 </h3>
                 <p className="text-xs text-zinc-500 max-w-sm mx-auto font-sans leading-relaxed">
-                  Extracting intelligence, parsing video transcripts, and organizing structured metadata...
+                  Parsing details, looking up metadata, and organizing clean inbox entries...
                 </p>
               </div>
             </div>
@@ -407,19 +407,19 @@ export default function AddMovieInput({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   {scanStage > 0 ? (
-                    <div className="w-5 h-5 rounded-full bg-purple-500/10 flex items-center justify-center">
-                      <Check className="w-3 h-3 text-purple-400" />
+                    <div className="w-5 h-5 rounded-full bg-zinc-900 border border-zinc-850 flex items-center justify-center">
+                      <Check className="w-3 h-3 text-zinc-400" />
                     </div>
                   ) : (
-                    <div className="w-5 h-5 rounded-full border border-zinc-800 flex items-center justify-center">
-                      <div className="w-2 h-2 bg-purple-500 rounded-full animate-ping" />
+                    <div className="w-5 h-5 rounded-full border border-zinc-850 flex items-center justify-center">
+                      <div className="w-2 h-2 bg-zinc-400 rounded-full animate-ping" />
                     </div>
                   )}
                   <span className={`text-xs ${scanStage >= 0 ? 'text-zinc-200 font-bold' : 'text-zinc-600'}`}>
                     Scanning movie titles...
                   </span>
                 </div>
-                <span className={`text-[10px] font-bold uppercase tracking-wider ${scanStage > 0 ? 'text-purple-400' : 'text-zinc-500 animate-pulse'}`}>
+                <span className={`text-[10px] font-bold uppercase tracking-wider ${scanStage > 0 ? 'text-zinc-400' : 'text-zinc-500 animate-pulse'}`}>
                   {scanStage > 0 ? 'SUCCESS' : 'SCANNING'}
                 </span>
               </div>
@@ -428,12 +428,12 @@ export default function AddMovieInput({
               <div className="flex items-center justify-between border-t border-zinc-900/60 pt-3">
                 <div className="flex items-center gap-3">
                   {scanStage > 1 ? (
-                    <div className="w-5 h-5 rounded-full bg-purple-500/10 flex items-center justify-center">
-                      <Check className="w-3 h-3 text-purple-400" />
+                    <div className="w-5 h-5 rounded-full bg-zinc-900 border border-zinc-850 flex items-center justify-center">
+                      <Check className="w-3 h-3 text-zinc-400" />
                     </div>
                   ) : scanStage === 1 ? (
-                    <div className="w-5 h-5 rounded-full border border-zinc-800 flex items-center justify-center">
-                      <div className="w-2 h-2 bg-purple-500 rounded-full animate-ping" />
+                    <div className="w-5 h-5 rounded-full border border-zinc-850 flex items-center justify-center">
+                      <div className="w-2 h-2 bg-zinc-400 rounded-full animate-ping" />
                     </div>
                   ) : (
                     <div className="w-5 h-5 rounded-full border border-zinc-850" />
@@ -442,7 +442,7 @@ export default function AddMovieInput({
                     Finding posters...
                   </span>
                 </div>
-                <span className={`text-[10px] font-bold uppercase tracking-wider ${scanStage > 1 ? 'text-purple-400' : scanStage === 1 ? 'text-zinc-500 animate-pulse' : 'text-zinc-700'}`}>
+                <span className={`text-[10px] font-bold uppercase tracking-wider ${scanStage > 1 ? 'text-zinc-400' : scanStage === 1 ? 'text-zinc-500 animate-pulse' : 'text-zinc-700'}`}>
                   {scanStage > 1 ? 'FOUND' : scanStage === 1 ? 'CRAWLING' : 'PENDING'}
                 </span>
               </div>
@@ -451,12 +451,12 @@ export default function AddMovieInput({
               <div className="flex items-center justify-between border-t border-zinc-900/60 pt-3">
                 <div className="flex items-center gap-3">
                   {scanStage > 2 ? (
-                    <div className="w-5 h-5 rounded-full bg-purple-500/10 flex items-center justify-center">
-                      <Check className="w-3 h-3 text-purple-400" />
+                    <div className="w-5 h-5 rounded-full bg-zinc-900 border border-zinc-850 flex items-center justify-center">
+                      <Check className="w-3 h-3 text-zinc-400" />
                     </div>
                   ) : scanStage === 2 ? (
-                    <div className="w-5 h-5 rounded-full border border-zinc-800 flex items-center justify-center">
-                      <div className="w-2 h-2 bg-purple-500 rounded-full animate-ping" />
+                    <div className="w-5 h-5 rounded-full border border-zinc-850 flex items-center justify-center">
+                      <div className="w-2 h-2 bg-zinc-400 rounded-full animate-ping" />
                     </div>
                   ) : (
                     <div className="w-5 h-5 rounded-full border border-zinc-850" />
@@ -465,27 +465,27 @@ export default function AddMovieInput({
                     Checking streaming platforms...
                   </span>
                 </div>
-                <span className={`text-[10px] font-bold uppercase tracking-wider ${scanStage > 2 ? 'text-purple-400' : scanStage === 2 ? 'text-zinc-500 animate-pulse' : 'text-zinc-700'}`}>
+                <span className={`text-[10px] font-bold uppercase tracking-wider ${scanStage > 2 ? 'text-zinc-400' : scanStage === 2 ? 'text-zinc-500 animate-pulse' : 'text-zinc-700'}`}>
                   {scanStage > 2 ? 'VERIFIED' : scanStage === 2 ? 'QUERIED' : 'PENDING'}
                 </span>
               </div>
 
-              {/* Step 4: Building your library... */}
+              {/* Step 4: Organizing your inbox... */}
               <div className="flex items-center justify-between border-t border-zinc-900/60 pt-3">
                 <div className="flex items-center gap-3">
                   {scanStage === 3 ? (
-                    <div className="w-5 h-5 rounded-full border border-zinc-800 flex items-center justify-center">
-                      <div className="w-2 h-2 bg-purple-500 rounded-full animate-ping" />
+                    <div className="w-5 h-5 rounded-full border border-zinc-850 flex items-center justify-center">
+                      <div className="w-2 h-2 bg-zinc-400 rounded-full animate-ping" />
                     </div>
                   ) : (
                     <div className="w-5 h-5 rounded-full border border-zinc-850" />
                   )}
                   <span className={`text-xs ${scanStage >= 3 ? 'text-zinc-200 font-bold' : 'text-zinc-600'}`}>
-                    Building your library...
+                    Organizing your inbox...
                   </span>
                 </div>
-                <span className={`text-[10px] font-bold uppercase tracking-wider ${scanStage === 3 ? 'text-purple-400 animate-pulse' : 'text-zinc-700'}`}>
-                  {scanStage === 3 ? 'PACKAGING' : 'PENDING'}
+                <span className={`text-[10px] font-bold uppercase tracking-wider ${scanStage === 3 ? 'text-zinc-400 animate-pulse' : 'text-zinc-700'}`}>
+                  {scanStage === 3 ? 'SAVING' : 'PENDING'}
                 </span>
               </div>
 
@@ -494,7 +494,7 @@ export default function AddMovieInput({
             {/* Seamless gradient progress loader bar */}
             <div className="w-full max-w-md mx-auto h-1.5 bg-zinc-900 rounded-full overflow-hidden relative">
               <motion.div 
-                className="h-full bg-gradient-to-r from-purple-600 via-purple-500 to-purple-400"
+                className="h-full bg-gradient-to-r from-zinc-700 via-zinc-600 to-zinc-500"
                 initial={{ width: '0%' }}
                 animate={{ 
                   width: scanStage === 0 ? '25%' : scanStage === 1 ? '50%' : scanStage === 2 ? '75%' : '98%' 
@@ -514,21 +514,21 @@ export default function AddMovieInput({
             transition={{ duration: 0.3 }}
             className="bg-zinc-950 border border-zinc-900 rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden"
           >
-            {/* Ambient visual backlights */}
-            <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-600/5 blur-[120px] rounded-full pointer-events-none" />
-            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-600/5 blur-[120px] rounded-full pointer-events-none" />
+             {/* Ambient visual backlights */}
+            <div className="absolute top-0 left-1/4 w-96 h-96 bg-zinc-800/5 blur-[120px] rounded-full pointer-events-none" />
+            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-zinc-800/5 blur-[120px] rounded-full pointer-events-none" />
 
             <div className="flex items-start justify-between gap-4 mb-6">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-purple-500/10 rounded-2xl border border-purple-500/15">
-                  <Sparkles className="w-5 h-5 text-purple-400" />
+                <div className="p-2.5 bg-zinc-900 rounded-2xl border border-zinc-800">
+                  <Film className="w-5 h-5 text-zinc-400" />
                 </div>
                 <div>
                   <h2 className="text-xl font-display font-extrabold text-white tracking-tight leading-none">
-                    Instant Cinema Extractor
+                    Capture Recommendation
                   </h2>
                   <p className="text-xs text-zinc-500 mt-1 font-mono font-medium">
-                    Convert social recommendations into clean cinema watchlists
+                    Convert social media recommendations into clean inbox entries
                   </p>
                 </div>
               </div>
@@ -538,7 +538,7 @@ export default function AddMovieInput({
                   type="button"
                   onClick={onCloseDrawer}
                   className="p-2 hover:bg-zinc-900 rounded-xl text-zinc-500 hover:text-white transition-colors cursor-pointer"
-                  aria-label="Close Extractor"
+                  aria-label="Close Capture"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -601,16 +601,11 @@ export default function AddMovieInput({
             </div>
 
             {/* Informational Platform Banner */}
-            <div className="bg-zinc-900/10 border border-zinc-900/60 rounded-xl px-4 py-2.5 mb-5 flex items-center justify-between">
-              <span className="text-[11px] text-zinc-400 flex items-center gap-2 font-sans">
-                {activeTab === 'instagram' && <>🍿 Paste Instagram Reel caption transcript or share URL</>}
-                {activeTab === 'youtube' && <>📺 Works with YouTube video descriptions or Shorts transcripts</>}
-                {activeTab === 'tiktok' && <>🎵 Paste TikTok comments, hashtags, captions, or short links</>}
-                {activeTab === 'manual' && <>📝 Paste recommendation list or chat transcripts directly</>}
-              </span>
-              <span className="text-[9px] font-mono font-extrabold text-zinc-500 uppercase tracking-widest bg-zinc-900 px-2 py-0.5 rounded border border-zinc-850">
-                {activeTab === 'manual' ? 'PASTE STATION' : `${activeTab} integrated`}
-              </span>
+            <div className="text-zinc-500 text-xs text-left mb-5">
+              {activeTab === 'instagram' && <span>Paste Instagram Reel caption transcript or share URL</span>}
+              {activeTab === 'youtube' && <span>Works with YouTube video descriptions or Shorts transcripts</span>}
+              {activeTab === 'tiktok' && <span>Paste TikTok comments, hashtags, captions, or short links</span>}
+              {activeTab === 'manual' && <span>Paste recommendation list or chat transcripts directly</span>}
             </div>
 
             <form onSubmit={handleExtract} className="space-y-4">
@@ -664,8 +659,8 @@ export default function AddMovieInput({
                   type="submit"
                   className="bg-blue-600 hover:bg-blue-500 text-white text-xs font-mono font-bold tracking-widest uppercase px-8 py-3.5 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-xl shadow-blue-500/15 cursor-pointer border border-blue-400/10"
                 >
-                  <Sparkles className="w-4 h-4 text-white" />
-                  <span>Extract Movies</span>
+                  <Film className="w-4 h-4 text-white" />
+                  <span>Capture Movies</span>
                 </motion.button>
               </div>
             </form>
@@ -688,7 +683,7 @@ export default function AddMovieInput({
                 className="flex items-center justify-between w-full text-left py-1 text-zinc-400 hover:text-white transition-colors group cursor-pointer"
               >
                 <span className="text-xs font-mono font-bold tracking-widest uppercase text-zinc-500">
-                  ⚡ Preloaded Reel Transcripts (For Fast Demo)
+                  Sample Transcripts
                 </span>
                 <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${showTemplates ? 'rotate-180' : ''}`} />
               </button>
@@ -762,18 +757,18 @@ export default function AddMovieInput({
             {/* Stage Title and Summary */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-zinc-900">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-emerald-500/10 rounded-2xl border border-emerald-500/20">
-                  <Sparkles className="w-5 h-5 text-emerald-400" />
+                <div className="p-2.5 bg-zinc-900 rounded-2xl border border-zinc-800">
+                  <BookmarkCheck className="w-5 h-5 text-emerald-400" />
                 </div>
                 <div>
                   <h2 className="text-xl font-display font-extrabold text-white tracking-tight flex items-center gap-2">
-                    {previewMovies.length} Movies Extracted
-                    <span className="text-[9px] bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-2.5 py-0.5 rounded-full font-mono font-bold uppercase tracking-wider">
-                      Ready for Vault
+                    {previewMovies.length} Movies Captured
+                    <span className="text-[9px] bg-zinc-900 border border-zinc-800 text-emerald-400 px-2.5 py-0.5 rounded-full font-mono font-bold uppercase tracking-wider">
+                      Ready to Save
                     </span>
                   </h2>
                   <p className="text-xs text-zinc-500 mt-1 font-mono">
-                    Structured with streaming services, metadata, and curation descriptions automatically.
+                    Parsed and organized with streaming services, metadata, and curation descriptions.
                   </p>
                 </div>
               </div>
@@ -1154,33 +1149,23 @@ export default function AddMovieInput({
                 </p>
               </div>
 
-              <div className="flex flex-wrap sm:flex-nowrap gap-3 w-full md:w-auto">
+              <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
                 <button
                   type="button"
                   onClick={() => setPreviewMovies(null)}
-                  className="flex-1 sm:flex-none border border-zinc-800 hover:bg-zinc-900 text-zinc-300 hover:text-white text-xs font-mono font-bold uppercase tracking-wider px-5 py-3 rounded-2xl transition-all cursor-pointer"
+                  className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-500 hover:text-zinc-300 transition-colors cursor-pointer"
                 >
-                  Discard All
+                  Discard Curation
                 </button>
-
-                {viewMode === 'detailed-list' && (
-                  <button
-                    type="button"
-                    onClick={handleSaveSelected}
-                    className="flex-1 sm:flex-none bg-zinc-900 hover:bg-zinc-850 border border-zinc-850 text-white text-xs font-mono font-bold uppercase tracking-wider px-5 py-3 rounded-2xl flex items-center justify-center gap-2 transition-all cursor-pointer"
-                  >
-                    <Check className="w-4 h-4 text-emerald-400" />
-                    <span>Save Selected ({previewMovies.filter((_, idx) => selectedIndices[idx]).length})</span>
-                  </button>
-                )}
 
                 <button
                   type="button"
-                  onClick={handleSaveAll}
-                  className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-500 text-white text-xs font-mono font-bold tracking-widest uppercase px-8 py-3.5 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-xl shadow-blue-500/20 cursor-pointer border border-blue-400/10 hover:scale-[1.01]"
+                  onClick={handleSaveSelected}
+                  disabled={previewMovies.filter((_, idx) => selectedIndices[idx]).length === 0}
+                  className="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 disabled:bg-zinc-800 disabled:text-zinc-600 disabled:cursor-not-allowed text-white text-xs font-mono font-bold tracking-widest uppercase px-8 py-3.5 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-xl shadow-blue-500/20 cursor-pointer border border-blue-400/10 hover:scale-[1.01]"
                 >
-                  <Sparkles className="w-4 h-4 text-white animate-spin-slow" />
-                  <span>Commit to Cinema Vault ({previewMovies.length})</span>
+                  <BookmarkCheck className="w-4 h-4 text-white" />
+                  <span>Save to Inbox ({previewMovies.filter((_, idx) => selectedIndices[idx]).length})</span>
                 </button>
               </div>
             </div>
@@ -1199,15 +1184,15 @@ export default function AddMovieInput({
             className="fixed inset-0 bg-zinc-950/95 backdrop-blur-md z-[100] flex flex-col items-center justify-center p-6"
           >
             <div className="text-center space-y-6 relative">
-              {/* Dynamic Vault Lock Sparkle */}
+              {/* Dynamic Saving Indicator */}
               <div className="relative w-16 h-16 mx-auto flex items-center justify-center">
-                <div className="absolute inset-0 rounded-full border border-dashed border-purple-500/35 animate-spin-slow" />
-                <Sparkles className="w-6 h-6 text-purple-400 animate-pulse" />
+                <div className="absolute inset-0 rounded-full border border-dashed border-zinc-700 animate-spin-slow" />
+                <BookmarkCheck className="w-6 h-6 text-zinc-400 animate-pulse" />
               </div>
               
               <div className="space-y-1.5">
-                <h3 className="text-sm font-display font-bold tracking-widest text-white uppercase leading-none">Vaulting Cinema...</h3>
-                <p className="text-[10px] text-zinc-500 font-mono uppercase tracking-wider">Securing social reels directly to shelves</p>
+                <h3 className="text-sm font-display font-bold tracking-widest text-white uppercase leading-none">Saving Movies...</h3>
+                <p className="text-[10px] text-zinc-500 font-mono uppercase tracking-wider">Adding social reels directly to your library</p>
               </div>
 
               {/* Poster thumbnails sailing upwards */}

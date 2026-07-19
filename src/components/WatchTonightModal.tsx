@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Film, Sparkles, X, Tv, Check, Play, Shuffle, Smile, AlertCircle } from 'lucide-react';
+import { Film, Sparkles, X, Tv, Check, Play, Shuffle, Smile, AlertCircle, ExternalLink } from 'lucide-react';
 import { Movie } from '../types';
 import { getTrailerUrl } from '../utils';
 
@@ -55,7 +55,7 @@ export default function WatchTonightModal({ movies, onClose, onMarkWatched }: Wa
   };
 
   const searchUrl = matchResult 
-    ? getTrailerUrl(matchResult.title, matchResult.year)
+    ? `https://www.google.com/search?q=${encodeURIComponent(matchResult.title + ' ' + matchResult.year + ' streaming showtimes where to watch')}`
     : '#';
 
   return (
@@ -98,8 +98,8 @@ export default function WatchTonightModal({ movies, onClose, onMarkWatched }: Wa
               className="space-y-6"
             >
               <div className="text-center sm:text-left">
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-500/10 border border-purple-500/20 text-purple-400 rounded-full text-xs font-mono font-medium mb-3">
-                  <Sparkles className="w-3.5 h-3.5" />
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-zinc-900 border border-zinc-800 text-zinc-400 rounded-full text-xs font-mono font-medium mb-3">
+                  <Film className="w-3.5 h-3.5" />
                   No more searching. Just watching.
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-display font-bold text-white tracking-tight">
@@ -128,7 +128,7 @@ export default function WatchTonightModal({ movies, onClose, onMarkWatched }: Wa
                             : 'bg-zinc-900/40 hover:bg-zinc-900 border-zinc-850 hover:border-zinc-800 text-zinc-300'
                         }`}
                       >
-                        {v === 'All' ? '⚡ Surprise Me' : v}
+                        {v === 'All' ? 'Surprise Me' : v}
                       </button>
                     ))}
                   </div>
@@ -229,8 +229,8 @@ export default function WatchTonightModal({ movies, onClose, onMarkWatched }: Wa
               className="space-y-6"
             >
               <div className="text-center mb-1">
-                <span className="text-[10px] font-mono tracking-widest uppercase bg-green-500/10 border border-green-500/20 text-green-400 px-3 py-1 rounded-full font-bold">
-                  ✨ Movie Night Match
+                <span className="text-[10px] font-mono tracking-widest uppercase bg-zinc-900 border border-zinc-800 text-zinc-400 px-3 py-1 rounded-full font-bold">
+                  Movie Night Match
                 </span>
               </div>
 
@@ -259,7 +259,7 @@ export default function WatchTonightModal({ movies, onClose, onMarkWatched }: Wa
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-[10px] font-mono bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2.5 py-0.5 rounded-full font-bold">
+                    <span className="text-[10px] font-mono bg-zinc-900 text-zinc-300 border border-zinc-800 px-2.5 py-0.5 rounded-full font-bold">
                       ✦ {matchResult.vibe}
                     </span>
                     <span className="text-[10px] font-mono text-amber-400 bg-amber-500/5 px-2 py-0.5 rounded border border-amber-500/10">
@@ -277,8 +277,8 @@ export default function WatchTonightModal({ movies, onClose, onMarkWatched }: Wa
                   </p>
 
                   {/* Why you saved it citation */}
-                  <div className="bg-purple-500/5 border border-purple-500/10 rounded-xl p-3 text-xs text-zinc-300 italic">
-                    <p className="font-semibold text-purple-400 not-italic text-[10px] uppercase tracking-wider font-mono mb-1">
+                  <div className="bg-zinc-900 border border-zinc-850 rounded-xl p-3 text-xs text-zinc-300 italic">
+                    <p className="font-semibold text-zinc-400 not-italic text-[10px] uppercase tracking-wider font-mono mb-1">
                       Why you saved this recommendation:
                     </p>
                     "{matchResult.whySave}"
@@ -296,37 +296,41 @@ export default function WatchTonightModal({ movies, onClose, onMarkWatched }: Wa
                     ))}
                   </p>
                 </div>
-
-                <a
-                  href={searchUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full sm:w-auto bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-800 text-xs font-semibold px-4 py-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all"
-                >
-                  <Play className="w-3.5 h-3.5 fill-current" />
-                  <span>Watch Trailer</span>
-                </a>
               </div>
 
               {/* Modal controls */}
-              <div className="flex flex-col sm:flex-row gap-2 pt-4 border-t border-zinc-900 justify-end">
+              <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-zinc-900 justify-end items-center">
+                {/* Pick another - subtle tertiary text */}
                 <button
                   onClick={handleReset}
-                  className="w-full sm:w-auto text-zinc-400 hover:text-white hover:bg-zinc-900 text-xs font-bold px-6 py-2.5 rounded-xl border border-transparent transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                  className="w-full sm:w-auto text-zinc-500 hover:text-zinc-300 text-xs font-mono font-bold uppercase tracking-wider py-2 px-4 transition-all cursor-pointer flex items-center justify-center gap-1.5"
                 >
                   <Shuffle className="w-3.5 h-3.5" />
                   <span>Pick Another</span>
                 </button>
+
+                {/* Mark watched - secondary button */}
                 <button
                   onClick={() => {
                     onMarkWatched(matchResult.id);
                     onClose();
                   }}
-                  className="w-full sm:w-auto bg-green-600 hover:bg-green-500 text-white text-xs font-bold px-6 py-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-lg shadow-green-500/10 cursor-pointer"
+                  className="w-full sm:w-auto bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 text-zinc-300 hover:text-white text-xs font-bold px-6 py-3 rounded-xl flex items-center justify-center gap-1.5 transition-all cursor-pointer"
                 >
-                  <Check className="w-3.5 h-3.5" />
-                  <span>Watch Tonight (Mark Watched)</span>
+                  <Check className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Mark Watched</span>
                 </button>
+
+                {/* Stream / watch now - primary CTA */}
+                <a
+                  href={searchUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-8 py-3 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-lg shadow-blue-500/15 cursor-pointer border border-blue-400/10 text-center uppercase tracking-wider font-mono"
+                >
+                  <ExternalLink className="w-3.5 h-3.5 text-white" />
+                  <span>Search Where to Watch</span>
+                </a>
               </div>
             </motion.div>
           )}
