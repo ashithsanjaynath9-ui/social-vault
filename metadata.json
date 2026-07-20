@@ -1,5 +1,5 @@
 {
-  "name": "Social Movie Watchlist Extractor",
+  "name": "CineSave",
   "description": "The fastest way to convert social media recommendations (Instagram Reels, TikToks, YouTube, Twitter) into a beautifully organized watchlist with streaming availability.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]

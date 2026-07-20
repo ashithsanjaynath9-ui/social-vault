@@ -1,69 +1,69 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Space Grotesk", sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Newsreader", Georgia, serif;
+  --font-mono: "Instrument Sans", sans-serif;
 
   /* Custom animations */
   --animate-shimmer: shimmer 2.5s infinite linear;
   --animate-pulse-slow: pulse-slow 3s infinite ease-in-out;
 
-  /* Premium Cinematic Dark design tokens */
-  --color-zinc-950: #090909;
-  --color-zinc-900: #111111;
-  --color-zinc-850: #161616;
-  --color-zinc-800: #1C1C1C;
-  --color-zinc-700: #222222;
-  --color-black: #090909;
+  /* Cozy Warm Deep Plum design tokens */
+  --color-zinc-950: #120716; /* Deepest Plum - body background */
+  --color-zinc-900: #1D0E22; /* Primary Plum Card / Nav bar */
+  --color-zinc-850: #26142C; /* Slightly lighter Plum Card */
+  --color-zinc-800: #321C39; /* Cozy Plum Highlight / Border */
+  --color-zinc-700: #43264D; /* Warm Plum Active Border */
+  --color-black: #0C040F;     /* True dark plum */
 
-  /* Premium High-Contrast Typography design tokens */
-  --color-white: #F5F5F5;
-  --color-zinc-50: #F5F5F5;
-  --color-zinc-100: #F5F5F5;
-  --color-zinc-200: #D0D0D0;
-  --color-zinc-300: #D0D0D0;
-  --color-zinc-400: #B0B0B0;
-  --color-zinc-500: #7B7B7B;
-  --color-zinc-600: #555555;
+  /* Warm Off-White Typography design tokens */
+  --color-white: #FAF6F0;    /* Warm ivory/off-white */
+  --color-zinc-50: #FAF6F0;
+  --color-zinc-100: #FAF6F0;
+  --color-zinc-200: #E6DFEB; /* Very light lavender-gray */
+  --color-zinc-300: #D2C5DB; /* Light lavender-gray */
+  --color-zinc-400: #BBA9C7; /* Soft lavender-gray */
+  --color-zinc-500: #907D9C; /* Muted lavender */
+  --color-zinc-600: #6F5E7A; /* Darker muted lavender */
 
-  /* Cinema Gold Palette overriding blue, indigo, and purple */
-  --color-blue-50: #FCF9F2;
-  --color-blue-100: #F5EDD0;
-  --color-blue-200: #ECDBA5;
-  --color-blue-300: #E5C65A; /* Hover */
-  --color-blue-400: #E5C65A; /* Hover */
-  --color-blue-500: #D4AF37; /* Primary Gold */
-  --color-blue-600: #D4AF37; /* Primary Gold */
-  --color-blue-700: #B99124; /* Pressed */
-  --color-blue-800: #B99124; /* Pressed */
-  --color-blue-900: #886815;
-  --color-blue-950: #1C1505;
+  /* Soft Lavender Accent Palette overriding blue, indigo, and purple */
+  --color-blue-50: #F8F5FC;
+  --color-blue-100: #F1EAFA;
+  --color-blue-200: #E1D3F3;
+  --color-blue-300: #CBB4EB;
+  --color-blue-400: #B39CD0; /* Primary Soft Lavender */
+  --color-blue-500: #9C82B3;
+  --color-blue-600: #866E9C;
+  --color-blue-700: #6E5A82;
+  --color-blue-800: #574668;
+  --color-blue-900: #40334E;
+  --color-blue-950: #231B2C;
 
-  --color-indigo-50: #FCF9F2;
-  --color-indigo-100: #F5EDD0;
-  --color-indigo-200: #ECDBA5;
-  --color-indigo-300: #E5C65A; /* Hover */
-  --color-indigo-400: #E5C65A; /* Hover */
-  --color-indigo-500: #D4AF37; /* Primary Gold */
-  --color-indigo-600: #D4AF37; /* Primary Gold */
-  --color-indigo-700: #B99124; /* Pressed */
-  --color-indigo-800: #B99124; /* Pressed */
-  --color-indigo-900: #886815;
-  --color-indigo-950: #1C1505;
+  --color-indigo-50: #F8F5FC;
+  --color-indigo-100: #F1EAFA;
+  --color-indigo-200: #E1D3F3;
+  --color-indigo-300: #CBB4EB;
+  --color-indigo-400: #B39CD0;
+  --color-indigo-500: #9C82B3;
+  --color-indigo-600: #866E9C;
+  --color-indigo-700: #6E5A82;
+  --color-indigo-800: #574668;
+  --color-indigo-900: #40334E;
+  --color-indigo-950: #231B2C;
 
-  --color-purple-50: #FAF5FF;
-  --color-purple-100: #F3E8FF;
-  --color-purple-200: #E9D5FF;
-  --color-purple-300: #B48BFF; /* Hover */
-  --color-purple-400: #B48BFF; /* Hover */
-  --color-purple-500: #9F6BFF; /* Primary Purple */
-  --color-purple-600: #9F6BFF; /* Primary Purple */
-  --color-purple-700: #8040FF; /* Pressed */
-  --color-purple-800: #6620FF; /* Pressed */
-  --color-purple-900: #4C0DF5;
-  --color-purple-950: #1A0066;
+  --color-purple-50: #F8F5FC;
+  --color-purple-100: #F1EAFA;
+  --color-purple-200: #E1D3F3;
+  --color-purple-300: #CBB4EB;
+  --color-purple-400: #B39CD0;
+  --color-purple-500: #9C82B3;
+  --color-purple-600: #866E9C;
+  --color-purple-700: #6E5A82;
+  --color-purple-800: #574668;
+  --color-purple-900: #40334E;
+  --color-purple-950: #231B2C;
 
   @keyframes shimmer {
     0% { background-position: -200% 0; }
@@ -77,8 +77,8 @@
 
 /* Beautiful custom styling overrides for premium feels */
 body {
-  background-color: #090909;
-  color: #D0D0D0;
+  background-color: #120716; /* Deepest Plum */
+  color: #E6DFEB;            /* Light lavender-gray text */
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
@@ -90,14 +90,14 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #090909;
+  background: #120716;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1C1C1C;
+  background: #26142C;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #222222;
+  background: #321C39;
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
@@ -123,21 +123,21 @@ input:not([type]):not([class*="bg-transparent"]),
 textarea:not([class*="bg-transparent"]),
 select:not([class*="bg-transparent"]),
 .custom-input {
-  background-color: #141414 !important;
-  border: 1px solid rgba(255, 255, 255, 0.05) !important;
-  color: #F5F5F5 !important;
+  background-color: #1D0E22 !important; /* Cozy deep plum input */
+  border: 1px solid rgba(186, 169, 199, 0.15) !important; /* Soft lavender-tinted subtle border */
+  color: #FAF6F0 !important; /* Warm off-white */
   transition: all 0.2s ease-in-out !important;
 }
 
 /* Filter select container divs in the Library refine panel */
 div.flex.items-center.bg-zinc-900\/50 {
-  background-color: #141414 !important;
-  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  background-color: #1D0E22 !important;
+  border: 1px solid rgba(186, 169, 199, 0.15) !important;
   transition: all 0.2s ease-in-out !important;
 }
 div.flex.items-center.bg-zinc-900\/50:hover,
 div.flex.items-center.bg-zinc-900\/50:focus-within {
-  border-color: #D4AF37 !important;
+  border-color: #B39CD0 !important; /* Soft lavender active */
 }
 
 /* Focused border color state */
@@ -151,16 +151,16 @@ input:not([type]):not([class*="bg-transparent"]):focus,
 textarea:not([class*="bg-transparent"]):focus,
 select:not([class*="bg-transparent"]):focus,
 .custom-input:focus {
-  border-color: #D4AF37 !important;
+  border-color: #B39CD0 !important; /* Soft lavender active */
   outline: none !important;
-  box-shadow: 0 0 0 1px #D4AF37 !important;
+  box-shadow: 0 0 0 1px #B39CD0 !important;
 }
 
-/* Placholder styling matching requirements exactly */
+/* Placeholder styling matching requirements exactly */
 input::placeholder,
 textarea::placeholder,
 .custom-input::placeholder {
-  color: #6D6D6D !important;
+  color: #907D9C !important; /* Muted lavender-gray */
   opacity: 1 !important; /* browser override */
 }
 
@@ -177,9 +177,9 @@ div.bg-blue-600,
 [class*="bg-blue-600"],
 [class*="bg-indigo-600"],
 .btn-primary {
-  background-color: #D4AF37 !important;
+  background-color: #B39CD0 !important; /* Soft lavender primary */
   background-image: none !important; /* clear secondary gradients */
-  color: #090909 !important;
+  color: #120716 !important; /* Deepest plum text */
   border: 1px solid rgba(255, 255, 255, 0.05) !important;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
@@ -196,12 +196,12 @@ a.bg-white:not([class*="bg-zinc-950"]):hover,
 [class*="bg-blue-600"]:hover,
 [class*="bg-indigo-600"]:hover,
 .btn-primary:hover {
-  background-color: #E7C75F !important;
+  background-color: #CBB4EB !important; /* Lighter lavender hover */
   background-image: none !important;
-  color: #090909 !important;
+  color: #120716 !important;
 }
 
-/* Ensure text and SVG icons inside primary buttons turn dark #090909 */
+/* Ensure text and SVG icons inside primary buttons turn dark #120716 */
 button.bg-blue-600 svg,
 button.bg-indigo-600 svg,
 button.bg-white:not([class*="bg-zinc-950"]):not([class*="rounded-full"]) svg,
@@ -213,8 +213,8 @@ a.bg-white:not([class*="bg-zinc-950"]) svg,
 [class*="bg-blue-600"] svg,
 [class*="bg-indigo-600"] svg,
 .btn-primary svg {
-  color: #090909 !important;
-  stroke: #090909 !important;
+  color: #120716 !important;
+  stroke: #120716 !important;
 }
 
 /* Secondary Button Styling */
@@ -235,9 +235,9 @@ button[class*="bg-zinc-"]:not([class*="rounded-full"]),
 a[class*="border-zinc-"],
 a[class*="bg-zinc-"],
 .btn-secondary {
-  background-color: #181818 !important;
-  border: 1px solid rgba(255, 255, 255, 0.06) !important;
-  color: #F5F5F5 !important;
+  background-color: #26142C !important; /* Lighter Plum Card */
+  border: 1px solid rgba(186, 169, 199, 0.15) !important;
+  color: #FAF6F0 !important; /* Warm off-white */
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
@@ -259,11 +259,11 @@ button[class*="bg-zinc-"]:not([class*="rounded-full"]):hover,
 a[class*="border-zinc-"]:hover,
 a[class*="bg-zinc-"]:hover,
 .btn-secondary:hover {
-  background-color: #202020 !important;
-  color: #F5F5F5 !important;
+  background-color: #321C39 !important; /* Cozy Plum Highlight */
+  color: #FAF6F0 !important;
 }
 
-/* Ensure icons inside secondary buttons are high-contrast off-white #F5F5F5 */
+/* Ensure icons inside secondary buttons are warm off-white #FAF6F0 */
 button.bg-zinc-900 svg,
 button.bg-zinc-950 svg,
 button.border-zinc-800 svg,
@@ -271,8 +271,8 @@ button.border-zinc-850 svg,
 [class*="bg-zinc-"] svg,
 [class*="border-zinc-"] svg,
 .btn-secondary svg {
-  color: #F5F5F5 !important;
-  stroke: #F5F5F5 !important;
+  color: #FAF6F0 !important;
+  stroke: #FAF6F0 !important;
 }
 
 

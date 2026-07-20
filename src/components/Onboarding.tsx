@@ -22,7 +22,8 @@ import {
   Inbox, 
   Smartphone,
   Play,
-  RotateCcw
+  RotateCcw,
+  Bookmark
 } from 'lucide-react';
 
 interface OnboardingProps {
@@ -145,24 +146,24 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
   ];
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#060608] flex flex-col justify-between p-6 md:p-12 overflow-hidden select-none font-sans text-white">
+    <div className="fixed inset-0 z-50 bg-[#120716] flex flex-col justify-between p-6 md:p-12 overflow-hidden select-none font-sans text-white">
       
       {/* Cinematic ambient background glow */}
-      <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-indigo-500/5 rounded-full blur-[160px] pointer-events-none" />
-      <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-blue-500/5 rounded-full blur-[160px] pointer-events-none" />
+      <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-[#B39CD0]/5 rounded-full blur-[160px] pointer-events-none" />
+      <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-[#B39CD0]/5 rounded-full blur-[160px] pointer-events-none" />
 
       {/* Elegant Header */}
       <header className="flex items-center justify-between relative z-30">
         <div className="flex items-center gap-2.5">
           <div className="w-7 h-7 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center">
-            <Film className="w-3.5 h-3.5 text-blue-400" />
+            <Film className="w-3.5 h-3.5 text-[#B39CD0]" />
           </div>
-          <span className="text-xs font-mono font-bold tracking-widest text-zinc-400 uppercase">CINESAVE</span>
+          <span className="text-xs font-display italic tracking-widest text-zinc-300">CineSave</span>
         </div>
 
         <button 
           onClick={onComplete}
-          className="text-[10px] font-mono font-bold tracking-widest text-zinc-500 hover:text-zinc-300 transition-colors uppercase cursor-pointer"
+          className="text-[10px] font-sans font-medium tracking-widest text-zinc-500 hover:text-zinc-300 transition-colors uppercase cursor-pointer"
         >
           Skip Intro
         </button>
@@ -179,156 +180,87 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
           {currentStep === 0 && (
             <motion.div
               key="step-0"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.6 }}
-              className="w-full flex flex-col items-center justify-center text-center space-y-12"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.5 }}
+              className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-12 items-center"
             >
-              {(screen1Phase === 'scrolling' || screen1Phase === 'filling') && (
-                <div className="w-full max-w-md flex flex-col items-center space-y-8">
-                  {/* Instagram Scroll Mockup */}
-                  <div className="w-72 aspect-[9/16] bg-[#0c0c0e] border border-zinc-850 rounded-[40px] p-4 flex flex-col relative overflow-hidden shadow-[0_24px_60px_rgba(0,0,0,0.8)]">
-                    
-                    {/* Header */}
-                    <div className="flex justify-between items-center pb-3 border-b border-zinc-900/80 mb-2">
-                      <Instagram className="w-4 h-4 text-zinc-400" />
-                      <div className="w-20 h-1.5 rounded bg-zinc-850" />
-                      <div className="w-4 h-4 rounded-full bg-zinc-850" />
-                    </div>
+              {/* Left Side: Smooth Infinite Reel List Mockup */}
+              <div className="flex justify-center select-none">
+                <div className="w-64 aspect-[9/16] bg-[#1d0e22] border border-zinc-850/80 rounded-[40px] p-4 flex flex-col relative overflow-hidden shadow-[0_24px_60px_rgba(0,0,0,0.8)] animate-fade-in">
+                  
+                  {/* Header */}
+                  <div className="flex justify-between items-center pb-3 border-b border-zinc-900/80 mb-2">
+                    <Instagram className="w-4 h-4 text-zinc-500" />
+                    <div className="w-20 h-1.5 rounded bg-zinc-850" />
+                    <div className="w-4 h-4 rounded-full bg-zinc-850" />
+                  </div>
 
-                    {/* Scrolling Reels Stack */}
-                    <div className="flex-1 flex flex-col gap-4 relative overflow-hidden">
-                      <motion.div 
-                        animate={{ y: -savedCount * 130 }}
-                        transition={{ type: "spring", stiffness: 60, damping: 15 }}
-                        className="space-y-4"
-                      >
-                        {[...Array(12)].map((_, idx) => (
-                          <div key={idx} className="bg-zinc-900/60 border border-zinc-850/60 rounded-2xl p-3 h-28 flex flex-col justify-between relative overflow-hidden">
-                            <div className="flex justify-between items-start">
-                              <div className="space-y-1">
-                                <div className="w-24 h-2 bg-zinc-800 rounded" />
-                                <div className="w-16 h-1.5 bg-zinc-850 rounded" />
-                              </div>
-                              <Instagram className="w-3 h-3 text-pink-500/40" />
+                  {/* Scrolling Stack */}
+                  <div className="flex-1 flex flex-col gap-4 relative overflow-hidden">
+                    <motion.div 
+                      animate={{ y: [0, -260, 0] }}
+                      transition={{ 
+                        repeat: Infinity, 
+                        duration: 12, 
+                        ease: "linear" 
+                      }}
+                      className="space-y-4"
+                    >
+                      {[...Array(6)].map((_, idx) => (
+                        <div key={idx} className="bg-[#26142c] border border-zinc-850/60 rounded-2xl p-3 h-28 flex flex-col justify-between">
+                          <div className="flex justify-between items-start">
+                            <div className="space-y-1">
+                              <div className="w-24 h-2 bg-zinc-850 rounded" />
+                              <div className="w-16 h-1.5 bg-zinc-900 rounded" />
                             </div>
-                            
-                            <div className="w-full h-10 rounded bg-zinc-950 flex items-center justify-center text-[9px] font-mono text-zinc-600">
-                              Movie Recommendation Reel #{idx + 1}
-                            </div>
-
-                            <div className="flex justify-between items-center text-[8px] text-zinc-500">
-                              <span>@cinemafan</span>
-                              <span className="text-pink-400 font-bold">♥ Save</span>
-                            </div>
+                            <Instagram className="w-3 h-3 text-pink-500/20" />
                           </div>
-                        ))}
-                      </motion.div>
+                          
+                          <div className="w-full h-10 rounded bg-[#120716] flex items-center justify-center text-[9px] font-sans text-zinc-500">
+                            Saved Movie Recommendation
+                          </div>
 
-                      {/* Toast Alerts Overlay */}
-                      <AnimatePresence>
-                        {savedCount > 0 && (
-                          <motion.div 
-                            initial={{ opacity: 0, y: 15, scale: 0.9 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.9 }}
-                            className="absolute bottom-4 left-4 right-4 bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 flex items-center justify-between shadow-xl z-20"
-                          >
-                            <div className="flex items-center gap-2">
-                              <div className="w-5 h-5 rounded-full bg-pink-500/10 flex items-center justify-center">
-                                <Check className="w-3 h-3 text-pink-500" />
-                              </div>
-                              <span className="text-[10px] font-mono text-white font-bold">Saved to Collection</span>
-                            </div>
-                            <span className="text-[9px] font-mono text-zinc-500">#{savedCount}</span>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  </div>
-
-                  {/* Status Indicator */}
-                  <div className="space-y-1.5">
-                    <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest block">STEP 1: THE DISCOVERY</span>
-                    <h3 className="text-sm font-semibold text-zinc-400">Saving movie recommendations to Instagram Reels...</h3>
-                  </div>
-                </div>
-              )}
-
-              {/* Chaos pile of saves stage */}
-              {screen1Phase === 'filling' && (
-                <div className="absolute inset-0 z-10 flex flex-wrap items-center justify-center gap-4 bg-[#060608]/90 p-6 pointer-events-none">
-                  {[...Array(40)].map((_, idx) => (
-                    <motion.div
-                      key={idx}
-                      initial={{ opacity: 0, scale: 0.2, y: 30 }}
-                      animate={{ opacity: 0.85, scale: 1, y: 0 }}
-                      transition={{ delay: idx * 0.08, type: "spring", stiffness: 100 }}
-                      className="bg-zinc-900 border border-zinc-700 text-xs px-4 py-2.5 rounded-full font-mono text-pink-400 flex items-center gap-1.5 shadow-lg"
-                    >
-                      <Instagram className="w-3 h-3 text-pink-500" />
-                      <span>Reel Saved</span>
+                          <div className="flex justify-between items-center text-[8px] text-zinc-650">
+                            <span>@cinemafan</span>
+                            <span className="text-pink-500/40 font-bold">♥ Save</span>
+                          </div>
+                        </div>
+                      ))}
                     </motion.div>
-                  ))}
+                  </div>
                 </div>
-              )}
+              </div>
 
-              {/* Blackout stage */}
-              {screen1Phase === 'blackout' && (
-                <div className="absolute inset-0 bg-[#060608] z-40" />
-              )}
-
-              {/* "You saved it." stage */}
-              {screen1Phase === 'saved-text' && (
-                <motion.div 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 1.2 }}
-                  className="space-y-2 py-16"
-                >
-                  <h1 className="text-4xl sm:text-7xl font-light tracking-tight text-zinc-300">
-                    You saved it.
+              {/* Right Side: Clear Value Proposition and Action */}
+              <div className="space-y-6 text-left">
+                <div className="space-y-3">
+                  <span className="text-[11px] font-sans text-zinc-500 uppercase tracking-widest block">The Endless Feed</span>
+                  <h1 className="text-4xl sm:text-5xl font-display font-light italic text-zinc-100 leading-tight">
+                    But did you <span className="text-[#B39CD0] not-italic font-sans font-semibold">ever</span> watch them?
                   </h1>
-                </motion.div>
-              )}
-
-              {/* "But did you ever watch it?" stage */}
-              {screen1Phase === 'question' && (
-                <div className="space-y-8 py-16">
-                  <motion.h1 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 1.5 }}
-                    className="text-4xl sm:text-7xl font-extrabold tracking-tight text-white leading-none"
-                  >
-                    But did you <span className="bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">ever</span> watch it?
-                  </motion.h1>
-                  <motion.p 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 1, duration: 1 }}
-                    className="text-xs sm:text-sm font-mono text-zinc-500 uppercase tracking-widest max-w-md mx-auto"
-                  >
-                    Probably not. It’s lost forever in your digital amnesia.
-                  </motion.p>
-
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 2, duration: 0.8 }}
-                    className="pt-4"
-                  >
-                    <button
-                      onClick={handleNext}
-                      className="px-8 py-4 rounded-full bg-white text-black hover:bg-zinc-200 text-xs font-mono font-bold tracking-widest uppercase transition-all shadow-[0_12px_40px_rgba(255,255,255,0.15)] flex items-center gap-2 mx-auto cursor-pointer"
-                    >
-                      <span>Exactly. What's next?</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
-                  </motion.div>
+                  <p className="text-zinc-400 text-sm leading-relaxed font-normal">
+                    We all save reels, screenshots, and texts containing great movie recommendations. But they get lost forever in digital noise and app saves.
+                  </p>
+                  <p className="text-zinc-500 text-xs leading-relaxed font-normal">
+                    CineSave is a simple, quiet archive to extract, catalog, and finally watch the movies you want to remember.
+                  </p>
                 </div>
-              )}
+
+                <div className="pt-4">
+                  <motion.button
+                    onClick={handleNext}
+                    whileHover={{ scale: 1.025 }}
+                    whileTap={{ scale: 0.975 }}
+                    transition={{ type: "spring", stiffness: 250, damping: 20 }}
+                    className="px-6 py-3.5 rounded-xl bg-white text-black hover:bg-zinc-200 text-xs font-mono font-bold tracking-widest uppercase flex items-center gap-2 cursor-pointer shadow-lg"
+                  >
+                    <span>What's next?</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </motion.button>
+                </div>
+              </div>
             </motion.div>
           )}
 
@@ -346,15 +278,15 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
             >
               {/* Header Headline */}
               <div className="text-center space-y-3 max-w-xl">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-500/10 border border-blue-500/15 text-blue-400 rounded-full text-[10px] font-mono font-semibold tracking-wider uppercase">
-                  THE SPRAWL PROBLEM
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-zinc-900 border border-zinc-800 text-zinc-400 rounded-full text-[10px] font-sans font-semibold tracking-wider uppercase">
+                  Scattered Scrapbooks
                 </span>
-                <h1 className="text-3xl sm:text-5xl font-display font-extrabold text-white tracking-tight leading-[1.1]">
-                  Everything. <br className="sm:hidden" />
-                  <span className="bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400 bg-clip-text text-transparent">Finally together.</span>
+                <h1 className="text-3xl sm:text-5xl font-display font-light italic text-zinc-100 tracking-tight leading-[1.1]">
+                  A quiet sanctuary <br className="sm:hidden" />
+                  <span className="text-[#B39CD0]">for all your lists.</span>
                 </h1>
-                <p className="text-xs text-zinc-500 font-mono">
-                  All your scattered watchlists and screenshots in one single space.
+                <p className="text-xs text-zinc-400 font-sans">
+                  All your scattered watchlists, notes, and screenshots in one single space.
                 </p>
               </div>
 
@@ -365,7 +297,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                 <motion.div 
                   className={`z-20 w-36 h-36 rounded-3xl bg-zinc-900 border flex flex-col items-center justify-center shadow-2xl relative transition-all duration-700 ${
                     screen2Phase === 'merged' 
-                      ? 'border-blue-500 bg-zinc-950 shadow-[0_0_50px_rgba(59,130,246,0.25)] scale-110' 
+                      ? 'border-[#B39CD0] bg-zinc-950 shadow-[0_0_50px_rgba(179,156,208,0.15)] scale-110' 
                       : 'border-zinc-800'
                   }`}
                 >
@@ -377,7 +309,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                         exit={{ scale: 0.8, opacity: 0 }}
                       >
                         <Film className="w-7 h-7 text-zinc-500 animate-pulse" />
-                        <span className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest font-bold">CineSave</span>
+                        <span className="text-[10px] font-display italic text-zinc-400">CineSave</span>
                       </motion.div>
                     ) : (
                       <motion.div 
@@ -386,8 +318,8 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                         animate={{ scale: 1, opacity: 1 }}
                         className="flex flex-col items-center space-y-1.5 text-center p-2"
                       >
-                        <Sparkles className="w-8 h-8 text-blue-400 animate-bounce" />
-                        <span className="text-[10px] font-mono text-blue-400 font-extrabold uppercase tracking-widest">Library Ready</span>
+                        <Sparkles className="w-8 h-8 text-[#B39CD0] animate-bounce" />
+                        <span className="text-[10px] font-sans text-[#B39CD0] font-bold uppercase tracking-widest">Library Ready</span>
                         <span className="text-[8px] font-sans text-zinc-400 leading-none">12 Movies Curated</span>
                       </motion.div>
                     )}
@@ -471,42 +403,46 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                       </motion.div>
                     </>
                   )}
-                </AnimatePresence>
-
-                {/* Pull gravity rings during collapsing phase */}
+                </AnimatePresence>                {/* Pull gravity rings during collapsing phase */}
                 {screen2Phase === 'collapsing' && (
                   <div className="absolute inset-0 flex items-center justify-center">
                     <motion.div 
                       initial={{ scale: 1.5, opacity: 0 }}
                       animate={{ scale: 0.5, opacity: 1 }}
                       transition={{ duration: 1.2, repeat: Infinity }}
-                      className="w-80 h-80 rounded-full border border-blue-500/20"
+                      className="w-80 h-80 rounded-full border border-[#B39CD0]/20"
                     />
                     <motion.div 
                       initial={{ scale: 2.2, opacity: 0 }}
                       animate={{ scale: 0.3, opacity: 0.8 }}
                       transition={{ duration: 1.5, delay: 0.3, repeat: Infinity }}
-                      className="w-96 h-96 rounded-full border border-indigo-500/10"
+                      className="w-96 h-96 rounded-full border border-[#B39CD0]/10"
                     />
                   </div>
                 )}
               </div>
-
+ 
               {/* Next navigation controls */}
               <div className="flex items-center gap-4">
-                <button
+                <motion.button
                   onClick={handleBack}
-                  className="px-6 py-3 rounded-xl border border-zinc-800 hover:bg-zinc-900 text-xs font-mono font-bold uppercase transition-colors tracking-widest cursor-pointer"
+                  whileHover={{ scale: 1.02, backgroundColor: "#18181b" }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 250, damping: 20 }}
+                  className="px-6 py-3 rounded-xl border border-zinc-800 text-xs font-sans font-bold uppercase tracking-widest cursor-pointer text-zinc-300"
                 >
                   Back
-                </button>
-                <button
+                </motion.button>
+                <motion.button
                   onClick={handleNext}
-                  className="px-8 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-mono font-bold tracking-widest uppercase transition-all shadow-lg shadow-blue-500/15 flex items-center gap-1.5 cursor-pointer"
+                  whileHover={{ scale: 1.02, backgroundColor: "#cbb6e5" }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 250, damping: 20 }}
+                  className="px-8 py-3.5 rounded-xl bg-[#B39CD0] text-[#120716] text-xs font-sans font-bold tracking-widest uppercase shadow-lg flex items-center gap-1.5 cursor-pointer"
                 >
                   <span>See How It Works</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
+                  <ArrowRight className="w-4 h-4 text-[#120716]" />
+                </motion.button>
               </div>
             </motion.div>
           )}
@@ -525,15 +461,15 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
             >
               {/* Headline */}
               <div className="text-center space-y-3 max-w-xl">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-zinc-900 border border-zinc-800 text-zinc-400 rounded-full text-[10px] font-mono font-semibold tracking-wider uppercase">
-                  ZERO MANUAL WORK
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-zinc-900 border border-zinc-800 text-zinc-400 rounded-full text-[10px] font-sans font-semibold tracking-wider uppercase">
+                  Curation without effort
                 </span>
-                <h1 className="text-3xl sm:text-5xl font-display font-extrabold text-white tracking-tight leading-[1.1]">
-                  Instagram to Watchlist. <br />
-                  <span className="text-[#D4AF37]">In one action.</span>
+                <h1 className="text-3xl sm:text-5xl font-display font-light italic text-zinc-100 tracking-tight leading-[1.1]">
+                  From a friend's text, <br />
+                  <span className="text-[#B39CD0]">straight to your shelf.</span>
                 </h1>
-                <p className="text-xs text-zinc-500 font-mono">
-                  Instantly capture descriptions & metadata on-the-fly.
+                <p className="text-xs text-zinc-400 font-sans">
+                  Instantly capture descriptions, years, and directors.
                 </p>
               </div>
 
@@ -543,12 +479,12 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-6 px-4 relative z-10">
                   {/* Left: Source */}
                   <div className="flex items-center gap-3 bg-zinc-900 border border-zinc-800 rounded-2xl p-3 w-48 shadow-lg">
-                    <div className="w-8 h-8 rounded-xl bg-pink-500/10 flex items-center justify-center">
-                      <Instagram className="w-4 h-4 text-pink-500" />
+                    <div className="w-8 h-8 rounded-xl bg-purple-500/10 flex items-center justify-center">
+                      <MessageSquare className="w-4 h-4 text-[#B39CD0]" />
                     </div>
                     <div>
-                      <h4 className="text-xs font-bold">Instagram Post</h4>
-                      <p className="text-[9px] font-mono text-zinc-500">Video Transcript</p>
+                      <h4 className="text-xs font-bold">Friend's Text</h4>
+                      <p className="text-[9px] font-sans text-zinc-500">Or a podcast transcript</p>
                     </div>
                   </div>
 
@@ -557,23 +493,23 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                     <motion.div 
                       animate={{ x: [0, 8, 0] }}
                       transition={{ repeat: Infinity, duration: 1.5 }}
-                      className="hidden sm:block text-blue-400"
+                      className="hidden sm:block text-[#B39CD0]"
                     >
                       <ArrowRight className="w-5 h-5" />
                     </motion.div>
-                    <span className="text-[9px] font-mono text-blue-400 bg-blue-500/5 border border-blue-500/10 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
-                      SHARE LINK
+                    <span className="text-[9px] font-sans text-[#B39CD0] bg-[#B39CD0]/5 border border-[#B39CD0]/10 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                      REMEMBER THIS
                     </span>
                   </div>
 
                   {/* Right: Destination */}
                   <div className="flex items-center gap-3 bg-zinc-900 border border-zinc-800 rounded-2xl p-3 w-48 shadow-lg">
                     <div className="w-8 h-8 rounded-xl bg-zinc-800 flex items-center justify-center shadow-md">
-                      <Film className="w-4 h-4 text-white" />
+                      <Bookmark className="w-4 h-4 text-[#B39CD0]" />
                     </div>
                     <div>
-                      <h4 className="text-xs font-bold text-zinc-300">CineSave Inbox</h4>
-                      <p className="text-[9px] font-mono text-zinc-400 font-extrabold">✓ 12 Movies Captured</p>
+                      <h4 className="text-xs font-bold text-zinc-300 font-display italic">Your Library</h4>
+                      <p className="text-[9px] font-sans text-zinc-400 font-extrabold">✓ Saved Forever</p>
                     </div>
                   </div>
                 </div>
@@ -602,7 +538,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent" />
                         <div className="relative z-10 space-y-0.5">
-                          <span className="text-[8px] font-mono bg-blue-500/20 text-blue-300 px-1 py-0.2 rounded font-extrabold">
+                          <span className="text-[8px] font-sans bg-[#B39CD0]/20 text-[#B39CD0] px-1 py-0.2 rounded font-extrabold">
                             {movie.vibe}
                           </span>
                           <h4 className="text-[10px] font-bold text-white truncate leading-tight pt-1">
@@ -617,19 +553,25 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
 
               {/* Master call to action buttons */}
               <div className="flex items-center gap-4">
-                <button
+                <motion.button
                   onClick={handleBack}
-                  className="px-6 py-3.5 rounded-xl border border-zinc-800 hover:bg-zinc-900 text-xs font-mono font-bold uppercase transition-colors tracking-widest cursor-pointer"
+                  whileHover={{ scale: 1.02, backgroundColor: "#18181b" }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 250, damping: 20 }}
+                  className="px-6 py-3.5 rounded-xl border border-zinc-800 text-xs font-sans font-bold uppercase tracking-widest cursor-pointer text-zinc-300"
                 >
                   Back
-                </button>
-                <button
+                </motion.button>
+                <motion.button
                   onClick={onComplete}
-                  className="px-12 py-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-mono font-bold tracking-widest uppercase transition-all shadow-xl flex items-center gap-2 cursor-pointer hover:scale-[1.02]"
+                  whileHover={{ scale: 1.015, backgroundColor: "#cbb6e5" }}
+                  whileTap={{ scale: 0.985 }}
+                  transition={{ type: "spring", stiffness: 250, damping: 20 }}
+                  className="px-12 py-4 rounded-xl bg-[#B39CD0] text-[#120716] text-xs font-sans font-bold tracking-widest uppercase shadow-xl flex items-center gap-2 cursor-pointer"
                 >
                   <span>Build My Library</span>
-                  <Film className="w-4 h-4 text-white" />
-                </button>
+                  <Bookmark className="w-4 h-4 text-[#120716]" />
+                </motion.button>
               </div>
             </motion.div>
           )}
@@ -639,8 +581,8 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
 
       {/* Elegant minimalist Stepper dots base footer */}
       <footer className="flex justify-between items-center relative z-10 border-t border-zinc-950/60 pt-6">
-        <div className="text-zinc-500 text-[10px] font-mono tracking-wider font-semibold uppercase">
-          Onboarding
+        <div className="text-zinc-500 text-[10px] font-sans tracking-wider font-semibold uppercase">
+          Introduction
         </div>
 
         {/* Dynamic Slide Counter dots */}
@@ -650,7 +592,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
               key={idx}
               onClick={() => setCurrentStep(idx)}
               className={`h-1.5 rounded-full transition-all duration-500 cursor-pointer ${
-                currentStep === idx ? 'w-8 bg-blue-500' : 'w-2 bg-zinc-850'
+                currentStep === idx ? 'w-8 bg-[#B39CD0]' : 'w-2 bg-zinc-850'
               }`}
             />
           ))}

@@ -56,7 +56,14 @@ export default function MovieDetailModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md" id="movie-detail-modal">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md"
+      id="movie-detail-modal"
+    >
       
       {/* Click backdrop to close */}
       <div className="fixed inset-0 cursor-pointer" onClick={onClose} />
@@ -72,15 +79,18 @@ export default function MovieDetailModal({
         {/* Header Close Trigger */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-900">
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest font-bold">Catalogued Item Detail</span>
+            <span className="text-[11px] font-sans text-zinc-500 uppercase tracking-wider">Archive Entry</span>
           </div>
-          <button
+          <motion.button
             onClick={onClose}
-            className="p-1.5 hover:bg-zinc-900 text-zinc-400 hover:text-white rounded-lg transition-all cursor-pointer"
+            whileHover={{ scale: 1.05, backgroundColor: "rgba(24, 24, 27, 0.8)" }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            className="p-1.5 text-zinc-400 hover:text-white rounded-lg cursor-pointer"
             title="Close Note"
           >
             <X className="w-4 h-4" />
-          </button>
+          </motion.button>
         </div>
 
         {/* Scrollable Content Body */}
@@ -89,10 +99,10 @@ export default function MovieDetailModal({
           {/* Main Title, Director, and Year */}
           <div className="space-y-1.5">
             <div className="flex items-baseline gap-2 flex-wrap">
-              <h2 className={`text-2xl font-bold text-white tracking-tight ${movie.watched ? 'line-through text-zinc-500' : ''}`}>
+              <h2 className={`text-3xl font-display font-light italic text-white tracking-tight ${movie.watched ? 'line-through text-zinc-500' : ''}`}>
                 {movie.title}
               </h2>
-              <span className="text-sm font-mono text-zinc-500 font-medium">({movie.year})</span>
+              <span className="text-sm font-sans text-zinc-500 font-medium">({movie.year})</span>
             </div>
             <p className="text-xs text-zinc-400 flex items-center gap-1">
               <User className="w-3.5 h-3.5 text-zinc-600" />
@@ -102,20 +112,20 @@ export default function MovieDetailModal({
 
           {/* Quick specs pill row */}
           <div className="flex flex-wrap gap-1.5">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-blue-400 bg-blue-500/5 border border-blue-500/10 px-2.5 py-1 rounded">
+            <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-[#B39CD0] bg-[#B39CD0]/5 border border-[#B39CD0]/10 px-2.5 py-1 rounded">
               ✦ {movie.vibe}
             </span>
             {movie.runtime && (
-              <span className="text-[10px] font-mono font-bold text-zinc-400 bg-zinc-900 border border-zinc-800 px-2.5 py-1 rounded flex items-center gap-1">
+              <span className="text-[10px] font-sans font-bold text-zinc-400 bg-zinc-900 border border-zinc-800 px-2.5 py-1 rounded flex items-center gap-1">
                 <Clock className="w-3 h-3 text-zinc-500" />
                 <span>{movie.runtime}</span>
               </span>
             )}
-            <span className="text-[10px] font-mono font-bold text-zinc-400 bg-zinc-900 border border-zinc-800 px-2.5 py-1 rounded flex items-center gap-1">
+            <span className="text-[10px] font-sans font-bold text-zinc-400 bg-zinc-900 border border-zinc-800 px-2.5 py-1 rounded flex items-center gap-1">
               <Languages className="w-3 h-3 text-zinc-500" />
               <span>{movie.language || 'English'}</span>
             </span>
-            <span className="text-[10px] font-mono font-bold text-amber-400 bg-amber-500/5 border border-amber-500/10 px-2.5 py-1 rounded flex items-center gap-1">
+            <span className="text-[10px] font-sans font-bold text-amber-400 bg-amber-500/5 border border-amber-500/10 px-2.5 py-1 rounded flex items-center gap-1">
               <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
               <span>⭐ {movie.rating}</span>
             </span>
@@ -132,14 +142,14 @@ export default function MovieDetailModal({
 
           {/* Synopsis */}
           <div className="space-y-1.5">
-            <h4 className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest">Synopsis</h4>
+            <h4 className="text-[10px] font-sans font-bold text-zinc-500 uppercase tracking-widest">Synopsis</h4>
             <p className="text-xs text-zinc-400 leading-relaxed font-sans">{movie.synopsis}</p>
           </div>
 
           {/* Discovered / saved reason */}
           {movie.whySave && (
             <div className="space-y-1.5">
-              <h4 className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest">Why You Saved This</h4>
+              <h4 className="text-[10px] font-sans font-bold text-zinc-500 uppercase tracking-widest">Why You Saved This</h4>
               <div className="bg-zinc-900/50 border border-zinc-850 p-4 rounded-xl text-xs text-zinc-300 italic leading-relaxed">
                 "{movie.whySave}"
               </div>
@@ -148,9 +158,9 @@ export default function MovieDetailModal({
 
           {/* Original source transcript stub */}
           <div className="space-y-1.5">
-            <h4 className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest">Source Recommendation Snippet</h4>
+            <h4 className="text-[10px] font-sans font-bold text-zinc-500 uppercase tracking-widest">Source Recommendation Snippet</h4>
             <div className="bg-zinc-900/30 border border-zinc-900 p-4 rounded-xl space-y-2">
-              <div className="flex items-center justify-between text-[10px] text-zinc-500 font-mono">
+              <div className="flex items-center justify-between text-[10px] text-zinc-500 font-sans">
                 <span>Saved from @{movie.socialSource.author || 'creator'} via {movie.socialSource.platform}</span>
                 <span>{getRelativeTime(movie.addedAt)}</span>
               </div>
@@ -162,7 +172,7 @@ export default function MovieDetailModal({
                   href={movie.socialSource.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-blue-400 hover:text-blue-300 transition-colors"
+                  className="inline-flex items-center gap-1 text-[10px] font-sans font-bold text-[#B39CD0] hover:text-purple-300 transition-colors"
                 >
                   <span>Link to source</span>
                   <ExternalLink className="w-2.5 h-2.5" />
@@ -173,12 +183,12 @@ export default function MovieDetailModal({
 
           {/* Streaming service match */}
           <div className="space-y-2">
-            <h4 className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest">Available channels</h4>
+            <h4 className="text-[10px] font-sans font-bold text-zinc-500 uppercase tracking-widest">Available Channels</h4>
             <div className="flex flex-wrap gap-1.5">
               {movie.streamingServices.map((srv) => (
                 <span 
                   key={srv} 
-                  className="text-xs font-mono font-bold text-zinc-200 bg-zinc-900 border border-zinc-800 px-3 py-1.5 rounded-lg uppercase flex items-center gap-1.5"
+                  className="text-xs font-sans font-bold text-zinc-200 bg-zinc-900 border border-zinc-800 px-3 py-1.5 rounded-lg uppercase flex items-center gap-1.5"
                 >
                   <Tv className="w-3.5 h-3.5 text-zinc-500" />
                   <span>{srv}</span>
@@ -193,23 +203,29 @@ export default function MovieDetailModal({
         <div className="bg-zinc-900/40 border-t border-zinc-900 px-5 py-4 flex flex-col sm:flex-row gap-2">
           
           {/* Main Action: Link out to actually watch the movie on stream platform/Google search */}
-          <a
+          <motion.a
             href={googleSearchUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 py-2.5 px-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-1.5 transition-all text-center shadow-lg shadow-blue-900/10 cursor-pointer"
+            whileHover={{ scale: 1.015 }}
+            whileTap={{ scale: 0.985 }}
+            transition={{ type: "spring", stiffness: 250, damping: 20 }}
+            className="flex-1 py-2.5 px-4 bg-blue-600 text-white rounded-xl font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-1.5 text-center shadow-lg shadow-blue-900/10 cursor-pointer"
           >
             <ExternalLink className="w-3.5 h-3.5 text-white" />
             <span>Search Where to Watch</span>
-          </a>
+          </motion.a>
 
           {/* Mark watched checkbox */}
-          <button
+          <motion.button
             onClick={() => onToggleWatched(movie.id)}
-            className={`py-2.5 px-4 rounded-xl border font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-1.5 cursor-pointer transition-all ${
+            whileHover={{ scale: 1.015 }}
+            whileTap={{ scale: 0.985 }}
+            transition={{ type: "spring", stiffness: 250, damping: 20 }}
+            className={`py-2.5 px-4 rounded-xl border font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-1.5 cursor-pointer ${
               movie.watched
-                ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/25'
-                : 'bg-zinc-900 hover:bg-zinc-850 border-zinc-800 text-zinc-300 hover:text-white'
+                ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400'
+                : 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:text-white'
             }`}
           >
             {movie.watched ? (
@@ -223,11 +239,11 @@ export default function MovieDetailModal({
                 <span>Mark Watched</span>
               </>
             )}
-          </button>
+          </motion.button>
 
         </div>
 
       </motion.div>
-    </div>
+    </motion.div>
   );
 }
