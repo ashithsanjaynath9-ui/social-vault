@@ -3,29 +3,31 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useMemo } from 'react';
-import { motion } from 'motion/react';
+import React, { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
+  User, 
   Tv, 
   Check, 
-  HelpCircle, 
-  Clock, 
   Sparkles, 
-  Film,
-  Camera,
-  LogOut,
-  Calendar
+  Bell, 
+  Lock, 
+  Download, 
+  Info, 
+  LogOut, 
+  ChevronRight,
+  HelpCircle,
+  X
 } from 'lucide-react';
 import { Movie, AppStats } from '../types';
-import { IdentityId, IdentityShowcase } from './BrandIdentity';
 
 interface ProfileScreenProps {
   movies: Movie[];
   stats: AppStats;
   onReplayOnboarding: () => void;
   userEmail?: string;
-  activeIdentity: IdentityId;
-  onChangeIdentity: (id: IdentityId) => void;
+  activeIdentity?: string;
+  onChangeIdentity?: (id: any) => void;
 }
 
 export default function ProfileScreen({
@@ -37,168 +39,331 @@ export default function ProfileScreen({
   onChangeIdentity
 }: ProfileScreenProps) {
   
-  // Calculate some fun curated metrics for the Profile screen
-  const recentWatched = useMemo(() => {
-    return movies
-      .filter(m => m.watched)
-      .sort((a, b) => {
-        const dateA = a.watchedAt ? new Date(a.watchedAt).getTime() : 0;
-        const dateB = b.watchedAt ? new Date(b.watchedAt).getTime() : 0;
-        return dateB - dateA;
-      })
-      .slice(0, 3);
+  // Calculate Favorite Genres from actual live movie list data
+  const favoriteGenres = useMemo(() => {
+    const counts: Record<string, number> = {};
+    movies.forEach(m => {
+      if (m.genres) {
+        m.genres.forEach(g => {
+          counts[g] = (counts[g] || 0) + 1;
+        });
+      }
+    });
+    
+    const sorted = Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([genre]) => genre);
+
+    return sorted.length > 0 ? sorted.join(', ') : 'Drama, Thriller';
   }, [movies]);
 
-  // Determine Curating Level title
-  const curatingLevel = useMemo(() => {
-    const total = movies.length;
-    if (total === 0) return 'Novice Archivist';
-    if (total <= 5) return 'Cinema Explorer';
-    if (total <= 12) return 'Aesthetic Selector';
-    return 'Master Curator';
-  }, [movies]);
+  // Clean UI states for interactive settings
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [privateLibrary, setPrivateLibrary] = useState(true);
+  const [showAbout, setShowAbout] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [isLoggedOut, setIsLoggedOut] = useState(false);
+
+  // Real Export Library logic - triggers watchlist file download
+  const handleExportLibrary = () => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(movies, null, 2));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", "cinesave_watchlist.json");
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+  };
+
+  if (isLoggedOut) {
+    return (
+      <div className="max-w-md mx-auto py-24 px-6 text-center space-y-6 select-none font-sans" id="logged-out-state">
+        <div className="w-16 h-16 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-500 mx-auto">
+          <LogOut className="w-6 h-6 text-zinc-500" />
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-xl font-display italic text-zinc-100">Signed Out</h2>
+          <p className="text-xs text-zinc-500 max-w-xs mx-auto leading-relaxed">
+            You have successfully signed out of CineSave. Refresh the application to start a fresh browsing session.
+          </p>
+        </div>
+        <button
+          onClick={() => setIsLoggedOut(false)}
+          className="px-4 py-2 bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 text-xs font-medium rounded-xl text-zinc-300 hover:text-white transition-all cursor-pointer"
+        >
+          Return to App
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-xl mx-auto space-y-10 py-6 px-4 text-zinc-100 font-sans" id="profile-panel">
+    <div className="max-w-md mx-auto space-y-6 py-6 px-4 text-zinc-100 font-sans select-none" id="profile-panel">
       
-      {/* 1. Header & Identity Card */}
-      <div className="flex flex-col items-center text-center space-y-4">
-        <div className="relative group">
-          <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-zinc-850 to-zinc-900 border border-zinc-800 flex items-center justify-center text-3xl shadow-lg relative overflow-hidden select-none">
-            👤
-          </div>
-          <div className="absolute -bottom-1 -right-1 bg-zinc-950 border border-zinc-800 w-6 h-6 rounded-full flex items-center justify-center text-[10px]">
-            ✨
-          </div>
-        </div>
+      {/* Page Heading aligned with other screens */}
+      <div className="text-center sm:text-left space-y-1.5 pb-4 border-b border-zinc-900 select-none">
+        <p className="text-[10px] tracking-wider uppercase font-medium text-zinc-500">
+          Personal Preferences
+        </p>
+        <h2 className="text-3xl sm:text-4xl font-display font-light italic text-zinc-100">
+          Profile Settings
+        </h2>
+        <p className="text-xs text-zinc-450 leading-relaxed max-w-sm">
+          Manage your private database preferences, download archives, and view statistics.
+        </p>
+      </div>
 
-        <div className="space-y-1">
-          <h2 className="text-2xl font-display font-light italic text-zinc-100">
+      {/* 1. Spotify-style Minimal Avatar Header */}
+      <div className="flex items-center gap-4 py-2">
+        <div className="relative w-12 h-12 rounded-full bg-gradient-to-tr from-zinc-900 to-zinc-950 border border-zinc-800 flex items-center justify-center text-xl shadow-md overflow-hidden shrink-0">
+          <User className="w-5 h-5 text-zinc-500" />
+        </div>
+        <div className="min-w-0 text-left">
+          <h3 className="text-sm font-medium text-zinc-200 truncate">
             {userEmail.split('@')[0]}
-          </h2>
-          <p className="text-[11px] font-sans tracking-wider text-zinc-400 uppercase">
-            {curatingLevel} • Curator since 2026
+          </h3>
+          <p className="text-[11px] text-zinc-500 truncate mt-0.5">
+            {userEmail}
           </p>
         </div>
       </div>
 
-      {/* 2. Sleek Core Statistics Grid */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="p-4 rounded-2xl bg-zinc-900/30 border border-zinc-850/60 text-center space-y-1.5">
-          <p className="text-[10px] font-sans tracking-wider text-zinc-500 uppercase">In Shelf</p>
-          <p className="text-xl font-normal text-zinc-100">{stats.totalSaved}</p>
-          <p className="text-[9px] text-zinc-500 font-sans">unwatched films</p>
-        </div>
+      {/* 2. Compact Statistics (Movies Saved, Movies Watched, Favorite Genres) */}
+      <div className="space-y-2.5">
+        <p className="text-[10px] tracking-wider uppercase font-medium text-zinc-500 px-1">Your Screening Stats</p>
+        <div className="bg-zinc-900/30 border border-zinc-850/60 rounded-2xl p-4 space-y-3.5">
+          <div className="flex justify-between items-center text-xs">
+            <span className="text-zinc-400">Movies Saved</span>
+            <span className="font-mono text-zinc-200 bg-zinc-900/60 border border-zinc-800 px-2 py-0.5 rounded text-[11px]">
+              {movies.length}
+            </span>
+          </div>
 
-        <div className="p-4 rounded-2xl bg-zinc-900/30 border border-zinc-850/60 text-center space-y-1.5">
-          <p className="text-[10px] font-sans tracking-wider text-zinc-500 uppercase">Watched</p>
-          <p className="text-xl font-normal text-[#B39CD0]">{stats.watchedCount}</p>
-          <p className="text-[9px] text-zinc-500 font-sans">completed journeys</p>
-        </div>
+          <div className="flex justify-between items-center text-xs">
+            <span className="text-zinc-400">Movies Watched</span>
+            <span className="font-mono text-emerald-400 bg-emerald-950/20 border border-emerald-900/30 px-2 py-0.5 rounded text-[11px]">
+              {movies.filter(m => m.watched).length}
+            </span>
+          </div>
 
-        <div className="p-4 rounded-2xl bg-zinc-900/30 border border-zinc-850/60 text-center space-y-1.5">
-          <p className="text-[10px] font-sans tracking-wider text-zinc-500 uppercase">Top Vibe</p>
-          <p className="text-xs font-normal text-zinc-200 line-clamp-1 py-1 truncate" title={stats.topVibe}>
-            {stats.topVibe}
-          </p>
-          <p className="text-[9px] text-zinc-500 font-sans">aesthetic focus</p>
+          <div className="flex justify-between items-center text-xs">
+            <span className="text-zinc-400">Favorite Genres</span>
+            <span className="text-zinc-300 font-medium truncate max-w-[200px]" title={favoriteGenres}>
+              {favoriteGenres}
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* 3. Recently Watched Timeline (Only if present) */}
-      {recentWatched.length > 0 && (
-        <div className="space-y-3.5">
-          <p className="text-[10px] font-sans text-zinc-500 uppercase tracking-widest">
-            Your Recent Screening Log
-          </p>
-          <div className="space-y-2.5">
-            {recentWatched.map((movie) => (
-              <div 
-                key={movie.id} 
-                className="flex items-center justify-between p-3.5 rounded-xl bg-zinc-900/20 border border-zinc-900"
-              >
-                <div className="flex items-center gap-3.5 min-w-0">
-                  <div className="w-8 h-12 rounded bg-zinc-950 overflow-hidden border border-zinc-850 shrink-0">
-                    {movie.posterUrl ? (
-                      <img 
-                        src={movie.posterUrl} 
-                        alt={movie.title}
-                        referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover" 
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-zinc-900 text-[10px]">
-                        🍿
-                      </div>
-                    )}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs font-normal text-zinc-100 truncate">{movie.title}</p>
-                    <p className="text-[10px] text-zinc-500">{movie.year} • {movie.director}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1.5 text-[10px] font-mono text-zinc-500">
-                  <Check className="w-3.5 h-3.5 text-emerald-500" />
-                  <span>Watched</span>
-                </div>
+      {/* 3. Spotify-Style Calm Settings Area */}
+      <div className="space-y-2.5">
+        <p className="text-[10px] tracking-wider uppercase font-medium text-zinc-500 px-1">Settings & Privacy</p>
+        <div className="bg-zinc-900/20 border border-zinc-900 rounded-2xl overflow-hidden divide-y divide-zinc-900">
+          
+          {/* Notifications Setting */}
+          <div className="flex items-center justify-between p-4 hover:bg-zinc-900/35 transition-colors">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800/80 flex items-center justify-center text-zinc-400 shrink-0">
+                <Bell className="w-4 h-4 text-zinc-400" />
               </div>
-            ))}
+              <div className="text-left min-w-0">
+                <p className="text-xs font-medium text-zinc-200">Notifications</p>
+                <p className="text-[10px] text-zinc-500 mt-0.5 truncate">Alerts for newly curated recommendations</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setNotificationsEnabled(!notificationsEnabled)}
+              className={`w-9 h-5 rounded-full p-[2.5px] transition-colors focus:outline-none cursor-pointer shrink-0 ${
+                notificationsEnabled ? 'bg-emerald-500' : 'bg-zinc-800'
+              }`}
+            >
+              <div className={`w-3.5 h-3.5 rounded-full bg-white shadow-sm transition-transform duration-200 ${
+                notificationsEnabled ? 'translate-x-4' : 'translate-x-0'
+              }`} />
+            </button>
           </div>
-        </div>
-      )}
 
-      {/* 3.5 Timeless Brand Identity Directions */}
-      <div className="p-5 rounded-2xl bg-zinc-900/10 border border-zinc-900/60 space-y-6">
-        <IdentityShowcase activeId={activeIdentity} onChangeIdentity={onChangeIdentity} />
+          {/* Privacy Setting */}
+          <div className="flex items-center justify-between p-4 hover:bg-zinc-900/35 transition-colors">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800/80 flex items-center justify-center text-zinc-400 shrink-0">
+                <Lock className="w-4 h-4 text-zinc-400" />
+              </div>
+              <div className="text-left min-w-0">
+                <p className="text-xs font-medium text-zinc-200">Private Library</p>
+                <p className="text-[10px] text-zinc-500 mt-0.5 truncate">Only accessible on this client device</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setPrivateLibrary(!privateLibrary)}
+              className={`w-9 h-5 rounded-full p-[2.5px] transition-colors focus:outline-none cursor-pointer shrink-0 ${
+                privateLibrary ? 'bg-emerald-500' : 'bg-zinc-800'
+              }`}
+            >
+              <div className={`w-3.5 h-3.5 rounded-full bg-white shadow-sm transition-transform duration-200 ${
+                privateLibrary ? 'translate-x-4' : 'translate-x-0'
+              }`} />
+            </button>
+          </div>
+
+          {/* Export Library Setting */}
+          <button
+            onClick={handleExportLibrary}
+            className="w-full flex items-center justify-between p-4 hover:bg-zinc-900/35 transition-colors text-left border-0 bg-transparent cursor-pointer"
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800/80 flex items-center justify-center text-zinc-400 shrink-0">
+                <Download className="w-4 h-4 text-zinc-400" />
+              </div>
+              <div className="text-left min-w-0">
+                <p className="text-xs font-medium text-zinc-200">Export Library</p>
+                <p className="text-[10px] text-zinc-500 mt-0.5 truncate">Download your curated watchlist as JSON</p>
+              </div>
+            </div>
+            <ChevronRight className="w-4 h-4 text-zinc-600 shrink-0" />
+          </button>
+
+          {/* About Setting */}
+          <button
+            onClick={() => setShowAbout(true)}
+            className="w-full flex items-center justify-between p-4 hover:bg-zinc-900/35 transition-colors text-left border-0 bg-transparent cursor-pointer"
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800/80 flex items-center justify-center text-zinc-400 shrink-0">
+                <Info className="w-4 h-4 text-zinc-400" />
+              </div>
+              <div className="text-left min-w-0">
+                <p className="text-xs font-medium text-zinc-200">About CineSave</p>
+                <p className="text-[10px] text-zinc-500 mt-0.5 truncate">Learn about this quiet cinematic sanctuary</p>
+              </div>
+            </div>
+            <ChevronRight className="w-4 h-4 text-zinc-600 shrink-0" />
+          </button>
+
+          {/* User Guide Replay trigger */}
+          <button
+            onClick={onReplayOnboarding}
+            className="w-full flex items-center justify-between p-4 hover:bg-zinc-900/35 transition-colors text-left border-0 bg-transparent cursor-pointer"
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800/80 flex items-center justify-center text-zinc-400 shrink-0">
+                <HelpCircle className="w-4 h-4 text-zinc-400" />
+              </div>
+              <div className="text-left min-w-0">
+                <p className="text-xs font-medium text-zinc-200">Replay User Guide</p>
+                <p className="text-[10px] text-zinc-500 mt-0.5 truncate">Launch the initial screen tutorial</p>
+              </div>
+            </div>
+            <ChevronRight className="w-4 h-4 text-zinc-600 shrink-0" />
+          </button>
+
+        </div>
       </div>
 
-      {/* 4. Preference Insights & Level Milestones */}
-      <div className="p-5 rounded-2xl bg-zinc-900/20 border border-zinc-900/60 space-y-4">
-        <h3 className="text-xs font-sans uppercase tracking-wider text-zinc-400">
-          Curator's Path
-        </h3>
-        
-        <div className="space-y-4 text-xs font-normal text-zinc-400 leading-relaxed">
-          <div className="flex items-start gap-3">
-            <div className="p-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-300">
-              <Film className="w-3.5 h-3.5" />
-            </div>
-            <div>
-              <p className="font-medium text-zinc-200">The Ultimate Film Inbox</p>
-              <p className="text-[11px] text-zinc-500">You've saved a total of {movies.length} custom movie recommendations found in Instagram Reels, TikTok, or podcasts.</p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-3">
-            <div className="p-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-emerald-400">
-              <Clock className="w-3.5 h-3.5" />
-            </div>
-            <div>
-              <p className="font-medium text-zinc-200">Save hours calculated</p>
-              <p className="text-[11px] text-zinc-500">You have curated approximately {stats.savedHours} hours of cinematic content awaiting your attention.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 5. Clear, Non-Competing Settings Area */}
-      <div className="pt-6 border-t border-zinc-900 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="text-left space-y-0.5">
-          <p className="text-xs font-medium text-zinc-300">Need help curating?</p>
-          <p className="text-[10px] text-zinc-500">Replay the introductory interactive tour guide at any time.</p>
-        </div>
-
-        <motion.button
-          onClick={onReplayOnboarding}
-          whileHover={{ scale: 1.02, color: "#FAF6F0", borderColor: "#3f3f46" }}
-          whileTap={{ scale: 0.98 }}
-          transition={{ type: "spring", stiffness: 250, damping: 20 }}
-          className="px-4 py-2 bg-zinc-900 hover:bg-zinc-850 text-zinc-200 border border-zinc-800 hover:border-zinc-700 text-xs font-semibold rounded-xl transition-all cursor-pointer inline-flex items-center gap-1.5 self-stretch sm:self-auto justify-center"
+      {/* 4. Simple Logout Button */}
+      <div className="pt-2">
+        <button
+          onClick={() => setShowLogoutConfirm(true)}
+          className="w-full py-3.5 bg-zinc-900/40 hover:bg-red-550/10 border border-zinc-900 hover:border-red-500/25 rounded-2xl text-xs font-medium text-zinc-400 hover:text-red-400 transition-all cursor-pointer flex items-center justify-center gap-2 shadow-sm"
         >
-          <HelpCircle className="w-3.5 h-3.5" />
-          <span>Replay User Guide</span>
-        </motion.button>
+          <LogOut className="w-3.5 h-3.5" />
+          <span>Sign Out of CineSave</span>
+        </button>
       </div>
+
+      {/* About CineSave Overlay Modal */}
+      <AnimatePresence>
+        {showAbout && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/75 backdrop-blur-md"
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 10 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 10 }}
+              className="bg-zinc-950 border border-zinc-850 rounded-2xl max-w-sm w-full p-6 text-left relative space-y-4 shadow-2xl"
+            >
+              <button
+                onClick={() => setShowAbout(false)}
+                className="absolute top-4 right-4 text-zinc-500 hover:text-zinc-200 p-1.5 rounded-full bg-zinc-900/50 hover:bg-zinc-900 border border-zinc-850/30 transition-all cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+              
+              <div className="space-y-1 select-none">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-400 font-semibold">CineSave</span>
+                <h3 className="text-base font-display italic text-zinc-100">Quiet Sanctuary</h3>
+              </div>
+
+              <div className="text-xs text-zinc-400 leading-relaxed font-sans space-y-3">
+                <p>
+                  CineSave is designed as a peaceful, visual database for your curated watch list. By eliminating aggressive algorithms, infinite scroll feeds, and comment section noise, we return control to the curator.
+                </p>
+                <p>
+                  Save movie suggestions immediately from messaging lists, podcasts, or friends. Categorize them under custom vibe tags, and let CineSave's calm recommendation assistant pick the absolute perfect choice for tonight.
+                </p>
+              </div>
+
+              <div className="pt-2">
+                <button
+                  onClick={() => setShowAbout(false)}
+                  className="w-full py-2.5 bg-zinc-900 hover:bg-zinc-850 text-zinc-200 text-xs font-medium rounded-xl border border-zinc-800 hover:border-zinc-700 transition-colors cursor-pointer"
+                >
+                  Close
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Logout Confirmation Modal */}
+      <AnimatePresence>
+        {showLogoutConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/75 backdrop-blur-md"
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 10 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 10 }}
+              className="bg-zinc-950 border border-zinc-850 rounded-2xl max-w-sm w-full p-6 text-left space-y-4 shadow-2xl"
+            >
+              <div className="space-y-1 select-none">
+                <h3 className="text-sm font-sans font-medium text-zinc-100">Sign Out</h3>
+                <p className="text-xs text-zinc-400 leading-normal font-normal">
+                  Are you sure you want to sign out of CineSave? Your local shelf state will be securely preserved on this browser cache.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3 pt-2">
+                <button
+                  onClick={() => setShowLogoutConfirm(false)}
+                  className="flex-1 py-2.5 bg-zinc-900 hover:bg-zinc-850 text-zinc-400 hover:text-zinc-200 text-xs font-medium rounded-xl border border-zinc-800 hover:border-zinc-700 transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    setShowLogoutConfirm(false);
+                    setIsLoggedOut(true);
+                  }}
+                  className="flex-1 py-2.5 bg-red-650 hover:bg-red-600 text-white text-xs font-medium rounded-xl border border-red-500/20 transition-colors cursor-pointer"
+                >
+                  Sign Out
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
     </div>
   );

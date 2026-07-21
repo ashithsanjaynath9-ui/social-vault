@@ -10,60 +10,68 @@
   --animate-shimmer: shimmer 2.5s infinite linear;
   --animate-pulse-slow: pulse-slow 3s infinite ease-in-out;
 
-  /* Cozy Warm Deep Plum design tokens */
-  --color-zinc-950: #120716; /* Deepest Plum - body background */
-  --color-zinc-900: #1D0E22; /* Primary Plum Card / Nav bar */
-  --color-zinc-850: #26142C; /* Slightly lighter Plum Card */
-  --color-zinc-800: #321C39; /* Cozy Plum Highlight / Border */
-  --color-zinc-700: #43264D; /* Warm Plum Active Border */
-  --color-black: #0C040F;     /* True dark plum */
+  /* Midnight Indigo design tokens */
+  --color-zinc-950: #0A0F1E; /* Midnight Indigo - body background */
+  --color-zinc-900: #12192B; /* Secondary Surface */
+  --color-zinc-850: #162037; /* Slightly lighter Indigo */
+  --color-zinc-800: #1B2540; /* Elevated Cards */
+  --color-zinc-700: #2C3C66; /* Active Highlight / Focus */
+  --color-zinc-600: #445680; /* Subtle borders / highlight */
+  --color-zinc-550: #6F7A99; /* Muted Text */
+  --color-zinc-500: #6F7A99; /* Muted Text */
+  --color-zinc-450: #8894B5; /* Mid-slate text */
+  --color-zinc-400: #A8B3CF; /* Secondary Text (#A8B3CF) */
+  --color-zinc-300: #CBD5E1; /* Light Slate */
+  --color-zinc-200: #E2E8F0; /* Soft near-white */
+  --color-zinc-100: #F8FAFF; /* Primary Text (#F8FAFF) */
+  --color-zinc-50: #F8FAFF;
+  --color-white: #F8FAFF;
+  --color-black: #050811;     /* Super dark indigo */
 
-  /* Warm Off-White Typography design tokens */
-  --color-white: #FAF6F0;    /* Warm ivory/off-white */
-  --color-zinc-50: #FAF6F0;
-  --color-zinc-100: #FAF6F0;
-  --color-zinc-200: #E6DFEB; /* Very light lavender-gray */
-  --color-zinc-300: #D2C5DB; /* Light lavender-gray */
-  --color-zinc-400: #BBA9C7; /* Soft lavender-gray */
-  --color-zinc-500: #907D9C; /* Muted lavender */
-  --color-zinc-600: #6F5E7A; /* Darker muted lavender */
+  /* Override blue, indigo, and purple palettes to be Midnight Indigo-compliant, with #7C8CFF as Primary Accent and #97A5FF as Hover */
+  --color-blue-50: #F0F4FF;
+  --color-blue-100: #E1E7FF;
+  --color-blue-200: #C2CEFF;
+  --color-blue-300: #9EAFFF;
+  --color-blue-400: #7C8CFF; /* Primary Accent #7C8CFF */
+  --color-blue-500: #7C8CFF;
+  --color-blue-600: #5A6DFF;
+  --color-blue-700: #4354EB;
+  --color-blue-800: #2C3BB3;
+  --color-blue-900: #1C247B;
+  --color-blue-950: #0E123F;
 
-  /* Soft Lavender Accent Palette overriding blue, indigo, and purple */
-  --color-blue-50: #F8F5FC;
-  --color-blue-100: #F1EAFA;
-  --color-blue-200: #E1D3F3;
-  --color-blue-300: #CBB4EB;
-  --color-blue-400: #B39CD0; /* Primary Soft Lavender */
-  --color-blue-500: #9C82B3;
-  --color-blue-600: #866E9C;
-  --color-blue-700: #6E5A82;
-  --color-blue-800: #574668;
-  --color-blue-900: #40334E;
-  --color-blue-950: #231B2C;
+  --color-indigo-50: #F0F4FF;
+  --color-indigo-100: #E1E7FF;
+  --color-indigo-200: #C2CEFF;
+  --color-indigo-300: #9EAFFF;
+  --color-indigo-400: #7C8CFF; /* Primary Accent #7C8CFF */
+  --color-indigo-500: #7C8CFF;
+  --color-indigo-600: #5A6DFF;
+  --color-indigo-700: #4354EB;
+  --color-indigo-800: #2C3BB3;
+  --color-indigo-900: #1C247B;
+  --color-indigo-950: #0E123F;
 
-  --color-indigo-50: #F8F5FC;
-  --color-indigo-100: #F1EAFA;
-  --color-indigo-200: #E1D3F3;
-  --color-indigo-300: #CBB4EB;
-  --color-indigo-400: #B39CD0;
-  --color-indigo-500: #9C82B3;
-  --color-indigo-600: #866E9C;
-  --color-indigo-700: #6E5A82;
-  --color-indigo-800: #574668;
-  --color-indigo-900: #40334E;
-  --color-indigo-950: #231B2C;
+  --color-purple-50: #F0F4FF;
+  --color-purple-100: #E1E7FF;
+  --color-purple-200: #C2CEFF;
+  --color-purple-300: #9EAFFF;
+  --color-purple-400: #7C8CFF; /* Primary Accent #7C8CFF */
+  --color-purple-500: #7C8CFF;
+  --color-purple-600: #5A6DFF;
+  --color-purple-700: #4354EB;
+  --color-purple-800: #2C3BB3;
+  --color-purple-900: #1C247B;
+  --color-purple-950: #0E123F;
 
-  --color-purple-50: #F8F5FC;
-  --color-purple-100: #F1EAFA;
-  --color-purple-200: #E1D3F3;
-  --color-purple-300: #CBB4EB;
-  --color-purple-400: #B39CD0;
-  --color-purple-500: #9C82B3;
-  --color-purple-600: #866E9C;
-  --color-purple-700: #6E5A82;
-  --color-purple-800: #574668;
-  --color-purple-900: #40334E;
-  --color-purple-950: #231B2C;
+  /* Custom Success color Override */
+  --color-emerald-400: #63D39B;
+  --color-emerald-500: #63D39B;
+  --color-emerald-600: #4CB882;
+  --color-green-400: #63D39B;
+  --color-green-500: #63D39B;
+  --color-green-600: #4CB882;
 
   @keyframes shimmer {
     0% { background-position: -200% 0; }
@@ -77,8 +85,9 @@
 
 /* Beautiful custom styling overrides for premium feels */
 body {
-  background-color: #120716; /* Deepest Plum */
-  color: #E6DFEB;            /* Light lavender-gray text */
+  background-color: #0A0F1E; /* Midnight Indigo background */
+  background-image: radial-gradient(circle at 50% 0%, rgba(124, 140, 255, 0.05) 0%, rgba(10, 15, 30, 0) 70%);
+  color: #A8B3CF;            /* Secondary Text #A8B3CF */
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
@@ -90,14 +99,14 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #120716;
+  background: #0A0F1E;
 }
 ::-webkit-scrollbar-thumb {
-  background: #26142C;
+  background: #12192B;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #321C39;
+  background: #1B2540;
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
@@ -123,21 +132,21 @@ input:not([type]):not([class*="bg-transparent"]),
 textarea:not([class*="bg-transparent"]),
 select:not([class*="bg-transparent"]),
 .custom-input {
-  background-color: #1D0E22 !important; /* Cozy deep plum input */
-  border: 1px solid rgba(186, 169, 199, 0.15) !important; /* Soft lavender-tinted subtle border */
-  color: #FAF6F0 !important; /* Warm off-white */
+  background-color: #12192B !important; /* Secondary Surface */
+  border: 1px solid rgba(255, 255, 255, 0.06) !important; /* Borders: rgba(255,255,255,.06) */
+  color: #F8FAFF !important; /* Primary Text */
   transition: all 0.2s ease-in-out !important;
 }
 
 /* Filter select container divs in the Library refine panel */
 div.flex.items-center.bg-zinc-900\/50 {
-  background-color: #1D0E22 !important;
-  border: 1px solid rgba(186, 169, 199, 0.15) !important;
+  background-color: #12192B !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
   transition: all 0.2s ease-in-out !important;
 }
 div.flex.items-center.bg-zinc-900\/50:hover,
 div.flex.items-center.bg-zinc-900\/50:focus-within {
-  border-color: #B39CD0 !important; /* Soft lavender active */
+  border-color: #7C8CFF !important; /* Primary Accent */
 }
 
 /* Focused border color state */
@@ -151,16 +160,16 @@ input:not([type]):not([class*="bg-transparent"]):focus,
 textarea:not([class*="bg-transparent"]):focus,
 select:not([class*="bg-transparent"]):focus,
 .custom-input:focus {
-  border-color: #B39CD0 !important; /* Soft lavender active */
+  border-color: #7C8CFF !important; /* Primary Accent */
   outline: none !important;
-  box-shadow: 0 0 0 1px #B39CD0 !important;
+  box-shadow: 0 0 0 1px #7C8CFF !important;
 }
 
 /* Placeholder styling matching requirements exactly */
 input::placeholder,
 textarea::placeholder,
 .custom-input::placeholder {
-  color: #907D9C !important; /* Muted lavender-gray */
+  color: #6F7A99 !important; /* Muted Text */
   opacity: 1 !important; /* browser override */
 }
 
@@ -177,9 +186,9 @@ div.bg-blue-600,
 [class*="bg-blue-600"],
 [class*="bg-indigo-600"],
 .btn-primary {
-  background-color: #B39CD0 !important; /* Soft lavender primary */
+  background-color: #7C8CFF !important; /* Primary Accent #7C8CFF */
   background-image: none !important; /* clear secondary gradients */
-  color: #120716 !important; /* Deepest plum text */
+  color: #0A0F1E !important; /* Midnight Indigo background */
   border: 1px solid rgba(255, 255, 255, 0.05) !important;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
@@ -196,12 +205,12 @@ a.bg-white:not([class*="bg-zinc-950"]):hover,
 [class*="bg-blue-600"]:hover,
 [class*="bg-indigo-600"]:hover,
 .btn-primary:hover {
-  background-color: #CBB4EB !important; /* Lighter lavender hover */
+  background-color: #97A5FF !important; /* Hover Accent #97A5FF */
   background-image: none !important;
-  color: #120716 !important;
+  color: #0A0F1E !important;
 }
 
-/* Ensure text and SVG icons inside primary buttons turn dark #120716 */
+/* Ensure text and SVG icons inside primary buttons turn dark #0A0F1E */
 button.bg-blue-600 svg,
 button.bg-indigo-600 svg,
 button.bg-white:not([class*="bg-zinc-950"]):not([class*="rounded-full"]) svg,
@@ -213,8 +222,8 @@ a.bg-white:not([class*="bg-zinc-950"]) svg,
 [class*="bg-blue-600"] svg,
 [class*="bg-indigo-600"] svg,
 .btn-primary svg {
-  color: #120716 !important;
-  stroke: #120716 !important;
+  color: #0A0F1E !important;
+  stroke: #0A0F1E !important;
 }
 
 /* Secondary Button Styling */
@@ -235,9 +244,9 @@ button[class*="bg-zinc-"]:not([class*="rounded-full"]),
 a[class*="border-zinc-"],
 a[class*="bg-zinc-"],
 .btn-secondary {
-  background-color: #26142C !important; /* Lighter Plum Card */
-  border: 1px solid rgba(186, 169, 199, 0.15) !important;
-  color: #FAF6F0 !important; /* Warm off-white */
+  background-color: #12192B !important; /* Secondary Surface */
+  border: 1px solid rgba(255, 255, 255, 0.06) !important; /* Borders: rgba(255,255,255,.06) */
+  color: #F8FAFF !important; /* Primary Text */
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
@@ -259,11 +268,11 @@ button[class*="bg-zinc-"]:not([class*="rounded-full"]):hover,
 a[class*="border-zinc-"]:hover,
 a[class*="bg-zinc-"]:hover,
 .btn-secondary:hover {
-  background-color: #321C39 !important; /* Cozy Plum Highlight */
-  color: #FAF6F0 !important;
+  background-color: #1B2540 !important; /* Elevated Cards */
+  color: #F8FAFF !important;
 }
 
-/* Ensure icons inside secondary buttons are warm off-white #FAF6F0 */
+/* Ensure icons inside secondary buttons are warm off-white #F8FAFF */
 button.bg-zinc-900 svg,
 button.bg-zinc-950 svg,
 button.border-zinc-800 svg,
@@ -271,8 +280,8 @@ button.border-zinc-850 svg,
 [class*="bg-zinc-"] svg,
 [class*="border-zinc-"] svg,
 .btn-secondary svg {
-  color: #FAF6F0 !important;
-  stroke: #FAF6F0 !important;
+  color: #F8FAFF !important;
+  stroke: #F8FAFF !important;
 }
 
 

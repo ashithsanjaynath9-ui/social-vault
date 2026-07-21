@@ -34,7 +34,7 @@ export const IDENTITY_DIRECTIONS: IdentityDirection[] = [
         {/* Soft open book outline background */}
         <path d="M6 10C12 10 18 12 24 15C30 12 36 10 42 10V38C36 38 30 40 24 43C18 40 12 38 6 38V10Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-30" />
         {/* Center bookmark hanging slip */}
-        <path d="M20 12V34L24 31L28 34V12H20Z" fill="#B39CD0" stroke="#B39CD0" strokeWidth="1.5" strokeLinejoin="round" />
+        <path d="M20 12V34L24 31L28 34V12H20Z" fill="#7C8CFF" stroke="#7C8CFF" strokeWidth="1.5" strokeLinejoin="round" />
         {/* Delicate bookmark thread */}
         <path d="M24 6V12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="opacity-40" />
       </svg>
@@ -42,7 +42,7 @@ export const IDENTITY_DIRECTIONS: IdentityDirection[] = [
     wordmark: (className = "text-xl") => (
       <div className={`flex items-baseline gap-1 select-none ${className}`}>
         <span className="font-display font-light italic text-zinc-100">Cine</span>
-        <span className="font-sans font-medium text-[#B39CD0] tracking-tight">Save</span>
+        <span className="font-sans font-medium text-[#7C8CFF] tracking-tight">Save</span>
       </div>
     )
   },
@@ -57,7 +57,7 @@ export const IDENTITY_DIRECTIONS: IdentityDirection[] = [
     logoSvg: (className = "w-12 h-12") => (
       <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
         {/* Ticket border with semi-circular side notches */}
-        <path d="M8 12H40C40 12 40 16 38 18C36 20 36 24 38 26C40 28 40 32 40 32H8C8 32 8 28 10 26C12 24 12 20 10 18C8 16 8 12 8 12Z" stroke="#B39CD0" strokeWidth="2" strokeLinejoin="round" />
+        <path d="M8 12H40C40 12 40 16 38 18C36 20 36 24 38 26C40 28 40 32 40 32H8C8 32 8 28 10 26C12 24 12 20 10 18C8 16 8 12 8 12Z" stroke="#7C8CFF" strokeWidth="2" strokeLinejoin="round" />
         {/* Center punched star */}
         <path d="M24 17L25.8 21.2L30.2 21.5L26.8 24.4L27.9 28.8L24 26.4L20.1 28.8L21.2 24.4L17.8 21.5L22.2 21.2L24 17Z" fill="currentColor" className="text-zinc-400" />
         {/* Minimalist stub dash line */}
@@ -67,7 +67,7 @@ export const IDENTITY_DIRECTIONS: IdentityDirection[] = [
     ),
     wordmark: (className = "text-xl") => (
       <div className={`flex items-center gap-1 select-none font-sans font-semibold text-zinc-100 ${className}`}>
-        <span className="tracking-tight text-[#B39CD0]">Cine</span>
+        <span className="tracking-tight text-[#7C8CFF]">Cine</span>
         <span className="text-[9px] text-zinc-650">•</span>
         <span className="tracking-tight text-zinc-200">Save</span>
       </div>
@@ -85,10 +85,10 @@ export const IDENTITY_DIRECTIONS: IdentityDirection[] = [
       <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
         {/* Elegant circle seal boundary */}
         <circle cx="24" cy="24" r="19" stroke="currentColor" strokeWidth="1.5" className="opacity-30" />
-        <circle cx="24" cy="24" r="16" stroke="#B39CD0" strokeWidth="1" className="opacity-20" />
+        <circle cx="24" cy="24" r="16" stroke="#7C8CFF" strokeWidth="1" className="opacity-20" />
         {/* Elegant Intertwined Letter C and S */}
         {/* C representation */}
-        <path d="M28 17C26 15.5 21 15.5 19.5 18C18 20.5 18 27.5 19.5 30C21 32.5 26 32.5 28 31" stroke="#B39CD0" strokeWidth="2.5" strokeLinecap="round" />
+        <path d="M28 17C26 15.5 21 15.5 19.5 18C18 20.5 18 27.5 19.5 30C21 32.5 26 32.5 28 31" stroke="#7C8CFF" strokeWidth="2.5" strokeLinecap="round" />
         {/* S representation intertwined */}
         <path d="M21 19.5C23.5 18 26.5 19.5 25.5 22.5C24.5 25.5 19.5 24.5 21 28C22.5 31.5 26.5 30 27 28.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
       </svg>
@@ -96,7 +96,7 @@ export const IDENTITY_DIRECTIONS: IdentityDirection[] = [
     wordmark: (className = "text-xl") => (
       <div className={`flex items-baseline gap-2 select-none ${className}`}>
         <span className="font-display tracking-[0.2em] font-light text-zinc-150 uppercase">Cine</span>
-        <span className="font-display tracking-[0.2em] font-light text-[#B39CD0] uppercase">Save</span>
+        <span className="font-display tracking-[0.2em] font-light text-[#7C8CFF] uppercase">Save</span>
       </div>
     )
   },
@@ -113,7 +113,7 @@ export const IDENTITY_DIRECTIONS: IdentityDirection[] = [
         {/* The horizontal shelf base */}
         <line x1="8" y1="36" x2="40" y2="36" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="opacity-60" />
         {/* Book/Film spine 1 */}
-        <rect x="12" y="16" width="6" height="18" rx="1" fill="#B39CD0" stroke="#B39CD0" strokeWidth="1" />
+        <rect x="12" y="16" width="6" height="18" rx="1" fill="#7C8CFF" stroke="#7C8CFF" strokeWidth="1" />
         {/* Book/Film spine 2 */}
         <rect x="20" y="12" width="5.5" height="22" rx="1" fill="currentColor" stroke="currentColor" strokeWidth="1" className="text-zinc-450" />
         {/* Leaning Book spine 3 */}
@@ -125,7 +125,7 @@ export const IDENTITY_DIRECTIONS: IdentityDirection[] = [
     wordmark: (className = "text-xl") => (
       <div className={`flex items-baseline select-none font-sans ${className}`}>
         <span className="font-normal text-zinc-200 tracking-tight">cine</span>
-        <span className="font-light text-[#B39CD0] tracking-wider">shelf</span>
+        <span className="font-light text-[#7C8CFF] tracking-wider">shelf</span>
       </div>
     )
   }
@@ -157,13 +157,13 @@ export function IdentityShowcase({ activeId, onChangeIdentity }: IdentityShowcas
               onClick={() => onChangeIdentity(dir.id)}
               className={`p-6 rounded-2xl cursor-pointer text-left transition-all duration-300 relative overflow-hidden flex flex-col justify-between min-h-[210px] border ${
                 isActive
-                  ? 'bg-zinc-900/35 border-[#B39CD0]/50 shadow-[0_4px_24px_rgba(179,156,208,0.06)]'
+                  ? 'bg-zinc-900/35 border-[#7C8CFF]/50 shadow-[0_4px_24px_rgba(124,140,255,0.06)]'
                   : 'bg-zinc-900/10 border-zinc-900 hover:border-zinc-800 hover:bg-zinc-900/20'
               }`}
             >
               {/* Active stamp */}
               {isActive && (
-                <div className="absolute top-4 right-4 flex items-center gap-1 text-xs font-sans text-[#B39CD0] bg-[#B39CD0]/10 border border-[#B39CD0]/20 px-2.5 py-0.5 rounded-full">
+                <div className="absolute top-4 right-4 flex items-center gap-1 text-xs font-sans text-[#7C8CFF] bg-[#7C8CFF]/10 border border-[#7C8CFF]/20 px-2.5 py-0.5 rounded-full">
                   <Check className="w-3 h-3 stroke-[3]" />
                   <span>Stamped</span>
                 </div>
@@ -173,7 +173,7 @@ export function IdentityShowcase({ activeId, onChangeIdentity }: IdentityShowcas
                 {/* Logo and Wordmark demo */}
                 <div className="flex items-center gap-3.5">
                   <div className={`p-2.5 rounded-xl transition-all duration-300 bg-zinc-950 border ${
-                    isActive ? 'border-[#B39CD0]/40 text-[#B39CD0]' : 'border-zinc-850 text-zinc-500'
+                    isActive ? 'border-[#7C8CFF]/40 text-[#7C8CFF]' : 'border-zinc-850 text-zinc-500'
                   }`}>
                     {dir.logoSvg("w-9 h-9")}
                   </div>

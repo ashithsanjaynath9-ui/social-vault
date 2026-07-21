@@ -146,24 +146,24 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
   ];
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#120716] flex flex-col justify-between p-6 md:p-12 overflow-hidden select-none font-sans text-white">
+    <div className="fixed inset-0 z-50 bg-[#0A0F1E] flex flex-col justify-between p-6 md:p-12 overflow-hidden select-none font-sans text-white">
       
       {/* Cinematic ambient background glow */}
-      <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-[#B39CD0]/5 rounded-full blur-[160px] pointer-events-none" />
-      <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-[#B39CD0]/5 rounded-full blur-[160px] pointer-events-none" />
+      <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-[#7C8CFF]/5 rounded-full blur-[160px] pointer-events-none" />
+      <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-[#7C8CFF]/5 rounded-full blur-[160px] pointer-events-none" />
 
       {/* Elegant Header */}
       <header className="flex items-center justify-between relative z-30">
         <div className="flex items-center gap-2.5">
           <div className="w-7 h-7 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center">
-            <Film className="w-3.5 h-3.5 text-[#B39CD0]" />
+            <Film className="w-3.5 h-3.5 text-[#7C8CFF]" />
           </div>
           <span className="text-xs font-display italic tracking-widest text-zinc-300">CineSave</span>
         </div>
 
         <button 
           onClick={onComplete}
-          className="text-[10px] font-sans font-medium tracking-widest text-zinc-500 hover:text-zinc-300 transition-colors uppercase cursor-pointer"
+          className="text-xs font-sans font-normal text-zinc-500 hover:text-zinc-300 transition-colors cursor-pointer"
         >
           Skip Intro
         </button>
@@ -184,82 +184,64 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -15 }}
               transition={{ duration: 0.5 }}
-              className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-12 items-center"
+              className="w-full max-w-2xl mx-auto flex flex-col items-center text-center space-y-10 py-12"
             >
-              {/* Left Side: Smooth Infinite Reel List Mockup */}
-              <div className="flex justify-center select-none">
-                <div className="w-64 aspect-[9/16] bg-[#1d0e22] border border-zinc-850/80 rounded-[40px] p-4 flex flex-col relative overflow-hidden shadow-[0_24px_60px_rgba(0,0,0,0.8)] animate-fade-in">
+              {/* Minimal abstract ticket stub illustration */}
+              <div className="relative flex items-center justify-center py-4">
+                {/* Ambient blur behind the ticket */}
+                <div className="absolute w-32 h-32 bg-[#7C8CFF]/15 rounded-full blur-2xl pointer-events-none" />
+                
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, rotate: -5 }}
+                  animate={{ opacity: 1, scale: 1, rotate: -5 }}
+                  transition={{ duration: 0.8, ease: "easeOut" }}
+                  className="relative z-10 w-24 h-36 rounded-2xl border border-zinc-800 bg-zinc-950/60 backdrop-blur-md flex flex-col justify-between p-4 shadow-xl select-none"
+                >
+                  {/* Top half ticket notches */}
+                  <div className="flex justify-between items-start">
+                    <div className="w-1 h-1 rounded-full bg-zinc-850" />
+                    <div className="w-6 h-1 rounded-full bg-zinc-850" />
+                    <div className="w-1 h-1 rounded-full bg-zinc-850" />
+                  </div>
                   
-                  {/* Header */}
-                  <div className="flex justify-between items-center pb-3 border-b border-zinc-900/80 mb-2">
-                    <Instagram className="w-4 h-4 text-zinc-500" />
-                    <div className="w-20 h-1.5 rounded bg-zinc-850" />
-                    <div className="w-4 h-4 rounded-full bg-zinc-850" />
+                  {/* Middle dashed tear line with notches */}
+                  <div className="relative flex items-center justify-between -mx-4 my-2">
+                    <div className="w-2.5 h-5 rounded-r-full bg-[#0A0F1E] border-y border-r border-zinc-800" />
+                    <div className="flex-1 border-t border-dashed border-zinc-800 mx-1" />
+                    <div className="w-2.5 h-5 rounded-l-full bg-[#0A0F1E] border-y border-l border-zinc-800" />
                   </div>
-
-                  {/* Scrolling Stack */}
-                  <div className="flex-1 flex flex-col gap-4 relative overflow-hidden">
-                    <motion.div 
-                      animate={{ y: [0, -260, 0] }}
-                      transition={{ 
-                        repeat: Infinity, 
-                        duration: 12, 
-                        ease: "linear" 
-                      }}
-                      className="space-y-4"
-                    >
-                      {[...Array(6)].map((_, idx) => (
-                        <div key={idx} className="bg-[#26142c] border border-zinc-850/60 rounded-2xl p-3 h-28 flex flex-col justify-between">
-                          <div className="flex justify-between items-start">
-                            <div className="space-y-1">
-                              <div className="w-24 h-2 bg-zinc-850 rounded" />
-                              <div className="w-16 h-1.5 bg-zinc-900 rounded" />
-                            </div>
-                            <Instagram className="w-3 h-3 text-pink-500/20" />
-                          </div>
-                          
-                          <div className="w-full h-10 rounded bg-[#120716] flex items-center justify-center text-[9px] font-sans text-zinc-500">
-                            Saved Movie Recommendation
-                          </div>
-
-                          <div className="flex justify-between items-center text-[8px] text-zinc-650">
-                            <span>@cinemafan</span>
-                            <span className="text-pink-500/40 font-bold">♥ Save</span>
-                          </div>
-                        </div>
-                      ))}
-                    </motion.div>
+                  
+                  {/* Bottom half ticket notches */}
+                  <div className="flex justify-between items-end">
+                    <div className="w-1 h-1 rounded-full bg-zinc-850" />
+                    <div className="w-8 h-1 rounded-full bg-zinc-850" />
+                    <div className="w-1 h-1 rounded-full bg-zinc-850" />
                   </div>
-                </div>
+                </motion.div>
               </div>
 
-              {/* Right Side: Clear Value Proposition and Action */}
-              <div className="space-y-6 text-left">
-                <div className="space-y-3">
-                  <span className="text-[11px] font-sans text-zinc-500 uppercase tracking-widest block">The Endless Feed</span>
-                  <h1 className="text-4xl sm:text-5xl font-display font-light italic text-zinc-100 leading-tight">
-                    But did you <span className="text-[#B39CD0] not-italic font-sans font-semibold">ever</span> watch them?
-                  </h1>
-                  <p className="text-zinc-400 text-sm leading-relaxed font-normal">
-                    We all save reels, screenshots, and texts containing great movie recommendations. But they get lost forever in digital noise and app saves.
-                  </p>
-                  <p className="text-zinc-500 text-xs leading-relaxed font-normal">
-                    CineSave is a simple, quiet archive to extract, catalog, and finally watch the movies you want to remember.
-                  </p>
-                </div>
+              {/* Text content: One Headline + One Supporting Sentence */}
+              <div className="space-y-4 max-w-lg">
+                <h1 className="text-3xl sm:text-4xl font-display font-light italic text-zinc-100 leading-tight tracking-tight">
+                  Movie recommendations shouldn't disappear into screenshots.
+                </h1>
+                <p className="text-zinc-400 text-sm sm:text-base font-normal leading-relaxed">
+                  Stop losing movies you'll never remember again.
+                </p>
+              </div>
 
-                <div className="pt-4">
-                  <motion.button
-                    onClick={handleNext}
-                    whileHover={{ scale: 1.025 }}
-                    whileTap={{ scale: 0.975 }}
-                    transition={{ type: "spring", stiffness: 250, damping: 20 }}
-                    className="px-6 py-3.5 rounded-xl bg-white text-black hover:bg-zinc-200 text-xs font-mono font-bold tracking-widest uppercase flex items-center gap-2 cursor-pointer shadow-lg"
-                  >
-                    <span>What's next?</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </motion.button>
-                </div>
+              {/* One CTA */}
+              <div className="pt-2">
+                <motion.button
+                  onClick={handleNext}
+                  whileHover={{ scale: 1.025 }}
+                  whileTap={{ scale: 0.975 }}
+                  transition={{ type: "spring", stiffness: 250, damping: 20 }}
+                  className="px-8 py-3.5 rounded-xl bg-white text-black hover:bg-zinc-200 text-xs font-sans font-medium flex items-center gap-2 cursor-pointer shadow-lg"
+                >
+                  <span>Build My Library</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </motion.button>
               </div>
             </motion.div>
           )}
@@ -278,12 +260,12 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
             >
               {/* Header Headline */}
               <div className="text-center space-y-3 max-w-xl">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-zinc-900 border border-zinc-800 text-zinc-400 rounded-full text-[10px] font-sans font-semibold tracking-wider uppercase">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-zinc-900 border border-zinc-800 text-zinc-400 rounded-full text-xs font-sans font-normal">
                   Scattered Scrapbooks
                 </span>
                 <h1 className="text-3xl sm:text-5xl font-display font-light italic text-zinc-100 tracking-tight leading-[1.1]">
                   A quiet sanctuary <br className="sm:hidden" />
-                  <span className="text-[#B39CD0]">for all your lists.</span>
+                  <span className="text-[#7C8CFF]">for all your lists.</span>
                 </h1>
                 <p className="text-xs text-zinc-400 font-sans">
                   All your scattered watchlists, notes, and screenshots in one single space.
@@ -297,7 +279,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                 <motion.div 
                   className={`z-20 w-36 h-36 rounded-3xl bg-zinc-900 border flex flex-col items-center justify-center shadow-2xl relative transition-all duration-700 ${
                     screen2Phase === 'merged' 
-                      ? 'border-[#B39CD0] bg-zinc-950 shadow-[0_0_50px_rgba(179,156,208,0.15)] scale-110' 
+                      ? 'border-[#7C8CFF] bg-zinc-950 shadow-[0_0_50px_rgba(124,140,255,0.15)] scale-110' 
                       : 'border-zinc-800'
                   }`}
                 >
@@ -318,9 +300,9 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                         animate={{ scale: 1, opacity: 1 }}
                         className="flex flex-col items-center space-y-1.5 text-center p-2"
                       >
-                        <Sparkles className="w-8 h-8 text-[#B39CD0] animate-bounce" />
-                        <span className="text-[10px] font-sans text-[#B39CD0] font-bold uppercase tracking-widest">Library Ready</span>
-                        <span className="text-[8px] font-sans text-zinc-400 leading-none">12 Movies Curated</span>
+                        <Sparkles className="w-8 h-8 text-[#7C8CFF] animate-bounce" />
+                        <span className="text-xs font-sans text-[#7C8CFF] font-normal">Library ready</span>
+                        <span className="text-xs font-sans text-zinc-450 leading-none">12 Movies Curated</span>
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -330,13 +312,13 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                 <AnimatePresence>
                   {screen2Phase === 'scattered' && (
                     <>
-                      {/* Instagram Saves */}
+                       {/* Instagram Saves */}
                       <motion.div 
                         initial={{ x: -160, y: -60, opacity: 0 }}
                         animate={{ opacity: 1, x: -140, y: -50 }}
                         exit={{ x: 0, y: 0, scale: 0.1, opacity: 0 }}
                         transition={{ type: "spring", stiffness: 80 }}
-                        className="absolute bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-[10px] font-mono text-pink-400 flex items-center gap-1.5 shadow-lg"
+                        className="absolute bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-xs font-sans text-pink-400 flex items-center gap-1.5 shadow-lg"
                       >
                         <Instagram className="w-3.5 h-3.5 text-pink-500" />
                         <span>Instagram Saves</span>
@@ -348,7 +330,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                         animate={{ opacity: 1, x: 130, y: -30 }}
                         exit={{ x: 0, y: 0, scale: 0.1, opacity: 0 }}
                         transition={{ type: "spring", stiffness: 80, delay: 0.05 }}
-                        className="absolute bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-[10px] font-mono text-emerald-400 flex items-center gap-1.5 shadow-lg"
+                        className="absolute bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-xs font-sans text-emerald-400 flex items-center gap-1.5 shadow-lg"
                       >
                         <MessageSquare className="w-3.5 h-3.5 text-emerald-500" />
                         <span>WhatsApp links</span>
@@ -360,7 +342,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                         animate={{ opacity: 1, x: -100, y: 70 }}
                         exit={{ x: 0, y: 0, scale: 0.1, opacity: 0 }}
                         transition={{ type: "spring", stiffness: 80, delay: 0.1 }}
-                        className="absolute bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-[10px] font-mono text-amber-400 flex items-center gap-1.5 shadow-lg"
+                        className="absolute bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-xs font-sans text-amber-400 flex items-center gap-1.5 shadow-lg"
                       >
                         <Camera className="w-3.5 h-3.5 text-amber-500" />
                         <span>Screenshots</span>
@@ -372,7 +354,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                         animate={{ opacity: 1, x: 110, y: 65 }}
                         exit={{ x: 0, y: 0, scale: 0.1, opacity: 0 }}
                         transition={{ type: "spring", stiffness: 80, delay: 0.15 }}
-                        className="absolute bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-[10px] font-mono text-zinc-300 flex items-center gap-1.5 shadow-lg"
+                        className="absolute bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-xs font-sans text-zinc-300 flex items-center gap-1.5 shadow-lg"
                       >
                         <FileText className="w-3.5 h-3.5 text-zinc-400" />
                         <span>Notes lists</span>
@@ -384,7 +366,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                         animate={{ opacity: 1, x: -20, y: -90 }}
                         exit={{ x: 0, y: 0, scale: 0.1, opacity: 0 }}
                         transition={{ type: "spring", stiffness: 80, delay: 0.2 }}
-                        className="absolute bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-[10px] font-mono text-red-400 flex items-center gap-1.5 shadow-lg"
+                        className="absolute bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-xs font-sans text-red-400 flex items-center gap-1.5 shadow-lg"
                       >
                         <Tv className="w-3.5 h-3.5 text-red-500" />
                         <span>Netflix Watchlist</span>
@@ -396,7 +378,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                         animate={{ opacity: 1, x: 80, y: -95 }}
                         exit={{ x: 0, y: 0, scale: 0.1, opacity: 0 }}
                         transition={{ type: "spring", stiffness: 80, delay: 0.25 }}
-                        className="absolute bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-[10px] font-mono text-blue-400 flex items-center gap-1.5 shadow-lg"
+                        className="absolute bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-xs font-sans text-blue-400 flex items-center gap-1.5 shadow-lg"
                       >
                         <Search className="w-3.5 h-3.5 text-blue-500" />
                         <span>Google Search Tabs</span>
@@ -410,13 +392,13 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                       initial={{ scale: 1.5, opacity: 0 }}
                       animate={{ scale: 0.5, opacity: 1 }}
                       transition={{ duration: 1.2, repeat: Infinity }}
-                      className="w-80 h-80 rounded-full border border-[#B39CD0]/20"
+                      className="w-80 h-80 rounded-full border border-[#7C8CFF]/20"
                     />
                     <motion.div 
                       initial={{ scale: 2.2, opacity: 0 }}
                       animate={{ scale: 0.3, opacity: 0.8 }}
                       transition={{ duration: 1.5, delay: 0.3, repeat: Infinity }}
-                      className="w-96 h-96 rounded-full border border-[#B39CD0]/10"
+                      className="w-96 h-96 rounded-full border border-[#7C8CFF]/10"
                     />
                   </div>
                 )}
@@ -429,19 +411,19 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                   whileHover={{ scale: 1.02, backgroundColor: "#18181b" }}
                   whileTap={{ scale: 0.98 }}
                   transition={{ type: "spring", stiffness: 250, damping: 20 }}
-                  className="px-6 py-3 rounded-xl border border-zinc-800 text-xs font-sans font-bold uppercase tracking-widest cursor-pointer text-zinc-300"
+                  className="px-6 py-3 rounded-xl border border-zinc-800 text-xs font-sans font-normal cursor-pointer text-zinc-300"
                 >
                   Back
                 </motion.button>
                 <motion.button
                   onClick={handleNext}
-                  whileHover={{ scale: 1.02, backgroundColor: "#cbb6e5" }}
+                  whileHover={{ scale: 1.02, backgroundColor: "#97A5FF" }}
                   whileTap={{ scale: 0.98 }}
                   transition={{ type: "spring", stiffness: 250, damping: 20 }}
-                  className="px-8 py-3.5 rounded-xl bg-[#B39CD0] text-[#120716] text-xs font-sans font-bold tracking-widest uppercase shadow-lg flex items-center gap-1.5 cursor-pointer"
+                  className="px-8 py-3.5 rounded-xl bg-[#7C8CFF] text-[#0A0F1E] text-xs font-sans font-medium shadow-lg flex items-center gap-1.5 cursor-pointer"
                 >
                   <span>See How It Works</span>
-                  <ArrowRight className="w-4 h-4 text-[#120716]" />
+                  <ArrowRight className="w-4 h-4 text-[#0A0F1E]" />
                 </motion.button>
               </div>
             </motion.div>
@@ -461,12 +443,12 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
             >
               {/* Headline */}
               <div className="text-center space-y-3 max-w-xl">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-zinc-900 border border-zinc-800 text-zinc-400 rounded-full text-[10px] font-sans font-semibold tracking-wider uppercase">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-zinc-900 border border-zinc-800 text-zinc-400 rounded-full text-xs font-sans font-normal">
                   Curation without effort
                 </span>
                 <h1 className="text-3xl sm:text-5xl font-display font-light italic text-zinc-100 tracking-tight leading-[1.1]">
                   From a friend's text, <br />
-                  <span className="text-[#B39CD0]">straight to your shelf.</span>
+                  <span className="text-[#7C8CFF]">straight to your shelf.</span>
                 </h1>
                 <p className="text-xs text-zinc-400 font-sans">
                   Instantly capture descriptions, years, and directors.
@@ -480,7 +462,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                   {/* Left: Source */}
                   <div className="flex items-center gap-3 bg-zinc-900 border border-zinc-800 rounded-2xl p-3 w-48 shadow-lg">
                     <div className="w-8 h-8 rounded-xl bg-purple-500/10 flex items-center justify-center">
-                      <MessageSquare className="w-4 h-4 text-[#B39CD0]" />
+                      <MessageSquare className="w-4 h-4 text-[#7C8CFF]" />
                     </div>
                     <div>
                       <h4 className="text-xs font-bold">Friend's Text</h4>
@@ -493,23 +475,23 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                     <motion.div 
                       animate={{ x: [0, 8, 0] }}
                       transition={{ repeat: Infinity, duration: 1.5 }}
-                      className="hidden sm:block text-[#B39CD0]"
+                      className="hidden sm:block text-[#7C8CFF]"
                     >
                       <ArrowRight className="w-5 h-5" />
                     </motion.div>
-                    <span className="text-[9px] font-sans text-[#B39CD0] bg-[#B39CD0]/5 border border-[#B39CD0]/10 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
-                      REMEMBER THIS
+                    <span className="text-xs font-sans text-[#7C8CFF] bg-[#7C8CFF]/5 border border-[#7C8CFF]/10 px-2.5 py-1 rounded-full font-normal">
+                      Remember this
                     </span>
                   </div>
 
                   {/* Right: Destination */}
                   <div className="flex items-center gap-3 bg-zinc-900 border border-zinc-800 rounded-2xl p-3 w-48 shadow-lg">
                     <div className="w-8 h-8 rounded-xl bg-zinc-800 flex items-center justify-center shadow-md">
-                      <Bookmark className="w-4 h-4 text-[#B39CD0]" />
+                      <Bookmark className="w-4 h-4 text-[#7C8CFF]" />
                     </div>
                     <div>
                       <h4 className="text-xs font-bold text-zinc-300 font-display italic">Your Library</h4>
-                      <p className="text-[9px] font-sans text-zinc-400 font-extrabold">✓ Saved Forever</p>
+                      <p className="text-xs font-sans text-zinc-400 font-normal">✓ Saved Forever</p>
                     </div>
                   </div>
                 </div>
@@ -538,10 +520,10 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent" />
                         <div className="relative z-10 space-y-0.5">
-                          <span className="text-[8px] font-sans bg-[#B39CD0]/20 text-[#B39CD0] px-1 py-0.2 rounded font-extrabold">
+                          <span className="text-xs font-sans bg-[#7C8CFF]/20 text-[#7C8CFF] px-1.5 py-0.5 rounded font-normal">
                             {movie.vibe}
                           </span>
-                          <h4 className="text-[10px] font-bold text-white truncate leading-tight pt-1">
+                          <h4 className="text-xs font-normal text-white truncate leading-tight pt-1">
                             {movie.title}
                           </h4>
                         </div>
@@ -558,19 +540,19 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                   whileHover={{ scale: 1.02, backgroundColor: "#18181b" }}
                   whileTap={{ scale: 0.98 }}
                   transition={{ type: "spring", stiffness: 250, damping: 20 }}
-                  className="px-6 py-3.5 rounded-xl border border-zinc-800 text-xs font-sans font-bold uppercase tracking-widest cursor-pointer text-zinc-300"
+                  className="px-6 py-3.5 rounded-xl border border-zinc-800 text-xs font-sans font-normal cursor-pointer text-zinc-300"
                 >
                   Back
                 </motion.button>
                 <motion.button
                   onClick={onComplete}
-                  whileHover={{ scale: 1.015, backgroundColor: "#cbb6e5" }}
+                  whileHover={{ scale: 1.015, backgroundColor: "#97A5FF" }}
                   whileTap={{ scale: 0.985 }}
                   transition={{ type: "spring", stiffness: 250, damping: 20 }}
-                  className="px-12 py-4 rounded-xl bg-[#B39CD0] text-[#120716] text-xs font-sans font-bold tracking-widest uppercase shadow-xl flex items-center gap-2 cursor-pointer"
+                  className="px-12 py-4 rounded-xl bg-[#7C8CFF] text-[#0A0F1E] text-xs font-sans font-medium shadow-xl flex items-center gap-2 cursor-pointer"
                 >
                   <span>Build My Library</span>
-                  <Bookmark className="w-4 h-4 text-[#120716]" />
+                  <Bookmark className="w-4 h-4 text-[#0A0F1E]" />
                 </motion.button>
               </div>
             </motion.div>
@@ -581,7 +563,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
 
       {/* Elegant minimalist Stepper dots base footer */}
       <footer className="flex justify-between items-center relative z-10 border-t border-zinc-950/60 pt-6">
-        <div className="text-zinc-500 text-[10px] font-sans tracking-wider font-semibold uppercase">
+        <div className="text-zinc-500 text-xs font-sans font-normal">
           Introduction
         </div>
 
@@ -592,7 +574,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
               key={idx}
               onClick={() => setCurrentStep(idx)}
               className={`h-1.5 rounded-full transition-all duration-500 cursor-pointer ${
-                currentStep === idx ? 'w-8 bg-[#B39CD0]' : 'w-2 bg-zinc-850'
+                currentStep === idx ? 'w-8 bg-[#7C8CFF]' : 'w-2 bg-zinc-850'
               }`}
             />
           ))}

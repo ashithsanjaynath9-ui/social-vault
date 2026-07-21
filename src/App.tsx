@@ -227,24 +227,24 @@ export default function App() {
     return (
       <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center font-sans relative overflow-hidden">
         {/* Soft background reflections */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-[#B39CD0]/5 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-[#7C8CFF]/5 rounded-full blur-[120px] pointer-events-none" />
         
         <div className="flex flex-col items-center gap-6 relative z-10">
           <div className="relative w-16 h-16 flex items-center justify-center">
-            <div className="absolute inset-0 rounded-full border-2 border-[#B39CD0]/5" />
+            <div className="absolute inset-0 rounded-full border-2 border-[#7C8CFF]/5" />
             <motion.div 
               animate={{ rotate: 360 }}
               transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
-              className="absolute inset-0 rounded-full border-t-2 border-[#B39CD0]/40"
+              className="absolute inset-0 rounded-full border-t-2 border-[#7C8CFF]/40"
             />
             {/* Handcrafted active logo mark instead of generic icon */}
-            <div className="text-[#B39CD0]">
+            <div className="text-[#7C8CFF]">
               {selectedIdentity.logoSvg("w-7 h-7")}
             </div>
           </div>
           <div className="text-center space-y-1.5">
             {selectedIdentity.wordmark("text-xl")}
-            <p className="text-[10px] text-zinc-500 font-sans uppercase tracking-wider">loading your cinema shelf...</p>
+            <p className="text-xs text-zinc-500 font-sans">Loading your cinema shelf...</p>
           </div>
         </div>
       </div>
@@ -263,34 +263,23 @@ export default function App() {
       <div className="w-full max-w-7xl mx-auto pt-8 sm:pt-12 space-y-8 relative">
         
         {/* Header Branding section */}
-        <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-zinc-900">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4 text-left select-none">
-            <div className="p-2.5 w-fit rounded-2xl bg-zinc-900/40 border border-zinc-850/60 text-[#B39CD0] shadow-sm">
-              {selectedIdentity.logoSvg("w-9 h-9")}
+        <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pb-6 border-b border-zinc-900/60">
+          <div className="flex items-center gap-3 select-none cursor-pointer" onClick={() => setViewMode('home')}>
+            <div className="p-2 w-10 h-10 rounded-xl bg-zinc-900/35 border border-zinc-850/50 text-[#7C8CFF] flex items-center justify-center shadow-sm">
+              {selectedIdentity.logoSvg("w-6 h-6")}
             </div>
-            <div className="space-y-1">
-              <div className="flex flex-wrap items-center gap-2">
-                {selectedIdentity.wordmark("text-3xl sm:text-4xl")}
-                <span className="text-xs font-sans text-zinc-450 bg-zinc-900/60 border border-zinc-850 px-2.5 py-0.5 rounded-full tracking-wide">
-                  {selectedIdentity.name}
-                </span>
-              </div>
-              <p className="text-xs sm:text-sm text-zinc-400 font-normal leading-relaxed">
-                {selectedIdentity.id === 'shelf' 
-                  ? 'A cozy, physical space for scanning and collecting movie recommendation entries.'
-                  : selectedIdentity.id === 'bookmark'
-                  ? 'A quiet, page-marked sanctuary for the film recommendations you want to remember.'
-                  : selectedIdentity.id === 'stub'
-                  ? 'A clean, tactile repository of cinema stubs, milestones, and cinematic memories.'
-                  : 'Your personal library seal and curated stamp of cinematic recommendations.'}
-              </p>
+            <div className="flex flex-col text-left">
+              {selectedIdentity.wordmark("text-base sm:text-lg")}
+              <span className="text-[10px] text-zinc-500 font-sans tracking-wide leading-none mt-0.5">
+                {selectedIdentity.name}
+              </span>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 self-start md:self-center">
+          <div className="flex flex-wrap items-center gap-3 self-stretch sm:self-auto justify-end">
             
             {/* Unified 4-tab premium Segmented Controller */}
-            <nav className="bg-zinc-900/80 backdrop-blur-md border border-zinc-850 p-1.5 rounded-xl flex items-center relative" id="main-tabs-nav">
+            <nav className="bg-zinc-900/60 backdrop-blur-md border border-zinc-850/85 p-1 rounded-xl flex items-center relative" id="main-tabs-nav">
               <button
                 onClick={() => setViewMode('home')}
                 className={`relative px-4 py-2.5 rounded-lg text-xs sm:text-sm font-medium transition-all flex items-center gap-2 cursor-pointer z-10 tracking-wide ${
@@ -344,7 +333,7 @@ export default function App() {
                     transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                   />
                 )}
-                <Sparkles className="w-4 h-4 text-blue-400" />
+                <Shuffle className="w-4 h-4" />
                 <span>Decide Tonight</span>
               </button>
 
@@ -427,6 +416,7 @@ export default function App() {
               <WatchTonightModal
                 movies={movies}
                 onMarkWatched={handleToggleWatched}
+                onSelectMovie={(id) => setSelectedMovieId(id)}
                 isInline={true}
               />
             </motion.div>
@@ -446,6 +436,7 @@ export default function App() {
                 onReplayOnboarding={handleResetOnboarding}
                 activeIdentity={activeIdentity}
                 onChangeIdentity={setActiveIdentity}
+                userEmail="ashithsanjaynath9@gmail.com"
               />
             </motion.div>
           )}
@@ -459,20 +450,22 @@ export default function App() {
               onClose={() => setSelectedMovieId(null)}
               onToggleWatched={handleToggleWatched}
               onToggleFavorite={handleToggleFavorite}
+              activeIdentity={activeIdentity}
+              userEmail="ashithsanjaynath9@gmail.com"
             />
           )}
         </AnimatePresence>
 
         {/* Subtle, ultra-clean Footer */}
-        <footer className="pt-16 border-t border-zinc-950 flex flex-col sm:flex-row items-center justify-between text-[11px] text-zinc-500 font-sans gap-4">
+        <footer className="pt-16 border-t border-zinc-950 flex flex-col sm:flex-row items-center justify-between text-xs text-zinc-500 font-sans gap-4">
           <div className="flex flex-wrap items-center gap-3">
             <p>© {new Date().getFullYear()} CineSave.</p>
             <motion.button
               onClick={handleResetOnboarding}
-              whileHover={{ scale: 1.02, color: "#B39CD0" }}
+              whileHover={{ scale: 1.02, color: "#7C8CFF" }}
               whileTap={{ scale: 0.98 }}
               transition={{ type: "spring", stiffness: 250, damping: 20 }}
-              className="text-zinc-500 hover:text-purple-400 transition-colors flex items-center gap-1 cursor-pointer underline bg-transparent border-0"
+              className="text-zinc-500 hover:text-blue-400 transition-colors flex items-center gap-1 cursor-pointer underline bg-transparent border-0"
             >
               <HelpCircle className="w-3.5 h-3.5" />
               Replay Guide
@@ -496,10 +489,10 @@ export default function App() {
                 <Check className="w-4 h-4 text-emerald-400 stroke-[3px]" />
               </div>
               <div className="text-left space-y-0.5">
-                <p className="text-[10px] font-mono font-bold tracking-widest uppercase text-emerald-400 leading-none">
+                <p className="text-xs font-sans font-medium text-emerald-400 leading-none">
                   {toast.message}
                 </p>
-                <p className="text-[11px] text-zinc-400 leading-normal font-medium pr-1">
+                <p className="text-xs text-zinc-450 leading-normal font-normal pr-1">
                   {toast.sub}
                 </p>
               </div>

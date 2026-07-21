@@ -8,7 +8,9 @@ import { motion, AnimatePresence } from 'motion/react';
 import { 
   Search, 
   X, 
-  Plus 
+  Plus,
+  Compass,
+  Archive
 } from 'lucide-react';
 import { Movie, AppStats } from '../types';
 
@@ -25,7 +27,7 @@ interface WatchlistDashboardProps {
   onGoToCapture?: () => void;
 }
 
-interface Album {
+interface EmotionalCollection {
   id: string;
   name: string;
   emoji: string;
@@ -46,410 +48,545 @@ export default function WatchlistDashboard({
   onGoToCapture
 }: WatchlistDashboardProps) {
 
-  // Default active collection is "recently-saved"
-  const [activeAlbumId, setActiveAlbumId] = useState<string>('recently-saved');
+  // Local state to toggle between the physical movie shelf and the completed archive
+  const [libraryMode, setLibraryMode] = useState<'shelf' | 'completed'>('shelf');
 
-  // Human collections exactly as requested
-  const ALBUMS: Album[] = useMemo(() => [
+  // Human-focused emotional collections exactly as requested
+  const COLLECTIONS: EmotionalCollection[] = useMemo(() => [
     {
       id: 'recently-saved',
       name: 'Recently Saved',
       emoji: '✨',
-      description: 'Your fresh screen discoveries, waiting to be unspooled.',
+      description: 'Quiet discoveries and fresh captures waiting to be unspooled.',
       filterFn: (m) => !m.watched
     },
     {
-      id: 'this-weekend',
-      name: 'For This Weekend',
+      id: 'friday-night',
+      name: 'Friday Night',
       emoji: '🍿',
-      description: 'Grounded comfort, thrilling action, and perfect Saturday night pick-ups.',
+      description: 'Comfort, spectacle, and high-energy picks for a perfect evening.',
       filterFn: (m) => !m.watched && (
         m.vibe.toLowerCase().includes('comfort') || 
         m.vibe.toLowerCase().includes('gargantuan') || 
         m.vibe.toLowerCase().includes('adrenaline') || 
-        ['init-1', 'init-2', 'init-3'].includes(m.id)
+        m.genres.some(g => ['Action', 'Adventure', 'Comedy', 'Thriller'].includes(g))
       )
     },
     {
       id: 'need-to-watch',
       name: 'Need To Watch',
       emoji: '🎯',
-      description: 'Your absolute top priority cinema, no more putting them off.',
-      filterFn: (m) => !m.watched && (
-        m.favorite || 
-        (m.confidence ? m.confidence >= 95 : true) || 
-        m.id === 'init-1' || 
-        m.id === 'init-6'
-      )
+      description: 'Your absolute top priority stories. No more putting them off.',
+      filterFn: (m) => !m.watched && (m.favorite || (m.confidence ? m.confidence >= 95 : true) || m.id === 'init-1' || m.id === 'init-6')
     },
     {
-      id: 'friends-rec',
-      name: 'Friends Recommended',
+      id: 'from-friends',
+      name: 'From Friends',
       emoji: '💬',
-      description: 'Quiet gems and cinema suggestions shared by your closest friends.',
+      description: 'Quiet gems shared by people who know you best.',
       filterFn: (m) => !m.watched && (
-        m.socialSource.platform === 'whatsapp' || 
-        m.socialSource.platform === 'manual' || 
+        m.socialSource?.platform === 'manual' || 
         m.whySave.toLowerCase().includes('friend') || 
         m.whySave.toLowerCase().includes('chat') || 
-        m.whySave.toLowerCase().includes('sent') || 
-        m.id === 'init-3' || 
-        m.id === 'init-4'
+        m.whySave.toLowerCase().includes('sent')
       )
     },
     {
-      id: 'instagram-saves',
-      name: 'From Instagram',
-      emoji: '📸',
-      description: 'Visual aesthetics and captivating trailers captured from your social feeds.',
+      id: 'saved-this-month',
+      name: 'Saved This Month',
+      emoji: '📅',
+      description: 'Your intake of cinema over the last thirty days.',
       filterFn: (m) => !m.watched && (
-        m.socialSource.platform === 'instagram' || 
-        m.whySave.toLowerCase().includes('instagram') || 
-        m.id === 'init-2' || 
-        m.id === 'init-5' || 
-        m.id === 'init-7'
+        new Date(m.addedAt).getTime() > Date.now() - 30 * 24 * 60 * 60 * 1000 || 
+        ['init-2', 'init-5'].includes(m.id)
       )
     },
     {
-      id: 'late-night',
-      name: 'Late Night',
-      emoji: '🌙',
-      description: 'Atmospheric, moody, and deep cinematic journeys perfect after midnight.',
+      id: 'rainy-evenings',
+      name: 'Rainy Evenings',
+      emoji: '🌧️',
+      description: 'Atmospheric, quiet, and deeply immersive comfort stories.',
       filterFn: (m) => !m.watched && (
-        m.vibe.toLowerCase().includes('dark') || 
-        m.vibe.toLowerCase().includes('cosmic') || 
-        m.genres.some(g => ['Thriller', 'Sci-Fi', 'Mystery', 'Horror', 'War'].includes(g)) || 
-        m.id === 'init-1' || 
-        m.id === 'init-5' || 
-        m.id === 'init-7'
+        m.vibe.toLowerCase().includes('cozy') || 
+        m.vibe.toLowerCase().includes('aesthetic') || 
+        m.vibe.toLowerCase().includes('rainy') || 
+        m.vibe.toLowerCase().includes('nostalgia') || 
+        m.genres.some(g => ['Drama', 'Romance', 'Mystery', 'Animation'].includes(g))
       )
     },
     {
       id: 'mind-bending',
       name: 'Mind Bending',
       emoji: '🧠',
-      description: 'Cerebral puzzles, existential scripts, and reality-warping masterworks.',
+      description: 'Cerebral puzzles, sci-fi realities, and mind-expanding plots.',
       filterFn: (m) => !m.watched && (
         m.vibe.toLowerCase().includes('mind-bending') || 
         m.vibe.toLowerCase().includes('cosmic') || 
-        m.genres.includes('Sci-Fi') ||
-        m.id === 'init-1' || 
-        m.id === 'init-2'
+        m.vibe.toLowerCase().includes('wonder') || 
+        m.genres.includes('Sci-Fi')
       )
     },
     {
-      id: 'oscars',
-      name: 'Oscar Winners',
-      emoji: '🏆',
-      description: 'Decorated masterpieces and universally acclaimed stories.',
+      id: 'date-night',
+      name: 'Date Night',
+      emoji: '🕯️',
+      description: 'Enchanting, romantic, and whimsical films made to share.',
       filterFn: (m) => !m.watched && (
-        m.rating.includes('8.') || 
-        m.rating.includes('96%') || 
-        m.whySave.toLowerCase().includes('oscar') || 
-        m.whySave.toLowerCase().includes('academy') || 
-        ['init-1', 'init-2', 'init-3', 'init-5', 'init-6'].includes(m.id)
+        m.genres.some(g => ['Romance', 'Drama', 'Comedy'].includes(g)) || 
+        m.vibe.toLowerCase().includes('cozy') || 
+        m.vibe.toLowerCase().includes('aesthetic') || 
+        m.vibe.toLowerCase().includes('whimsical')
       )
-    },
-    {
-      id: 'all',
-      name: 'My Whole Library',
-      emoji: '📚',
-      description: 'Your complete personal movie library and curated shelf.',
-      filterFn: (m) => !m.watched
-    },
-    {
-      id: 'completed',
-      name: 'Watched Archive',
-      emoji: '👀',
-      description: 'Completed cinematic journeys and saved digital ticket stubs.',
-      filterFn: (m) => m.watched
     }
   ], []);
 
-  // Compute final movies on the shelf
-  const processedMovies = useMemo(() => {
-    const currentAlbum = ALBUMS.find(a => a.id === activeAlbumId) || ALBUMS[0];
-    let list = movies.filter(currentAlbum.filterFn);
+  // Compute search results across all unwatched movies when query is present
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    const q = searchQuery.toLowerCase();
+    return movies.filter(m => 
+      !m.watched && 
+      (m.title.toLowerCase().includes(q) ||
+       m.director.toLowerCase().includes(q) ||
+       m.vibe.toLowerCase().includes(q) ||
+       m.synopsis.toLowerCase().includes(q) ||
+       m.genres.some(genre => genre.toLowerCase().includes(q)))
+    );
+  }, [movies, searchQuery]);
 
-    // Dynamic search filtering
-    if (searchQuery.trim() !== '') {
-      const q = searchQuery.toLowerCase();
-      list = list.filter(m => 
-        m.title.toLowerCase().includes(q) ||
-        m.director.toLowerCase().includes(q) ||
-        m.vibe.toLowerCase().includes(q) ||
-        m.synopsis.toLowerCase().includes(q) ||
-        m.genres.some(genre => genre.toLowerCase().includes(q))
-      );
-    }
-
-    // Default sorting for shelf: newest first for Recently Saved, and release date/alphabetical otherwise
-    return [...list].sort((a, b) => {
-      if (activeAlbumId === 'recently-saved') {
-        return new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime();
-      }
-      return a.title.localeCompare(b.title);
+  // Compute completed watched movies
+  const completedMovies = useMemo(() => {
+    return movies.filter(m => m.watched).sort((a, b) => {
+      const timeA = a.watchedAt ? new Date(a.watchedAt).getTime() : 0;
+      const timeB = b.watchedAt ? new Date(b.watchedAt).getTime() : 0;
+      return timeB - timeA;
     });
-  }, [movies, activeAlbumId, searchQuery, ALBUMS]);
-
-  const activeAlbum = ALBUMS.find(a => a.id === activeAlbumId) || ALBUMS[0];
+  }, [movies]);
 
   return (
-    <div className="space-y-12 animate-fade-in text-zinc-100 font-sans max-w-4xl mx-auto py-2" id="personal-movie-shelf">
+    <div className="space-y-10 animate-fade-in text-zinc-100 font-sans max-w-5xl mx-auto py-2 px-4 sm:px-6" id="personal-movie-shelf">
       
-      {/* 1. Interactive Personal Shelf Header */}
-      <div className="space-y-5">
-        <div className="flex items-end justify-between px-1.5">
-          <div className="space-y-1.5">
-            <p className="text-xs sm:text-sm font-sans text-zinc-450 tracking-wide">
-              My Archives
-            </p>
-            <h2 className="text-2xl sm:text-3xl font-display font-light italic text-zinc-150 flex items-center gap-2">
-              <span>Your Personal Movie Shelf</span>
-            </h2>
-          </div>
-          <span className="text-xs sm:text-sm font-sans text-zinc-450 tracking-wide">
-            {movies.filter(m => !m.watched).length} unwatched • {movies.filter(m => m.watched).length} watched
-          </span>
-        </div>
-
-        {/* 2. Human Collections Folder Belt */}
-        <div className="flex gap-5 overflow-x-auto pb-6 pt-1.5 px-1.5 scrollbar-none snap-x">
-          {ALBUMS.map((album) => {
-            const isSelected = activeAlbumId === album.id;
-            const count = movies.filter(album.filterFn).length;
-            const coverMovie = movies.filter(album.filterFn)[0];
-
-            return (
-              <motion.button
-                key={album.id}
-                onClick={() => {
-                  setActiveAlbumId(album.id);
-                  if (album.id === 'completed') {
-                    onChangeTab('watched');
-                  } else {
-                    onChangeTab('unwatched');
-                  }
-                }}
-                whileHover={{ y: -3, scale: 1.01 }}
-                whileTap={{ scale: 0.99 }}
-                transition={{ type: "spring", stiffness: 250, damping: 20 }}
-                className="group flex flex-col items-start gap-2.5 shrink-0 snap-start text-left focus:outline-none cursor-pointer select-none"
-              >
-                {/* Visual Book/Folder Spine Card */}
-                <div 
-                  className={`relative w-28 sm:w-32 aspect-[4/3] rounded-2xl overflow-hidden bg-zinc-900 border transition-all duration-300 ${
-                    isSelected 
-                      ? 'border-zinc-700 bg-zinc-900/80 ring-1 ring-zinc-800' 
-                      : 'border-zinc-900/60 bg-zinc-950/40 opacity-50 group-hover:opacity-85'
-                  }`}
-                >
-                  {coverMovie ? (
-                    <div className="absolute inset-0">
-                      <img 
-                        src={coverMovie.posterUrl} 
-                        alt={album.name}
-                        referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover opacity-35 group-hover:opacity-50 transition-all duration-300 scale-105 group-hover:scale-110"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-transparent" />
-                    </div>
-                  ) : null}
- 
-                  {/* Icon and label overlaid nicely */}
-                  <div className="absolute inset-x-3 bottom-3 flex flex-col gap-1 justify-end h-full z-10">
-                    <span className="text-xl mb-0.5 filter drop-shadow">{album.emoji}</span>
-                    <h4 className="text-sm font-medium text-zinc-100 tracking-wide leading-tight">
-                      {album.name}
-                    </h4>
-                    <p className="text-xs font-sans text-zinc-400 tracking-wide">
-                      {count} {count === 1 ? 'film' : 'films'}
-                    </p>
-                  </div>
-                </div>
-              </motion.button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* 3. Sleek Title Card & Search Bar (Extremely Minimal) */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 border-b border-zinc-900/60 pb-6 px-1.5">
-        <div className="space-y-2">
-          <h3 className="text-lg sm:text-xl font-display font-light italic text-zinc-150 flex items-center gap-2">
-            <span>{activeAlbum.emoji} {activeAlbum.name}</span>
-          </h3>
-          <p className="text-xs sm:text-sm text-zinc-400 font-normal leading-relaxed max-w-xl">
-            {activeAlbum.description}
+      {/* Sleek Header & Search Room */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-zinc-900/60">
+        <div className="space-y-1.5 text-left">
+          <p className="text-[10px] tracking-wider uppercase font-medium text-zinc-500">
+            Private Archive
+          </p>
+          <h2 className="text-3xl sm:text-4xl font-display font-light italic text-zinc-100">
+            The Cinema Shelf
+          </h2>
+          <p className="text-xs sm:text-sm text-zinc-450 font-sans max-w-md">
+            A silent space for the films you've chosen to remember, free from endless feed noise.
           </p>
         </div>
 
-        {/* Quiet Search Box */}
-        <div className="relative w-full sm:w-64">
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-            <Search className="h-4 w-4 text-zinc-650" />
-          </div>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => onChangeSearch(e.target.value)}
-            placeholder="Search this shelf..."
-            className="block w-full bg-zinc-900/40 hover:bg-zinc-900/60 focus:bg-zinc-900 border border-zinc-850/60 focus:border-zinc-800 text-xs sm:text-sm rounded-xl pl-10 pr-8 py-2.5 text-zinc-200 placeholder-zinc-500 outline-none transition-all"
-          />
-          {searchQuery && (
+        {/* Quiet Mode Selector + Search Input */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+          
+          {/* Elegant Slate Pill Switcher */}
+          <div className="flex items-center bg-zinc-900/40 p-1 rounded-xl border border-zinc-850/65 self-start sm:self-auto">
             <button
-              onClick={() => onChangeSearch('')}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-500 hover:text-white transition-colors cursor-pointer"
+              onClick={() => {
+                setLibraryMode('shelf');
+                onChangeTab('unwatched');
+              }}
+              className={`px-4 py-2 rounded-lg text-xs font-sans font-medium transition-all duration-250 cursor-pointer flex items-center gap-1.5 ${
+                libraryMode === 'shelf'
+                  ? 'bg-zinc-800 text-zinc-100 shadow-md'
+                  : 'text-zinc-500 hover:text-zinc-300'
+              }`}
             >
-              <X className="w-4 h-4" />
+              <Compass className="w-3.5 h-3.5" />
+              <span>My Shelves</span>
             </button>
-          )}
+            <button
+              onClick={() => {
+                setLibraryMode('completed');
+                onChangeTab('watched');
+              }}
+              className={`px-4 py-2 rounded-lg text-xs font-sans font-medium transition-all duration-250 cursor-pointer flex items-center gap-1.5 ${
+                libraryMode === 'completed'
+                  ? 'bg-zinc-800 text-zinc-100 shadow-md'
+                  : 'text-zinc-500 hover:text-zinc-300'
+              }`}
+            >
+              <Archive className="w-3.5 h-3.5" />
+              <span>Completed Archive</span>
+            </button>
+          </div>
+
+          {/* Minimal Search Input */}
+          <div className="relative w-full sm:w-60">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search className="h-4 w-4 text-zinc-650" />
+            </div>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => onChangeSearch(e.target.value)}
+              placeholder="Search your shelf..."
+              className="block w-full bg-zinc-900/40 hover:bg-zinc-900/60 focus:bg-zinc-900 border border-zinc-850/60 focus:border-zinc-800 text-xs sm:text-sm rounded-xl pl-9 pr-8 py-2 text-zinc-200 placeholder-zinc-550 outline-none transition-all duration-200"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => onChangeSearch('')}
+                className="absolute inset-y-0 right-0 pr-2.5 flex items-center text-zinc-500 hover:text-white transition-colors cursor-pointer"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* 4. Elegant Movie Grid (Posters Dominate) */}
+      {/* Main Interactive Shelf Display */}
       <div>
-        <AnimatePresence mode="popLayout">
-          {processedMovies.length > 0 ? (
-            <motion.div 
+        <AnimatePresence mode="wait">
+          
+          {/* SEARCH STATE */}
+          {searchQuery.trim() !== '' ? (
+            <motion.div
+              key="search-results-shelf"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              className="space-y-8"
+            >
+              <div className="space-y-1">
+                <h3 className="text-lg font-display font-light italic text-zinc-100">
+                  Search Results
+                </h3>
+                <p className="text-xs text-zinc-500 font-sans">
+                  Found {searchResults.length} matching films on your shelves
+                </p>
+              </div>
+
+              {searchResults.length > 0 ? (
+                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-6">
+                  {searchResults.map((movie) => (
+                    <motion.div
+                      key={movie.id}
+                      whileHover={{ y: -8, scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      transition={{ type: "spring", stiffness: 220, damping: 25 }}
+                      onClick={() => onSelectMovie(movie.id)}
+                      className="group flex flex-col cursor-pointer text-left select-none"
+                    >
+                      {/* Tactile 3D-like Framed Movie Poster */}
+                      <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-zinc-950 border border-zinc-800/80 shadow-[0_12px_24px_rgba(0,0,0,0.75)] ring-1 ring-white/5 transition-all duration-300 group-hover:border-zinc-700/80 group-hover:shadow-[0_20px_40px_rgba(0,0,0,0.95),_0_0_20px_rgba(124,140,255,0.05)]">
+                        {/* Left Edge 3D Spine Highlight */}
+                        <div className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-r from-white/15 via-white/5 to-transparent z-20 pointer-events-none" />
+                        
+                        {/* Glossy Diagonal Reflection Sheen */}
+                        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20" />
+
+                        {movie.posterUrl ? (
+                          <img
+                            src={movie.posterUrl}
+                            alt={movie.title}
+                            referrerPolicy="no-referrer"
+                            className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-all duration-500 scale-100 group-hover:scale-[1.03]"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-900 text-zinc-600 p-3 text-center">
+                            <span className="text-xl mb-1">🍿</span>
+                            <span className="text-[9px] text-zinc-500 font-medium truncate w-full">{movie.title}</span>
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none z-10" />
+                      </div>
+
+                      {/* Museum-Grade Label Pane answering ONLY: What movie? Where can I watch? Why saved? */}
+                      <div className="mt-3.5 space-y-1.5 px-0.5">
+                        {/* What movie? */}
+                        <div className="space-y-0.5">
+                          <h4 className="text-[11px] sm:text-[11.5px] font-sans font-medium text-zinc-200 truncate group-hover:text-white transition-colors" title={movie.title}>
+                            {movie.title}
+                          </h4>
+                          <p className="text-[9.5px] text-zinc-500 font-sans font-normal">
+                            {movie.year}
+                          </p>
+                        </div>
+
+                        {/* Where to watch? */}
+                        <div className="text-[9.5px] text-zinc-400 font-sans truncate font-normal">
+                          {movie.streamingServices && movie.streamingServices.length > 0 
+                            ? `Stream: ${movie.streamingServices.slice(0, 2).join(', ')}`
+                            : 'Find channels'}
+                        </div>
+
+                        {/* Why did I save it? */}
+                        {movie.whySave && (
+                          <p className="text-[9.5px] text-zinc-500 italic font-sans truncate font-normal leading-normal border-l border-zinc-800/80 pl-1.5" title={movie.whySave}>
+                            "{movie.whySave}"
+                          </p>
+                        )}
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              ) : (
+                <div className="py-16 text-center border border-dashed border-zinc-900 rounded-2xl text-zinc-550 text-xs">
+                  No matching films found on your shelves.
+                </div>
+              )}
+            </motion.div>
+          ) : libraryMode === 'shelf' ? (
+            
+            /* ACTIVE SHELVES (Grouping Unwatched Movies into Emotional Collections) */
+            <motion.div
+              key="emotional-shelves-container"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-12"
+              className="space-y-12"
             >
-              {processedMovies.map((movie) => {
-                const whySaved = movie.whySave || (movie.socialSource?.author ? `Recommended by @${movie.socialSource.author}` : null);
-                
+              {COLLECTIONS.map((collection) => {
+                // Apply the collection's filter to get its movies
+                let shelfMovies = movies.filter(collection.filterFn);
+
+                // For recently saved, sort by addedAt desc to make it feel fresh
+                if (collection.id === 'recently-saved') {
+                  shelfMovies = [...shelfMovies].sort((a, b) => 
+                    new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime()
+                  );
+                } else {
+                  // Keep alphabetical sorting otherwise
+                  shelfMovies = [...shelfMovies].sort((a, b) => a.title.localeCompare(b.title));
+                }
+
+                // If a collection has no matching films, hide its shelf dynamically to reduce clutter
+                if (shelfMovies.length === 0) return null;
+
                 return (
-                  <motion.div
-                    key={movie.id}
-                    layoutId={`shelf-movie-${movie.id}`}
-                    initial={{ opacity: 0, scale: 0.96, y: 8 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.96, y: 8 }}
-                    whileHover={{ y: -6, scale: 1.015 }}
-                    whileTap={{ scale: 0.98 }}
-                    transition={{ type: "spring", stiffness: 220, damping: 24 }}
-                    onClick={() => onSelectMovie(movie.id)}
-                    className="group flex flex-col space-y-4 cursor-pointer text-left focus:outline-none select-none"
-                  >
-                    {/* Hero Movie Poster Card */}
-                    <div className="relative aspect-[2/3] rounded-[24px] overflow-hidden bg-zinc-950 shadow-[0_8px_30px_rgba(0,0,0,0.4)] group-hover:shadow-[0_20px_50px_rgba(0,0,0,0.6)] transition-all duration-300">
-                      {movie.posterUrl ? (
-                        <img
-                          src={movie.posterUrl}
-                          alt={movie.title}
-                          referrerPolicy="no-referrer"
-                          className="w-full h-full object-cover opacity-95 group-hover:opacity-100 transition-all duration-500 scale-100 group-hover:scale-[1.025]"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-zinc-900 to-zinc-950 p-6 text-center">
-                          <span className="text-3xl mb-2">🍿</span>
-                          <span className="text-xs text-zinc-500 font-medium truncate w-full">{movie.title}</span>
-                        </div>
-                      )}
+                  <div key={collection.id} className="space-y-4">
+                    
+                    {/* Shelf Header */}
+                    <div className="flex items-baseline justify-between px-1">
+                      <div className="space-y-0.5">
+                        <h3 className="text-lg font-display font-light italic text-zinc-150 flex items-center gap-2">
+                          <span className="text-base select-none">{collection.emoji}</span>
+                          <span>{collection.name}</span>
+                        </h3>
+                        <p className="text-[11px] text-zinc-500 font-sans font-normal">
+                          {collection.description}
+                        </p>
+                      </div>
+                      <span className="text-[10px] text-zinc-600 font-sans tracking-wide">
+                        {shelfMovies.length} {shelfMovies.length === 1 ? 'film' : 'films'}
+                      </span>
+                    </div>
+
+                    {/* Physical Movie Shelf Ledge Layout */}
+                    <div className="relative group/shelf">
                       
-                      {/* Quiet vignette on poster to enrich details */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent opacity-60 pointer-events-none" />
+                      {/* Horizontal Scrolling Row of Dominant Posters */}
+                      <div className="flex gap-6 overflow-x-auto pb-5 pt-3 px-1 no-scrollbar scroll-smooth snap-x snap-mandatory">
+                        {shelfMovies.map((movie) => (
+                          <motion.div
+                            key={`${collection.id}-${movie.id}`}
+                            whileHover={{ y: -8, scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            transition={{ type: "spring", stiffness: 220, damping: 25 }}
+                            onClick={() => onSelectMovie(movie.id)}
+                            className="snap-start shrink-0 w-28 sm:w-32 md:w-36 flex flex-col cursor-pointer text-left select-none group"
+                          >
+                            {/* Tactile 3D-like Framed Movie Poster */}
+                            <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-zinc-950 border border-zinc-800/80 shadow-[0_12px_24px_rgba(0,0,0,0.75)] ring-1 ring-white/5 transition-all duration-300 group-hover:border-zinc-700/80 group-hover:shadow-[0_20px_40px_rgba(0,0,0,0.95),_0_0_20px_rgba(124,140,255,0.05)]">
+                              {/* Left Edge 3D Spine Highlight */}
+                              <div className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-r from-white/15 via-white/5 to-transparent z-20 pointer-events-none" />
+                              
+                              {/* Glossy Diagonal Reflection Sheen */}
+                              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20" />
+
+                              {movie.posterUrl ? (
+                                <img
+                                  src={movie.posterUrl}
+                                  alt={movie.title}
+                                  referrerPolicy="no-referrer"
+                                  className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-all duration-500 scale-100 group-hover:scale-[1.03]"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-900 text-zinc-650 p-4 text-center">
+                                  <span className="text-2xl mb-1.5">🍿</span>
+                                  <span className="text-[10px] text-zinc-500 font-medium truncate w-full">{movie.title}</span>
+                                </div>
+                              )}
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none z-10" />
+                            </div>
+
+                            {/* Museum-Grade Label Pane answering ONLY: What movie? Where can I watch? Why saved? */}
+                            <div className="mt-3.5 space-y-1.5 px-0.5">
+                              {/* What movie? */}
+                              <div className="space-y-0.5">
+                                <h4 className="text-[11px] sm:text-[11.5px] font-sans font-medium text-zinc-200 truncate group-hover:text-white transition-colors" title={movie.title}>
+                                  {movie.title}
+                                </h4>
+                                <p className="text-[9.5px] text-zinc-500 font-sans font-normal">
+                                  {movie.year}
+                                </p>
+                              </div>
+
+                              {/* Where to watch? */}
+                              <div className="text-[9.5px] text-zinc-400 font-sans truncate font-normal">
+                                {movie.streamingServices && movie.streamingServices.length > 0 
+                                  ? `Stream: ${movie.streamingServices.slice(0, 2).join(', ')}`
+                                  : 'Find channels'}
+                              </div>
+
+                              {/* Why did I save it? */}
+                              {movie.whySave && (
+                                <p className="text-[9.5px] text-zinc-500 italic font-sans truncate font-normal leading-normal border-l border-zinc-800/80 pl-1.5" title={movie.whySave}>
+                                  "{movie.whySave}"
+                                </p>
+                              )}
+                            </div>
+                          </motion.div>
+                        ))}
+
+                        {/* Special Add Ticket slot at the end of Recently Saved shelf */}
+                        {collection.id === 'recently-saved' && onGoToCapture && (
+                          <motion.div
+                            whileHover={{ y: -6, scale: 1.01 }}
+                            whileTap={{ scale: 0.99 }}
+                            onClick={onGoToCapture}
+                            className="snap-end shrink-0 w-28 sm:w-32 md:w-36 aspect-[2/3] rounded-2xl border-2 border-dashed border-zinc-850 hover:border-zinc-700 bg-zinc-950/20 hover:bg-zinc-900/10 flex flex-col items-center justify-center p-4 text-center cursor-pointer select-none transition-all"
+                          >
+                            <div className="w-8 h-8 rounded-full bg-zinc-900/60 border border-zinc-850 flex items-center justify-center mb-2.5">
+                              <Plus className="w-4 h-4 text-zinc-500 group-hover:text-zinc-300" />
+                            </div>
+                            <span className="text-[10px] font-sans text-zinc-500 tracking-wide font-medium">Add Film</span>
+                          </motion.div>
+                        )}
+                      </div>
+
+                      {/* Gorgeous physical wood/slate ledge line supporting the posters */}
+                      <div className="relative h-2 bg-gradient-to-b from-zinc-800 to-zinc-950 rounded-full border-t border-zinc-700/35 shadow-lg -mt-3.5 mx-0.5 z-10 pointer-events-none" />
                     </div>
-
-                    {/* Exquisite minimal text footer */}
-                    <div className="space-y-1.5 px-1.5 transition-all">
-                      {/* Title (What movie is this?) */}
-                      <h4 className="text-base font-normal text-zinc-100 tracking-wide leading-snug group-hover:text-white transition-colors line-clamp-1">
-                        {movie.title}
-                      </h4>
-
-                      {/* Streaming services (Where can I watch it?) */}
-                      {movie.streamingServices.length > 0 ? (
-                        <p className="text-xs font-sans text-zinc-500 tracking-wide">
-                          Streaming on {movie.streamingServices.slice(0, 2).join(', ')}
-                        </p>
-                      ) : (
-                        <p className="text-xs font-sans text-zinc-600 tracking-wide">
-                          Saved to library
-                        </p>
-                      )}
-
-                      {/* Why saved (Why did I save it?) */}
-                      {whySaved && (
-                        <p className="text-xs text-zinc-400 font-normal leading-relaxed line-clamp-2 pt-1 border-l border-zinc-850 pl-2.5 mt-1.5 group-hover:text-zinc-350 transition-colors italic">
-                          {whySaved}
-                        </p>
-                      )}
-                    </div>
-                  </motion.div>
+                  </div>
                 );
               })}
 
-              {/* Magical "Continue Building" CTA grid slot */}
-              {onGoToCapture && (
-                <motion.div
-                  key="continue-building-slot"
-                  layout
-                  whileHover={{ y: -6, scale: 1.015 }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: "spring", stiffness: 220, damping: 24 }}
-                  className="group flex flex-col justify-between p-6 rounded-2xl border border-dashed border-zinc-800/80 hover:border-zinc-700 bg-zinc-950/20 hover:bg-zinc-950/40 aspect-[2/3] cursor-pointer text-left select-none"
-                  onClick={onGoToCapture}
-                >
-                  <div className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-850 flex items-center justify-center text-zinc-450 group-hover:text-white transition-colors">
-                    <Plus className="w-5 h-5" />
-                  </div>
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-medium text-zinc-350 group-hover:text-white transition-colors tracking-wide">
-                      Add to collection
-                    </h4>
-                    <p className="text-xs text-zinc-550 leading-relaxed font-sans">
-                      Capture an Instagram Reel, TikTok, or podcast transcript to expand your shelf.
+              {/* Guard case: If all dynamic shelves are empty */}
+              {movies.filter(m => !m.watched).length === 0 && (
+                <div className="py-24 text-center max-w-sm mx-auto space-y-4">
+                  <div className="text-3xl">📽️</div>
+                  <div className="space-y-1">
+                    <p className="font-display font-light italic text-zinc-200 text-lg">Your shelf is currently empty</p>
+                    <p className="text-xs text-zinc-500 leading-relaxed">
+                      Capture recommendations from Instagram, TikTok, or links to build your private cinema shelf.
                     </p>
                   </div>
-                </motion.div>
+                  {onGoToCapture && (
+                    <div className="pt-2">
+                      <motion.button
+                        onClick={onGoToCapture}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="px-6 py-2.5 bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-sans font-medium rounded-xl cursor-pointer"
+                      >
+                        Capture My First Recommendation
+                      </motion.button>
+                    </div>
+                  )}
+                </div>
               )}
             </motion.div>
           ) : (
-            /* Empty collection placeholder state */
-            <motion.div 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="py-20 text-center rounded-2xl border border-dashed border-zinc-900 bg-zinc-950/10 text-zinc-500 font-sans text-xs space-y-4"
+            
+            /* COMPLETED ARCHIVE VAULT (Faded grid of completed movie tickets) */
+            <motion.div
+              key="completed-archive-container"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="space-y-8"
             >
-              <div className="text-2xl">📽️</div>
               <div className="space-y-1">
-                <p className="font-medium text-zinc-400">Empty shelf slot</p>
-                <p className="max-w-xs mx-auto text-zinc-600">No films match this human collection or search filter.</p>
+                <h3 className="text-lg font-display font-light italic text-zinc-150 flex items-center gap-2">
+                  <span>🏆 Completed Archive</span>
+                </h3>
+                <p className="text-xs text-zinc-500 font-sans">
+                  A classic vault of completed tickets and finished cinematic journeys ({completedMovies.length} total)
+                </p>
               </div>
-              <div className="flex justify-center gap-3 pt-2">
-                {searchQuery ? (
-                  <motion.button
-                    onClick={() => onChangeSearch('')}
-                    whileHover={{ scale: 1.02, color: "#FAF6F0", borderColor: "#3f3f46" }}
-                    whileTap={{ scale: 0.98 }}
-                    transition={{ type: "spring", stiffness: 250, damping: 20 }}
-                    className="text-zinc-400 hover:text-white bg-zinc-900 border border-zinc-800 px-3.5 py-1.5 rounded-xl font-medium transition-all cursor-pointer"
-                  >
-                    Clear search query
-                  </motion.button>
-                ) : (
-                  onGoToCapture && (
-                    <motion.button
-                      onClick={onGoToCapture}
-                      whileHover={{ scale: 1.02 }}
+
+              {completedMovies.length > 0 ? (
+                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-6">
+                  {completedMovies.map((movie) => (
+                    <motion.div
+                      key={movie.id}
+                      whileHover={{ y: -8, scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      transition={{ type: "spring", stiffness: 250, damping: 20 }}
-                      className="text-zinc-950 hover:text-black bg-zinc-100 hover:bg-white px-4 py-1.5 rounded-xl font-medium transition-all cursor-pointer flex items-center gap-1.5"
+                      transition={{ type: "spring", stiffness: 220, damping: 25 }}
+                      onClick={() => onSelectMovie(movie.id)}
+                      className="group flex flex-col cursor-pointer text-left select-none opacity-70 hover:opacity-100 transition-opacity duration-300"
                     >
-                      <Plus className="w-3.5 h-3.5" />
-                      <span>Capture recommendations</span>
-                    </motion.button>
-                  )
-                )}
-              </div>
+                      {/* Archive-styled slightly grayed poster with tactile 3D frame */}
+                      <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-zinc-950 border border-zinc-800/80 shadow-[0_12px_24px_rgba(0,0,0,0.75)] ring-1 ring-white/5 transition-all duration-300 group-hover:border-zinc-700/80">
+                        {/* Left Edge 3D Spine Highlight */}
+                        <div className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-r from-white/10 via-white/5 to-transparent z-20 pointer-events-none" />
+                        
+                        {/* Glossy Diagonal Reflection Sheen */}
+                        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20" />
+
+                        {movie.posterUrl ? (
+                          <img
+                            src={movie.posterUrl}
+                            alt={movie.title}
+                            referrerPolicy="no-referrer"
+                            className="w-full h-full object-cover grayscale opacity-75 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-zinc-900 text-zinc-700 text-xl">
+                            ✓
+                          </div>
+                        )}
+                        {/* Stamp indicating watched status */}
+                        <div className="absolute top-2 right-2 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[8px] font-sans px-1.5 py-0.5 rounded uppercase tracking-wider z-20 shadow-md font-medium">
+                          Watched
+                        </div>
+                      </div>
+
+                      {/* Museum-Grade Label Pane answering ONLY: What movie? Where can I watch? Why saved? */}
+                      <div className="mt-3.5 space-y-1.5 px-0.5">
+                        {/* What movie? */}
+                        <div className="space-y-0.5">
+                          <h4 className="text-[11px] sm:text-[11.5px] font-sans font-medium text-zinc-300 truncate group-hover:text-white transition-colors" title={movie.title}>
+                            {movie.title}
+                          </h4>
+                          <p className="text-[9.5px] text-zinc-550 font-sans font-normal">
+                            {movie.year}
+                          </p>
+                        </div>
+
+                        {/* Where to watch? */}
+                        <div className="text-[9.5px] text-zinc-500 font-sans truncate font-normal">
+                          {movie.streamingServices && movie.streamingServices.length > 0 
+                            ? `Stream: ${movie.streamingServices.slice(0, 2).join(', ')}`
+                            : 'Find channels'}
+                        </div>
+
+                        {/* Why did I save it? */}
+                        {movie.whySave && (
+                          <p className="text-[9.5px] text-zinc-600 italic font-sans truncate font-normal leading-normal border-l border-zinc-900 pl-1.5" title={movie.whySave}>
+                            "{movie.whySave}"
+                          </p>
+                        )}
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              ) : (
+                <div className="py-20 text-center border border-dashed border-zinc-900 rounded-2xl text-zinc-550 text-xs max-w-sm mx-auto space-y-1.5">
+                  <p className="font-medium text-zinc-400">Empty Archive Vault</p>
+                  <p className="text-zinc-600">When you finish a film on your shelf, mark it as completed to store its digital stub here.</p>
+                </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
       </div>
-
     </div>
   );
 }
