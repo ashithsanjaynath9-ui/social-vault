@@ -10,7 +10,7 @@ import { Movie, AppStats } from './types';
 import { INITIAL_MOVIES, ReelTemplate } from './data';
 import { parseRuntimeMinutes } from './utils';
 import WatchlistDashboard from './components/WatchlistDashboard';
-import WatchTonightModal from './components/WatchTonightModal';
+import CineSaveAssistant from './components/CineSaveAssistant';
 import Onboarding from './components/Onboarding';
 import HomeScreen from './components/HomeScreen';
 import MovieDetailModal from './components/MovieDetailModal';
@@ -27,7 +27,7 @@ export default function App() {
       return 'bookmark';
     }
   });
-  const [viewMode, setViewMode] = useState<'home' | 'library' | 'decide' | 'profile'>('home');
+  const [viewMode, setViewMode] = useState<'home' | 'library' | 'profile'>('home');
   const [currentTab, setCurrentTab] = useState<'unwatched' | 'watched' | 'all'>('unwatched');
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoaded, setIsLoaded] = useState(false);
@@ -278,7 +278,7 @@ export default function App() {
 
           <div className="flex flex-wrap items-center gap-3 self-stretch sm:self-auto justify-end">
             
-            {/* Unified 4-tab premium Segmented Controller */}
+            {/* Unified 3-tab premium Segmented Controller */}
             <nav className="bg-zinc-900/60 backdrop-blur-md border border-zinc-850/85 p-1 rounded-xl flex items-center relative" id="main-tabs-nav">
               <button
                 onClick={() => setViewMode('home')}
@@ -316,25 +316,6 @@ export default function App() {
                 )}
                 <Tv className="w-4 h-4" />
                 <span>Library</span>
-              </button>
-
-              <button
-                onClick={() => setViewMode('decide')}
-                className={`relative px-4 py-2.5 rounded-lg text-xs sm:text-sm font-medium transition-all flex items-center gap-2 cursor-pointer z-10 tracking-wide ${
-                  viewMode === 'decide' 
-                    ? 'text-white' 
-                    : 'text-zinc-400 hover:text-zinc-200'
-                }`}
-              >
-                {viewMode === 'decide' && (
-                  <motion.div
-                    layoutId="mainNavIndicator"
-                    className="absolute inset-0 bg-zinc-800 rounded-lg shadow-md -z-10"
-                    transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                  />
-                )}
-                <Shuffle className="w-4 h-4" />
-                <span>Decide Tonight</span>
               </button>
 
               <button
@@ -405,22 +386,7 @@ export default function App() {
             </motion.div>
           )}
 
-          {viewMode === 'decide' && (
-            <motion.div
-              key="decide-view"
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-            >
-              <WatchTonightModal
-                movies={movies}
-                onMarkWatched={handleToggleWatched}
-                onSelectMovie={(id) => setSelectedMovieId(id)}
-                isInline={true}
-              />
-            </motion.div>
-          )}
+
 
           {viewMode === 'profile' && (
             <motion.div
@@ -499,6 +465,14 @@ export default function App() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Global Floating AI Decider Assistant Drawer */}
+        <CineSaveAssistant
+          movies={movies}
+          onMarkWatched={handleToggleWatched}
+          onSelectMovie={(id) => setSelectedMovieId(id)}
+          activeIdentity={activeIdentity}
+        />
 
       </div>
     </div>
