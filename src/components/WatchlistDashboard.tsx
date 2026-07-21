@@ -51,7 +51,7 @@ export default function WatchlistDashboard({
   // Local state to toggle between the physical movie shelf and the completed archive
   const [libraryMode, setLibraryMode] = useState<'shelf' | 'completed'>('shelf');
 
-  // Human-focused emotional collections exactly as requested
+  // Human-focused emotional collections exactly matching the user requested categories and examples
   const COLLECTIONS: EmotionalCollection[] = useMemo(() => [
     {
       id: 'recently-saved',
@@ -73,56 +73,15 @@ export default function WatchlistDashboard({
       )
     },
     {
-      id: 'need-to-watch',
-      name: 'Need To Watch',
-      emoji: '🎯',
-      description: 'Your absolute top priority stories. No more putting them off.',
-      filterFn: (m) => !m.watched && (m.favorite || (m.confidence ? m.confidence >= 95 : true) || m.id === 'init-1' || m.id === 'init-6')
-    },
-    {
-      id: 'from-friends',
-      name: 'From Friends',
-      emoji: '💬',
-      description: 'Quiet gems shared by people who know you best.',
-      filterFn: (m) => !m.watched && (
-        m.socialSource?.platform === 'manual' || 
-        m.whySave.toLowerCase().includes('friend') || 
-        m.whySave.toLowerCase().includes('chat') || 
-        m.whySave.toLowerCase().includes('sent')
-      )
-    },
-    {
-      id: 'saved-this-month',
-      name: 'Saved This Month',
-      emoji: '📅',
-      description: 'Your intake of cinema over the last thirty days.',
-      filterFn: (m) => !m.watched && (
-        new Date(m.addedAt).getTime() > Date.now() - 30 * 24 * 60 * 60 * 1000 || 
-        ['init-2', 'init-5'].includes(m.id)
-      )
-    },
-    {
-      id: 'rainy-evenings',
-      name: 'Rainy Evenings',
-      emoji: '🌧️',
-      description: 'Atmospheric, quiet, and deeply immersive comfort stories.',
-      filterFn: (m) => !m.watched && (
-        m.vibe.toLowerCase().includes('cozy') || 
-        m.vibe.toLowerCase().includes('aesthetic') || 
-        m.vibe.toLowerCase().includes('rainy') || 
-        m.vibe.toLowerCase().includes('nostalgia') || 
-        m.genres.some(g => ['Drama', 'Romance', 'Mystery', 'Animation'].includes(g))
-      )
-    },
-    {
       id: 'mind-bending',
-      name: 'Mind Bending',
+      name: 'Mind-bending',
       emoji: '🧠',
       description: 'Cerebral puzzles, sci-fi realities, and mind-expanding plots.',
       filterFn: (m) => !m.watched && (
         m.vibe.toLowerCase().includes('mind-bending') || 
         m.vibe.toLowerCase().includes('cosmic') || 
         m.vibe.toLowerCase().includes('wonder') || 
+        m.vibe.toLowerCase().includes('cerebral') || 
         m.genres.includes('Sci-Fi')
       )
     },
@@ -137,8 +96,73 @@ export default function WatchlistDashboard({
         m.vibe.toLowerCase().includes('aesthetic') || 
         m.vibe.toLowerCase().includes('whimsical')
       )
+    },
+    {
+      id: 'rainy-evening',
+      name: 'Rainy Evening',
+      emoji: '🌧️',
+      description: 'Atmospheric, quiet, and deeply immersive comfort stories.',
+      filterFn: (m) => !m.watched && (
+        m.vibe.toLowerCase().includes('cozy') || 
+        m.vibe.toLowerCase().includes('aesthetic') || 
+        m.vibe.toLowerCase().includes('rainy') || 
+        m.vibe.toLowerCase().includes('nostalgia') || 
+        m.genres.some(g => ['Drama', 'Romance', 'Mystery', 'Animation'].includes(g))
+      )
+    },
+    {
+      id: 'from-friends',
+      name: 'From Friends',
+      emoji: '💬',
+      description: 'Quiet gems shared by people who know you best.',
+      filterFn: (m) => !m.watched && (
+        m.socialSource?.platform === 'manual' || 
+        m.whySave.toLowerCase().includes('friend') || 
+        m.whySave.toLowerCase().includes('chat') || 
+        m.whySave.toLowerCase().includes('sent')
+      )
+    },
+    {
+      id: 'comfort-movies',
+      name: 'Comfort Movies',
+      emoji: '😌',
+      description: 'Gentle, heartwarming, and familiar stories that feel like home.',
+      filterFn: (m) => !m.watched && (
+        m.vibe.toLowerCase().includes('comfort') || 
+        m.vibe.toLowerCase().includes('feel-good') || 
+        m.vibe.toLowerCase().includes('cozy') || 
+        m.genres.includes('Animation')
+      )
+    },
+    {
+      id: 'hidden-gems',
+      name: 'Hidden Gems',
+      emoji: '💎',
+      description: 'High-rated or premium cinema entries with exceptional detail.',
+      filterFn: (m) => !m.watched && (
+        m.favorite || 
+        (m.confidence ? m.confidence >= 95 : false) || 
+        m.rating.toLowerCase().includes('9.') || 
+        m.rating.toLowerCase().includes('8.8') || 
+        m.rating.toLowerCase().includes('8.9')
+      )
     }
   ], []);
+
+  // Remember the user's last selected collection across sessions
+  const [activeCollectionId, setActiveCollectionId] = useState<string>(() => {
+    const saved = localStorage.getItem('cinesave_active_collection');
+    const validIds = COLLECTIONS.map(c => c.id);
+    if (saved && validIds.includes(saved)) {
+      return saved;
+    }
+    return 'recently-saved';
+  });
+
+  const handleSelectCollection = (id: string) => {
+    setActiveCollectionId(id);
+    localStorage.setItem('cinesave_active_collection', id);
+  };
 
   // Compute search results across all unwatched movies when query is present
   const searchResults = useMemo(() => {
@@ -164,18 +188,18 @@ export default function WatchlistDashboard({
   }, [movies]);
 
   return (
-    <div className="space-y-10 animate-fade-in text-zinc-100 font-sans max-w-5xl mx-auto py-2 px-4 sm:px-6" id="personal-movie-shelf">
+    <div className="space-y-8 animate-fade-in text-zinc-100 font-sans max-w-5xl mx-auto py-2 px-4 sm:px-6" id="personal-movie-shelf">
       
       {/* Sleek Header & Search Room */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-zinc-900/60">
         <div className="space-y-1.5 text-left">
-          <p className="text-[10px] tracking-wider uppercase font-medium text-zinc-500">
+          <p className="text-[10px] tracking-wider uppercase font-medium text-zinc-500 font-mono">
             Private Archive
           </p>
           <h2 className="text-3xl sm:text-4xl font-display font-light italic text-zinc-100">
             The Cinema Shelf
           </h2>
-          <p className="text-xs sm:text-sm text-zinc-450 font-sans max-w-md">
+          <p className="text-xs sm:text-sm text-zinc-455 font-sans max-w-md">
             A silent space for the films you've chosen to remember, free from endless feed noise.
           </p>
         </div>
@@ -239,6 +263,43 @@ export default function WatchlistDashboard({
         </div>
       </div>
 
+      {/* HORIZONTAL COLLECTION SELECTOR (Positioned directly below the search/header bar) */}
+      {libraryMode === 'shelf' && !searchQuery.trim() && (
+        <div className="space-y-2 border-b border-zinc-900/40 pb-5 text-left">
+          <p className="text-[10px] tracking-wider uppercase font-semibold text-zinc-500 font-mono pl-1 mb-1">
+            Shelf Collections
+          </p>
+          <div className="flex gap-2.5 overflow-x-auto no-scrollbar scroll-smooth py-1 px-1 -mx-4 sm:mx-0 px-4 sm:px-0">
+            {COLLECTIONS.map((collection) => {
+              const isActive = activeCollectionId === collection.id;
+              const count = movies.filter(collection.filterFn).length;
+              return (
+                <button
+                  key={collection.id}
+                  onClick={() => handleSelectCollection(collection.id)}
+                  style={{
+                    backgroundColor: isActive ? '#1B2540' : 'rgba(24, 24, 27, 0.4)',
+                    border: isActive ? '1px solid rgba(124, 140, 255, 0.36)' : '1px solid rgba(63, 63, 70, 0.4)',
+                    color: isActive ? '#F8FAFF' : '#A1A1AA',
+                  }}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 select-none cursor-pointer whitespace-nowrap shrink-0 hover:scale-[1.02] ${
+                    isActive ? 'shadow-[0_4px_12px_rgba(10,15,30,0.35)]' : 'hover:text-zinc-200 hover:border-zinc-700'
+                  }`}
+                >
+                  <span className="text-sm select-none">{collection.emoji}</span>
+                  <span>{collection.name}</span>
+                  <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded-full ${
+                    isActive ? 'bg-[#97A5FF]/15 text-[#97A5FF]' : 'bg-zinc-800/40 text-zinc-500'
+                  }`}>
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Main Interactive Shelf Display */}
       <div>
         <AnimatePresence mode="wait">
@@ -252,7 +313,7 @@ export default function WatchlistDashboard({
               exit={{ opacity: 0, y: -15 }}
               className="space-y-8"
             >
-              <div className="space-y-1">
+              <div className="space-y-1 text-left">
                 <h3 className="text-lg font-display font-light italic text-zinc-100">
                   Search Results
                 </h3>
@@ -262,7 +323,7 @@ export default function WatchlistDashboard({
               </div>
 
               {searchResults.length > 0 ? (
-                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-6">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
                   {searchResults.map((movie) => (
                     <motion.div
                       key={movie.id}
@@ -270,7 +331,7 @@ export default function WatchlistDashboard({
                       whileTap={{ scale: 0.98 }}
                       transition={{ type: "spring", stiffness: 220, damping: 25 }}
                       onClick={() => onSelectMovie(movie.id)}
-                      className="group flex flex-col cursor-pointer text-left select-none"
+                      className="group flex flex-col cursor-pointer text-left select-none w-full"
                     >
                       {/* Tactile 3D-like Framed Movie Poster */}
                       <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-zinc-950 border border-zinc-800/80 shadow-[0_12px_24px_rgba(0,0,0,0.75)] ring-1 ring-white/5 transition-all duration-300 group-hover:border-zinc-700/80 group-hover:shadow-[0_20px_40px_rgba(0,0,0,0.95),_0_0_20px_rgba(124,140,255,0.05)]">
@@ -296,11 +357,10 @@ export default function WatchlistDashboard({
                         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none z-10" />
                       </div>
 
-                      {/* Museum-Grade Label Pane answering ONLY: What movie? Where can I watch? Why saved? */}
+                      {/* Museum-Grade Label Pane */}
                       <div className="mt-3.5 space-y-1.5 px-0.5">
-                        {/* What movie? */}
                         <div className="space-y-0.5">
-                          <h4 className="text-[11px] sm:text-[11.5px] font-sans font-medium text-zinc-200 truncate group-hover:text-white transition-colors" title={movie.title}>
+                          <h4 className="text-[11px] sm:text-[11.5px] font-sans font-semibold text-zinc-200 truncate group-hover:text-white transition-colors" title={movie.title}>
                             {movie.title}
                           </h4>
                           <p className="text-[9.5px] text-zinc-500 font-sans font-normal">
@@ -308,14 +368,12 @@ export default function WatchlistDashboard({
                           </p>
                         </div>
 
-                        {/* Where to watch? */}
                         <div className="text-[9.5px] text-zinc-400 font-sans truncate font-normal">
                           {movie.streamingServices && movie.streamingServices.length > 0 
                             ? `Stream: ${movie.streamingServices.slice(0, 2).join(', ')}`
                             : 'Find channels'}
                         </div>
 
-                        {/* Why did I save it? */}
                         {movie.whySave && (
                           <p className="text-[9.5px] text-zinc-500 italic font-sans truncate font-normal leading-normal border-l border-zinc-800/80 pl-1.5" title={movie.whySave}>
                             "{movie.whySave}"
@@ -333,55 +391,47 @@ export default function WatchlistDashboard({
             </motion.div>
           ) : libraryMode === 'shelf' ? (
             
-            /* ACTIVE SHELVES (Grouping Unwatched Movies into Emotional Collections) */
+            /* ACTIVE SHELVES (Displaying single selected collection in a clean responsive grid) */
             <motion.div
-              key="emotional-shelves-container"
+              key={`selected-collection-${activeCollectionId}`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="space-y-12"
+              transition={{ duration: 0.25 }}
+              className="space-y-6 text-left"
             >
-              {COLLECTIONS.map((collection) => {
-                // Apply the collection's filter to get its movies
+              {(() => {
+                const collection = COLLECTIONS.find(c => c.id === activeCollectionId) || COLLECTIONS[0];
                 let shelfMovies = movies.filter(collection.filterFn);
 
-                // For recently saved, sort by addedAt desc to make it feel fresh
+                // Sort Recently Saved by addedAt desc to make it feel fresh
                 if (collection.id === 'recently-saved') {
                   shelfMovies = [...shelfMovies].sort((a, b) => 
                     new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime()
                   );
                 } else {
-                  // Keep alphabetical sorting otherwise
                   shelfMovies = [...shelfMovies].sort((a, b) => a.title.localeCompare(b.title));
                 }
 
-                // If a collection has no matching films, hide its shelf dynamically to reduce clutter
-                if (shelfMovies.length === 0) return null;
-
                 return (
-                  <div key={collection.id} className="space-y-4">
-                    
-                    {/* Shelf Header */}
-                    <div className="flex items-baseline justify-between px-1">
-                      <div className="space-y-0.5">
-                        <h3 className="text-lg font-display font-light italic text-zinc-150 flex items-center gap-2">
+                  <>
+                    <div className="flex items-baseline justify-between px-1 border-b border-zinc-900/35 pb-3">
+                      <div className="space-y-1">
+                        <h3 className="text-lg sm:text-xl font-display font-light italic text-zinc-150 flex items-center gap-2">
                           <span className="text-base select-none">{collection.emoji}</span>
                           <span>{collection.name}</span>
                         </h3>
-                        <p className="text-[11px] text-zinc-500 font-sans font-normal">
+                        <p className="text-[11px] text-zinc-500 font-sans font-normal max-w-xl">
                           {collection.description}
                         </p>
                       </div>
-                      <span className="text-[10px] text-zinc-600 font-sans tracking-wide">
+                      <span className="text-[10px] text-zinc-650 font-mono tracking-wide shrink-0">
                         {shelfMovies.length} {shelfMovies.length === 1 ? 'film' : 'films'}
                       </span>
                     </div>
 
-                    {/* Physical Movie Shelf Ledge Layout */}
-                    <div className="relative group/shelf">
-                      
-                      {/* Horizontal Scrolling Row of Dominant Posters */}
-                      <div className="flex gap-6 overflow-x-auto pb-5 pt-3 px-1 no-scrollbar scroll-smooth snap-x snap-mandatory">
+                    {shelfMovies.length > 0 ? (
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 pt-1">
                         {shelfMovies.map((movie) => (
                           <motion.div
                             key={`${collection.id}-${movie.id}`}
@@ -389,7 +439,7 @@ export default function WatchlistDashboard({
                             whileTap={{ scale: 0.98 }}
                             transition={{ type: "spring", stiffness: 220, damping: 25 }}
                             onClick={() => onSelectMovie(movie.id)}
-                            className="snap-start shrink-0 w-28 sm:w-32 md:w-36 flex flex-col cursor-pointer text-left select-none group"
+                            className="w-full flex flex-col cursor-pointer text-left select-none group"
                           >
                             {/* Tactile 3D-like Framed Movie Poster */}
                             <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-zinc-950 border border-zinc-800/80 shadow-[0_12px_24px_rgba(0,0,0,0.75)] ring-1 ring-white/5 transition-all duration-300 group-hover:border-zinc-700/80 group-hover:shadow-[0_20px_40px_rgba(0,0,0,0.95),_0_0_20px_rgba(124,140,255,0.05)]">
@@ -415,26 +465,23 @@ export default function WatchlistDashboard({
                               <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none z-10" />
                             </div>
 
-                            {/* Museum-Grade Label Pane answering ONLY: What movie? Where can I watch? Why saved? */}
+                            {/* Museum-Grade Label Pane */}
                             <div className="mt-3.5 space-y-1.5 px-0.5">
-                              {/* What movie? */}
                               <div className="space-y-0.5">
                                 <h4 className="text-[11px] sm:text-[11.5px] font-sans font-medium text-zinc-200 truncate group-hover:text-white transition-colors" title={movie.title}>
                                   {movie.title}
                                 </h4>
-                                <p className="text-[9.5px] text-zinc-500 font-sans font-normal">
+                                <p className="text-[9.5px] text-zinc-550 font-sans font-normal">
                                   {movie.year}
                                 </p>
                               </div>
 
-                              {/* Where to watch? */}
                               <div className="text-[9.5px] text-zinc-400 font-sans truncate font-normal">
                                 {movie.streamingServices && movie.streamingServices.length > 0 
                                   ? `Stream: ${movie.streamingServices.slice(0, 2).join(', ')}`
                                   : 'Find channels'}
                               </div>
 
-                              {/* Why did I save it? */}
                               {movie.whySave && (
                                 <p className="text-[9.5px] text-zinc-500 italic font-sans truncate font-normal leading-normal border-l border-zinc-800/80 pl-1.5" title={movie.whySave}>
                                   "{movie.whySave}"
@@ -450,47 +497,41 @@ export default function WatchlistDashboard({
                             whileHover={{ y: -6, scale: 1.01 }}
                             whileTap={{ scale: 0.99 }}
                             onClick={onGoToCapture}
-                            className="snap-end shrink-0 w-28 sm:w-32 md:w-36 aspect-[2/3] rounded-2xl border-2 border-dashed border-zinc-850 hover:border-zinc-700 bg-zinc-950/20 hover:bg-zinc-900/10 flex flex-col items-center justify-center p-4 text-center cursor-pointer select-none transition-all"
+                            className="w-full aspect-[2/3] rounded-xl border-2 border-dashed border-zinc-850 hover:border-zinc-700 bg-zinc-950/20 hover:bg-zinc-900/10 flex flex-col items-center justify-center p-4 text-center cursor-pointer select-none transition-all group"
                           >
                             <div className="w-8 h-8 rounded-full bg-zinc-900/60 border border-zinc-850 flex items-center justify-center mb-2.5">
-                              <Plus className="w-4 h-4 text-zinc-500 group-hover:text-zinc-300" />
+                              <Plus className="w-4 h-4 text-zinc-500 group-hover:text-zinc-300 animate-pulse" />
                             </div>
                             <span className="text-[10px] font-sans text-zinc-500 tracking-wide font-medium">Add Film</span>
                           </motion.div>
                         )}
                       </div>
-
-                      {/* Gorgeous physical wood/slate ledge line supporting the posters */}
-                      <div className="relative h-2 bg-gradient-to-b from-zinc-800 to-zinc-950 rounded-full border-t border-zinc-700/35 shadow-lg -mt-3.5 mx-0.5 z-10 pointer-events-none" />
-                    </div>
-                  </div>
+                    ) : (
+                      <div className="py-24 text-center max-w-sm mx-auto space-y-4">
+                        <div className="text-3xl select-none">📽️</div>
+                        <div className="space-y-1">
+                          <p className="font-display font-light italic text-zinc-200 text-lg">This shelf is currently empty</p>
+                          <p className="text-xs text-zinc-500 leading-relaxed">
+                            No films match this category yet. Capture recommendations to start building this collection!
+                          </p>
+                        </div>
+                        {onGoToCapture && (
+                          <div className="pt-2">
+                            <motion.button
+                              onClick={onGoToCapture}
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                              className="px-6 py-2.5 bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-sans font-medium rounded-xl cursor-pointer"
+                            >
+                              Add a Film
+                            </motion.button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </>
                 );
-              })}
-
-              {/* Guard case: If all dynamic shelves are empty */}
-              {movies.filter(m => !m.watched).length === 0 && (
-                <div className="py-24 text-center max-w-sm mx-auto space-y-4">
-                  <div className="text-3xl">📽️</div>
-                  <div className="space-y-1">
-                    <p className="font-display font-light italic text-zinc-200 text-lg">Your shelf is currently empty</p>
-                    <p className="text-xs text-zinc-500 leading-relaxed">
-                      Capture recommendations from Instagram, TikTok, or links to build your private cinema shelf.
-                    </p>
-                  </div>
-                  {onGoToCapture && (
-                    <div className="pt-2">
-                      <motion.button
-                        onClick={onGoToCapture}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        className="px-6 py-2.5 bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-sans font-medium rounded-xl cursor-pointer"
-                      >
-                        Capture My First Recommendation
-                      </motion.button>
-                    </div>
-                  )}
-                </div>
-              )}
+              })()}
             </motion.div>
           ) : (
             
@@ -500,7 +541,7 @@ export default function WatchlistDashboard({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="space-y-8"
+              className="space-y-8 text-left"
             >
               <div className="space-y-1">
                 <h3 className="text-lg font-display font-light italic text-zinc-150 flex items-center gap-2">
@@ -512,7 +553,7 @@ export default function WatchlistDashboard({
               </div>
 
               {completedMovies.length > 0 ? (
-                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-6">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
                   {completedMovies.map((movie) => (
                     <motion.div
                       key={movie.id}
@@ -520,7 +561,7 @@ export default function WatchlistDashboard({
                       whileTap={{ scale: 0.98 }}
                       transition={{ type: "spring", stiffness: 220, damping: 25 }}
                       onClick={() => onSelectMovie(movie.id)}
-                      className="group flex flex-col cursor-pointer text-left select-none opacity-70 hover:opacity-100 transition-opacity duration-300"
+                      className="group flex flex-col cursor-pointer text-left select-none opacity-70 hover:opacity-100 transition-opacity duration-300 w-full"
                     >
                       {/* Archive-styled slightly grayed poster with tactile 3D frame */}
                       <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-zinc-950 border border-zinc-800/80 shadow-[0_12px_24px_rgba(0,0,0,0.75)] ring-1 ring-white/5 transition-all duration-300 group-hover:border-zinc-700/80">
@@ -548,9 +589,8 @@ export default function WatchlistDashboard({
                         </div>
                       </div>
 
-                      {/* Museum-Grade Label Pane answering ONLY: What movie? Where can I watch? Why saved? */}
+                      {/* Label Pane */}
                       <div className="mt-3.5 space-y-1.5 px-0.5">
-                        {/* What movie? */}
                         <div className="space-y-0.5">
                           <h4 className="text-[11px] sm:text-[11.5px] font-sans font-medium text-zinc-300 truncate group-hover:text-white transition-colors" title={movie.title}>
                             {movie.title}
@@ -560,14 +600,12 @@ export default function WatchlistDashboard({
                           </p>
                         </div>
 
-                        {/* Where to watch? */}
                         <div className="text-[9.5px] text-zinc-500 font-sans truncate font-normal">
                           {movie.streamingServices && movie.streamingServices.length > 0 
                             ? `Stream: ${movie.streamingServices.slice(0, 2).join(', ')}`
                             : 'Find channels'}
                         </div>
 
-                        {/* Why did I save it? */}
                         {movie.whySave && (
                           <p className="text-[9.5px] text-zinc-600 italic font-sans truncate font-normal leading-normal border-l border-zinc-900 pl-1.5" title={movie.whySave}>
                             "{movie.whySave}"
@@ -580,7 +618,7 @@ export default function WatchlistDashboard({
               ) : (
                 <div className="py-20 text-center border border-dashed border-zinc-900 rounded-2xl text-zinc-550 text-xs max-w-sm mx-auto space-y-1.5">
                   <p className="font-medium text-zinc-400">Empty Archive Vault</p>
-                  <p className="text-zinc-600">When you finish a film on your shelf, mark it as completed to store its digital stub here.</p>
+                  <p className="text-zinc-650">When you finish a film on your shelf, mark it as completed to store its digital stub here.</p>
                 </div>
               )}
             </motion.div>
