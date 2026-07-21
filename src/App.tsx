@@ -16,6 +16,7 @@ import HomeScreen from './components/HomeScreen';
 import MovieDetailModal from './components/MovieDetailModal';
 import ProfileScreen from './components/ProfileScreen';
 import { IdentityId, IDENTITY_DIRECTIONS } from './components/BrandIdentity';
+import GlobalSearch from './components/GlobalSearch';
 
 export default function App() {
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -200,6 +201,11 @@ export default function App() {
 
   const handleAddSingleMovie = (newMovie: Omit<Movie, 'id' | 'addedAt' | 'watched'>) => {
     if (movies.some(m => m.title.toLowerCase() === newMovie.title.toLowerCase())) {
+      setToast({
+        message: "Already Saved",
+        sub: `"${newMovie.title}" is already resting in your curated library.`,
+        visible: true
+      });
       return;
     }
     const decorated: Movie = {
@@ -209,6 +215,11 @@ export default function App() {
       watched: false,
     };
     setMovies(prev => [decorated, ...prev]);
+    setToast({
+      message: "Added to Library",
+      sub: `"${newMovie.title}" has been successfully vaulted onto your cinema shelf.`,
+      visible: true
+    });
   };
 
   const handleToggleFavorite = (id: string) => {
@@ -263,7 +274,7 @@ export default function App() {
       <div className="w-full max-w-7xl mx-auto pt-8 sm:pt-12 space-y-8 relative">
         
         {/* Header Branding section */}
-        <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pb-6 border-b border-zinc-900/60">
+        <header className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 pb-6 border-b border-zinc-900/60">
           <div className="flex items-center gap-3 select-none cursor-pointer" onClick={() => setViewMode('home')}>
             <div className="p-2 w-10 h-10 rounded-xl bg-zinc-900/35 border border-zinc-850/50 text-[#7C8CFF] flex items-center justify-center shadow-sm">
               {selectedIdentity.logoSvg("w-6 h-6")}
@@ -276,7 +287,12 @@ export default function App() {
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 self-stretch sm:self-auto justify-end">
+          {/* PERMANENT TOP NAV SEARCH BAR - Spotlight feel */}
+          <div className="w-full lg:w-auto flex-1 max-w-xs md:max-w-sm">
+            <GlobalSearch movies={movies} onAddMovie={handleAddSingleMovie} />
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3 self-stretch lg:self-auto justify-end">
             
             {/* Unified 3-tab premium Segmented Controller */}
             <nav className="bg-zinc-900/60 backdrop-blur-md border border-zinc-850/85 p-1 rounded-xl flex items-center relative" id="main-tabs-nav">
