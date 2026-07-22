@@ -269,7 +269,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#070708] text-[#F5F5F3] pb-6 relative px-4 sm:px-6 lg:px-8 font-sans">
+    <div className="min-h-screen bg-[#050505] text-[#F5F5F3] pb-6 relative px-4 sm:px-6 lg:px-8 font-sans">
       
       {/* Main Container */}
       <div className="w-full max-w-7xl mx-auto pt-4 sm:pt-6 space-y-8 relative">

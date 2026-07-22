@@ -13,6 +13,7 @@ import {
   Archive
 } from 'lucide-react';
 import { Movie, AppStats } from '../types';
+import MovieCard from './MovieCard';
 
 interface WatchlistDashboardProps {
   movies: Movie[];
@@ -61,18 +62,6 @@ export default function WatchlistDashboard({
       filterFn: (m) => !m.watched
     },
     {
-      id: 'friday-night',
-      name: 'Friday Night',
-      emoji: '🍿',
-      description: 'Comfort, spectacle, and high-energy picks for a perfect evening.',
-      filterFn: (m) => !m.watched && (
-        m.vibe.toLowerCase().includes('comfort') || 
-        m.vibe.toLowerCase().includes('gargantuan') || 
-        m.vibe.toLowerCase().includes('adrenaline') || 
-        m.genres.some(g => ['Action', 'Adventure', 'Comedy', 'Thriller'].includes(g))
-      )
-    },
-    {
       id: 'mind-bending',
       name: 'Mind-bending',
       emoji: '🧠',
@@ -80,21 +69,19 @@ export default function WatchlistDashboard({
       filterFn: (m) => !m.watched && (
         m.vibe.toLowerCase().includes('mind-bending') || 
         m.vibe.toLowerCase().includes('cosmic') || 
-        m.vibe.toLowerCase().includes('wonder') || 
         m.vibe.toLowerCase().includes('cerebral') || 
-        m.genres.includes('Sci-Fi')
+        m.genres.some(g => ['Sci-Fi', 'Mystery', 'Thriller'].includes(g))
       )
     },
     {
-      id: 'date-night',
-      name: 'Date Night',
-      emoji: '🕯️',
-      description: 'Enchanting, romantic, and whimsical films made to share.',
+      id: 'friday-night',
+      name: 'Friday Night',
+      emoji: '🍿',
+      description: 'Comfort, spectacle, and high-energy picks for a perfect evening.',
       filterFn: (m) => !m.watched && (
-        m.genres.some(g => ['Romance', 'Drama', 'Comedy'].includes(g)) || 
-        m.vibe.toLowerCase().includes('cozy') || 
-        m.vibe.toLowerCase().includes('aesthetic') || 
-        m.vibe.toLowerCase().includes('whimsical')
+        m.vibe.toLowerCase().includes('comfort') || 
+        m.vibe.toLowerCase().includes('adrenaline') || 
+        m.genres.some(g => ['Action', 'Adventure', 'Comedy', 'Thriller'].includes(g))
       )
     },
     {
@@ -111,27 +98,82 @@ export default function WatchlistDashboard({
       )
     },
     {
-      id: 'from-friends',
-      name: 'From Friends',
-      emoji: '💬',
-      description: 'Quiet gems shared by people who know you best.',
+      id: 'romance',
+      name: 'Romance',
+      emoji: '❤️',
+      description: 'Enchanting stories, romantic spark, and whimsical cinema.',
       filterFn: (m) => !m.watched && (
-        m.socialSource?.platform === 'manual' || 
-        m.whySave.toLowerCase().includes('friend') || 
-        m.whySave.toLowerCase().includes('chat') || 
-        m.whySave.toLowerCase().includes('sent')
+        m.genres.includes('Romance') || 
+        m.vibe.toLowerCase().includes('romantic') || 
+        m.vibe.toLowerCase().includes('cozy')
+      )
+    },
+    {
+      id: 'horror',
+      name: 'Horror',
+      emoji: '👻',
+      description: 'Chilling atmosphere, psychological dread, and thrilling scares.',
+      filterFn: (m) => !m.watched && (
+        m.genres.includes('Horror') || 
+        m.genres.includes('Thriller') || 
+        m.vibe.toLowerCase().includes('eerie') || 
+        m.vibe.toLowerCase().includes('dark')
       )
     },
     {
       id: 'comfort-movies',
-      name: 'Comfort Movies',
+      name: 'Comfort',
       emoji: '😌',
       description: 'Gentle, heartwarming, and familiar stories that feel like home.',
       filterFn: (m) => !m.watched && (
         m.vibe.toLowerCase().includes('comfort') || 
         m.vibe.toLowerCase().includes('feel-good') || 
         m.vibe.toLowerCase().includes('cozy') || 
-        m.genres.includes('Animation')
+        m.genres.includes('Animation') ||
+        m.genres.includes('Comedy')
+      )
+    },
+    {
+      id: 'action',
+      name: 'Action',
+      emoji: '💥',
+      description: 'High-octane adrenaline, grand spectacles, and kinetic cinema.',
+      filterFn: (m) => !m.watched && (
+        m.genres.some(g => ['Action', 'Adventure', 'Thriller'].includes(g)) ||
+        m.vibe.toLowerCase().includes('adrenaline') ||
+        m.vibe.toLowerCase().includes('gargantuan')
+      )
+    },
+    {
+      id: 'sci-fi',
+      name: 'Sci-Fi',
+      emoji: '🚀',
+      description: 'Futuristic visions, outer space journeys, and speculative realities.',
+      filterFn: (m) => !m.watched && (
+        m.genres.includes('Sci-Fi') ||
+        m.vibe.toLowerCase().includes('cosmic') ||
+        m.vibe.toLowerCase().includes('futuristic')
+      )
+    },
+    {
+      id: 'anime',
+      name: 'Anime',
+      emoji: '🌸',
+      description: 'Captivating hand-drawn animation, fantasy worlds, and Japanese classics.',
+      filterFn: (m) => !m.watched && (
+        m.genres.some(g => ['Anime', 'Animation'].includes(g)) ||
+        m.vibe.toLowerCase().includes('anime')
+      )
+    },
+    {
+      id: 'comedy',
+      name: 'Comedy',
+      emoji: '🎭',
+      description: 'Witty humor, lighthearted warmth, and joyous cinema.',
+      filterFn: (m) => !m.watched && (
+        m.genres.includes('Comedy') ||
+        m.vibe.toLowerCase().includes('funny') ||
+        m.vibe.toLowerCase().includes('comfort')
       )
     },
     {
@@ -141,10 +183,33 @@ export default function WatchlistDashboard({
       description: 'High-rated or premium cinema entries with exceptional detail.',
       filterFn: (m) => !m.watched && (
         m.favorite || 
-        (m.confidence ? m.confidence >= 95 : false) || 
+        (m.confidence ? m.confidence >= 90 : false) || 
         m.rating.toLowerCase().includes('9.') || 
-        m.rating.toLowerCase().includes('8.8') || 
-        m.rating.toLowerCase().includes('8.9')
+        m.rating.toLowerCase().includes('8.')
+      )
+    },
+    {
+      id: 'from-friends',
+      name: 'Friends',
+      emoji: '💬',
+      description: 'Quiet gems shared by people who know you best.',
+      filterFn: (m) => !m.watched && (
+        m.socialSource?.platform === 'manual' || 
+        m.whySave.toLowerCase().includes('friend') || 
+        m.whySave.toLowerCase().includes('chat') || 
+        m.whySave.toLowerCase().includes('sent') ||
+        m.whySave.toLowerCase().includes('tiktok') ||
+        m.whySave.toLowerCase().includes('reel')
+      )
+    },
+    {
+      id: 'international',
+      name: 'International',
+      emoji: '🌍',
+      description: 'Global masterworks and visionary foreign language films.',
+      filterFn: (m) => !m.watched && (
+        (m.language && m.language !== 'English') ||
+        m.genres.some(g => ['International', 'Foreign', 'Drama'].includes(g))
       )
     }
   ], []);
@@ -191,32 +256,32 @@ export default function WatchlistDashboard({
     <div className="space-y-8 animate-fade-in text-zinc-100 font-sans max-w-5xl mx-auto py-2 px-4 sm:px-6" id="personal-movie-shelf">
       
       {/* Sleek Header & Search Room */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-zinc-900/60">
-        <div className="space-y-1.5 text-left">
-          <p className="text-[10px] tracking-wider uppercase font-medium text-zinc-500 font-mono">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-2">
+        <div className="space-y-1 text-left">
+          <p className="text-[10px] tracking-widest uppercase font-medium text-zinc-500 font-mono">
             Private Archive
           </p>
           <h2 className="text-3xl sm:text-4xl font-display font-light italic text-zinc-100">
             The Cinema Shelf
           </h2>
-          <p className="text-xs sm:text-sm text-zinc-455 font-sans max-w-md">
-            A silent space for the films you've chosen to remember, free from endless feed noise.
+          <p className="text-xs sm:text-sm text-zinc-500 font-sans max-w-md leading-relaxed">
+            A quiet space for the films you've chosen to keep.
           </p>
         </div>
 
         {/* Quiet Mode Selector + Search Input */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           
           {/* Elegant Slate Pill Switcher */}
-          <div className="flex items-center bg-zinc-900/40 p-1 rounded-xl border border-zinc-850/65 self-start sm:self-auto">
+          <div className="flex items-center bg-zinc-900/30 p-1 rounded-xl border border-white/5 self-start sm:self-auto">
             <button
               onClick={() => {
                 setLibraryMode('shelf');
                 onChangeTab('unwatched');
               }}
-              className={`px-4 py-2 rounded-lg text-xs font-sans font-medium transition-all duration-250 cursor-pointer flex items-center gap-1.5 ${
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-sans font-medium transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${
                 libraryMode === 'shelf'
-                  ? 'bg-zinc-800 text-zinc-100 shadow-md'
+                  ? 'bg-zinc-800/90 text-zinc-100 shadow-sm'
                   : 'text-zinc-500 hover:text-zinc-300'
               }`}
             >
@@ -228,28 +293,28 @@ export default function WatchlistDashboard({
                 setLibraryMode('completed');
                 onChangeTab('watched');
               }}
-              className={`px-4 py-2 rounded-lg text-xs font-sans font-medium transition-all duration-250 cursor-pointer flex items-center gap-1.5 ${
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-sans font-medium transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${
                 libraryMode === 'completed'
-                  ? 'bg-zinc-800 text-zinc-100 shadow-md'
+                  ? 'bg-zinc-800/90 text-zinc-100 shadow-sm'
                   : 'text-zinc-500 hover:text-zinc-300'
               }`}
             >
               <Archive className="w-3.5 h-3.5" />
-              <span>Completed Archive</span>
+              <span>Completed</span>
             </button>
           </div>
 
           {/* Minimal Search Input */}
-          <div className="relative w-full sm:w-60">
+          <div className="relative w-full sm:w-56">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search className="h-4 w-4 text-zinc-650" />
+              <Search className="h-3.5 w-3.5 text-zinc-600" />
             </div>
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => onChangeSearch(e.target.value)}
-              placeholder="Search your shelf..."
-              className="block w-full bg-zinc-900/40 hover:bg-zinc-900/60 focus:bg-zinc-900 border border-zinc-850/60 focus:border-zinc-800 text-xs sm:text-sm rounded-xl pl-9 pr-8 py-2 text-zinc-200 placeholder-zinc-550 outline-none transition-all duration-200"
+              placeholder="Search shelf..."
+              className="block w-full bg-zinc-900/30 hover:bg-zinc-900/50 focus:bg-zinc-900/80 border border-white/5 focus:border-zinc-700 text-xs rounded-xl pl-8 pr-7 py-2 text-zinc-200 placeholder-zinc-600 outline-none transition-all duration-200"
             />
             {searchQuery && (
               <button
@@ -263,13 +328,10 @@ export default function WatchlistDashboard({
         </div>
       </div>
 
-      {/* HORIZONTAL COLLECTION SELECTOR (Positioned directly below the search/header bar) */}
+      {/* HORIZONTAL COLLECTION SELECTOR (Midnight Glass Navigation) */}
       {libraryMode === 'shelf' && !searchQuery.trim() && (
-        <div className="space-y-2 border-b border-zinc-900/40 pb-5 text-left">
-          <p className="text-[10px] tracking-wider uppercase font-semibold text-zinc-500 font-mono pl-1 mb-1">
-            Shelf Collections
-          </p>
-          <div className="flex gap-2.5 overflow-x-auto no-scrollbar scroll-smooth py-1 px-1 -mx-4 sm:mx-0 px-4 sm:px-0">
+        <div className="pt-2 pb-2 text-left">
+          <div className="relative flex flex-nowrap gap-2 overflow-x-auto no-scrollbar scroll-smooth py-1 px-1 -mx-4 sm:mx-0 px-4 sm:px-0">
             {COLLECTIONS.map((collection) => {
               const isActive = activeCollectionId === collection.id;
               const count = movies.filter(collection.filterFn).length;
@@ -277,20 +339,44 @@ export default function WatchlistDashboard({
                 <button
                   key={collection.id}
                   onClick={() => handleSelectCollection(collection.id)}
-                  style={{
-                    backgroundColor: isActive ? '#1B2540' : 'rgba(24, 24, 27, 0.4)',
-                    border: isActive ? '1px solid rgba(124, 140, 255, 0.36)' : '1px solid rgba(63, 63, 70, 0.4)',
-                    color: isActive ? '#F8FAFF' : '#A1A1AA',
-                  }}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 select-none cursor-pointer whitespace-nowrap shrink-0 hover:scale-[1.02] ${
-                    isActive ? 'shadow-[0_4px_12px_rgba(10,15,30,0.35)]' : 'hover:text-zinc-200 hover:border-zinc-700'
+                  className={`relative group flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-medium tracking-wide transition-all duration-200 select-none cursor-pointer whitespace-nowrap shrink-0 ${
+                    isActive
+                      ? 'text-[#F5F5F3]'
+                      : 'text-zinc-400 hover:text-zinc-200 opacity-60 hover:opacity-100'
                   }`}
                 >
-                  <span className="text-sm select-none">{collection.emoji}</span>
-                  <span>{collection.name}</span>
-                  <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded-full ${
-                    isActive ? 'bg-[#97A5FF]/15 text-[#97A5FF]' : 'bg-zinc-800/40 text-zinc-500'
-                  }`}>
+                  {/* Active Midnight Glass Surface with Indigo Glow */}
+                  {isActive ? (
+                    <motion.div
+                      layoutId="activeShelfPill"
+                      className="absolute inset-0 rounded-xl bg-[#0E111C]/90 backdrop-blur-md border border-[#7F72FF]/40 shadow-[0_0_18px_rgba(127,114,255,0.18)] z-0"
+                      transition={{ type: "spring", stiffness: 420, damping: 32 }}
+                    />
+                  ) : (
+                    <div className="absolute inset-0 rounded-xl bg-[#0B0D12]/60 backdrop-blur-md border border-white/5 group-hover:border-zinc-800 group-hover:bg-[#0E1017]/60 transition-all duration-200 z-0" />
+                  )}
+
+                  {/* Active Animated Bottom Glow Underline */}
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeShelfUnderline"
+                      className="absolute bottom-0 left-3 right-3 h-[1.5px] bg-[#7F72FF] rounded-full shadow-[0_0_6px_#7F72FF] z-10"
+                      transition={{ type: "spring", stiffness: 420, damping: 32 }}
+                    />
+                  )}
+
+                  {/* Inner Content (Icon, Title, Badge) */}
+                  <span className="relative z-10 text-sm select-none opacity-90 transition-transform duration-200 group-hover:scale-105">
+                    {collection.emoji}
+                  </span>
+                  <span className="relative z-10 font-medium">{collection.name}</span>
+                  <span
+                    className={`relative z-10 text-[10px] font-mono px-1.5 py-0.2 rounded-full transition-colors duration-200 ${
+                      isActive
+                        ? 'bg-[#7F72FF]/20 text-[#A095FF]'
+                        : 'bg-white/5 text-zinc-500'
+                    }`}
+                  >
                     {count}
                   </span>
                 </button>
@@ -325,62 +411,11 @@ export default function WatchlistDashboard({
               {searchResults.length > 0 ? (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
                   {searchResults.map((movie) => (
-                    <motion.div
+                    <MovieCard
                       key={movie.id}
-                      whileHover={{ y: -8, scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      transition={{ type: "spring", stiffness: 220, damping: 25 }}
+                      movie={movie}
                       onClick={() => onSelectMovie(movie.id)}
-                      className="group flex flex-col cursor-pointer text-left select-none w-full"
-                    >
-                      {/* Tactile 3D-like Framed Movie Poster */}
-                      <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-zinc-950 border border-zinc-800/80 shadow-[0_12px_24px_rgba(0,0,0,0.75)] ring-1 ring-white/5 transition-all duration-300 group-hover:border-zinc-700/80 group-hover:shadow-[0_20px_40px_rgba(0,0,0,0.95),_0_0_20px_rgba(124,140,255,0.05)]">
-                        {/* Left Edge 3D Spine Highlight */}
-                        <div className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-r from-white/15 via-white/5 to-transparent z-20 pointer-events-none" />
-                        
-                        {/* Glossy Diagonal Reflection Sheen */}
-                        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20" />
-
-                        {movie.posterUrl ? (
-                          <img
-                            src={movie.posterUrl}
-                            alt={movie.title}
-                            referrerPolicy="no-referrer"
-                            className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-all duration-500 scale-100 group-hover:scale-[1.03]"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-900 text-zinc-600 p-3 text-center">
-                            <span className="text-xl mb-1">🍿</span>
-                            <span className="text-[9px] text-zinc-500 font-medium truncate w-full">{movie.title}</span>
-                          </div>
-                        )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none z-10" />
-                      </div>
-
-                      {/* Museum-Grade Label Pane */}
-                      <div className="mt-3.5 space-y-1.5 px-0.5">
-                        <div className="space-y-0.5">
-                          <h4 className="text-[11px] sm:text-[11.5px] font-sans font-semibold text-zinc-200 truncate group-hover:text-white transition-colors" title={movie.title}>
-                            {movie.title}
-                          </h4>
-                          <p className="text-[9.5px] text-zinc-500 font-sans font-normal">
-                            {movie.year}
-                          </p>
-                        </div>
-
-                        <div className="text-[9.5px] text-zinc-400 font-sans truncate font-normal">
-                          {movie.streamingServices && movie.streamingServices.length > 0 
-                            ? `Stream: ${movie.streamingServices.slice(0, 2).join(', ')}`
-                            : 'Find channels'}
-                        </div>
-
-                        {movie.whySave && (
-                          <p className="text-[9.5px] text-zinc-500 italic font-sans truncate font-normal leading-normal border-l border-zinc-800/80 pl-1.5" title={movie.whySave}>
-                            "{movie.whySave}"
-                          </p>
-                        )}
-                      </div>
-                    </motion.div>
+                    />
                   ))}
                 </div>
               ) : (
@@ -394,10 +429,10 @@ export default function WatchlistDashboard({
             /* ACTIVE SHELVES (Displaying single selected collection in a clean responsive grid) */
             <motion.div
               key={`selected-collection-${activeCollectionId}`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
+              initial={{ opacity: 0, x: 12, filter: 'blur(1px)' }}
+              animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, x: -12, filter: 'blur(1px)' }}
+              transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1.0] }}
               className="space-y-6 text-left"
             >
               {(() => {
@@ -415,8 +450,8 @@ export default function WatchlistDashboard({
 
                 return (
                   <>
-                    <div className="flex items-baseline justify-between px-1 border-b border-zinc-900/35 pb-3">
-                      <div className="space-y-1">
+                    <div className="flex items-baseline justify-between px-1 mb-4">
+                      <div className="space-y-0.5">
                         <h3 className="text-lg sm:text-xl font-display font-light italic text-zinc-150 flex items-center gap-2">
                           <span className="text-base select-none">{collection.emoji}</span>
                           <span>{collection.name}</span>
@@ -425,7 +460,7 @@ export default function WatchlistDashboard({
                           {collection.description}
                         </p>
                       </div>
-                      <span className="text-[10px] text-zinc-650 font-mono tracking-wide shrink-0">
+                      <span className="text-[10px] text-zinc-600 font-mono tracking-wide shrink-0">
                         {shelfMovies.length} {shelfMovies.length === 1 ? 'film' : 'films'}
                       </span>
                     </div>
@@ -433,62 +468,11 @@ export default function WatchlistDashboard({
                     {shelfMovies.length > 0 ? (
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 pt-1">
                         {shelfMovies.map((movie) => (
-                          <motion.div
+                          <MovieCard
                             key={`${collection.id}-${movie.id}`}
-                            whileHover={{ y: -8, scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            transition={{ type: "spring", stiffness: 220, damping: 25 }}
+                            movie={movie}
                             onClick={() => onSelectMovie(movie.id)}
-                            className="w-full flex flex-col cursor-pointer text-left select-none group"
-                          >
-                            {/* Tactile 3D-like Framed Movie Poster */}
-                            <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-zinc-950 border border-zinc-800/80 shadow-[0_12px_24px_rgba(0,0,0,0.75)] ring-1 ring-white/5 transition-all duration-300 group-hover:border-zinc-700/80 group-hover:shadow-[0_20px_40px_rgba(0,0,0,0.95),_0_0_20px_rgba(124,140,255,0.05)]">
-                              {/* Left Edge 3D Spine Highlight */}
-                              <div className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-r from-white/15 via-white/5 to-transparent z-20 pointer-events-none" />
-                              
-                              {/* Glossy Diagonal Reflection Sheen */}
-                              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20" />
-
-                              {movie.posterUrl ? (
-                                <img
-                                  src={movie.posterUrl}
-                                  alt={movie.title}
-                                  referrerPolicy="no-referrer"
-                                  className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-all duration-500 scale-100 group-hover:scale-[1.03]"
-                                />
-                              ) : (
-                                <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-900 text-zinc-650 p-4 text-center">
-                                  <span className="text-2xl mb-1.5">🍿</span>
-                                  <span className="text-[10px] text-zinc-500 font-medium truncate w-full">{movie.title}</span>
-                                </div>
-                              )}
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none z-10" />
-                            </div>
-
-                            {/* Museum-Grade Label Pane */}
-                            <div className="mt-3.5 space-y-1.5 px-0.5">
-                              <div className="space-y-0.5">
-                                <h4 className="text-[11px] sm:text-[11.5px] font-sans font-medium text-zinc-200 truncate group-hover:text-white transition-colors" title={movie.title}>
-                                  {movie.title}
-                                </h4>
-                                <p className="text-[9.5px] text-zinc-550 font-sans font-normal">
-                                  {movie.year}
-                                </p>
-                              </div>
-
-                              <div className="text-[9.5px] text-zinc-400 font-sans truncate font-normal">
-                                {movie.streamingServices && movie.streamingServices.length > 0 
-                                  ? `Stream: ${movie.streamingServices.slice(0, 2).join(', ')}`
-                                  : 'Find channels'}
-                              </div>
-
-                              {movie.whySave && (
-                                <p className="text-[9.5px] text-zinc-500 italic font-sans truncate font-normal leading-normal border-l border-zinc-800/80 pl-1.5" title={movie.whySave}>
-                                  "{movie.whySave}"
-                                </p>
-                              )}
-                            </div>
-                          </motion.div>
+                          />
                         ))}
 
                         {/* Special Add Ticket slot at the end of Recently Saved shelf */}
@@ -497,7 +481,7 @@ export default function WatchlistDashboard({
                             whileHover={{ y: -6, scale: 1.01 }}
                             whileTap={{ scale: 0.99 }}
                             onClick={onGoToCapture}
-                            className="w-full aspect-[2/3] rounded-xl border-2 border-dashed border-zinc-850 hover:border-zinc-700 bg-zinc-950/20 hover:bg-zinc-900/10 flex flex-col items-center justify-center p-4 text-center cursor-pointer select-none transition-all group"
+                            className="w-full aspect-[2/3] rounded-2xl border-2 border-dashed border-zinc-850 hover:border-zinc-700 bg-zinc-950/20 hover:bg-zinc-900/10 flex flex-col items-center justify-center p-4 text-center cursor-pointer select-none transition-all group"
                           >
                             <div className="w-8 h-8 rounded-full bg-zinc-900/60 border border-zinc-850 flex items-center justify-center mb-2.5">
                               <Plus className="w-4 h-4 text-zinc-500 group-hover:text-zinc-300 animate-pulse" />
@@ -555,64 +539,12 @@ export default function WatchlistDashboard({
               {completedMovies.length > 0 ? (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
                   {completedMovies.map((movie) => (
-                    <motion.div
+                    <MovieCard
                       key={movie.id}
-                      whileHover={{ y: -8, scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      transition={{ type: "spring", stiffness: 220, damping: 25 }}
+                      movie={movie}
                       onClick={() => onSelectMovie(movie.id)}
-                      className="group flex flex-col cursor-pointer text-left select-none opacity-70 hover:opacity-100 transition-opacity duration-300 w-full"
-                    >
-                      {/* Archive-styled slightly grayed poster with tactile 3D frame */}
-                      <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-zinc-950 border border-zinc-800/80 shadow-[0_12px_24px_rgba(0,0,0,0.75)] ring-1 ring-white/5 transition-all duration-300 group-hover:border-zinc-700/80">
-                        {/* Left Edge 3D Spine Highlight */}
-                        <div className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-r from-white/10 via-white/5 to-transparent z-20 pointer-events-none" />
-                        
-                        {/* Glossy Diagonal Reflection Sheen */}
-                        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20" />
-
-                        {movie.posterUrl ? (
-                          <img
-                            src={movie.posterUrl}
-                            alt={movie.title}
-                            referrerPolicy="no-referrer"
-                            className="w-full h-full object-cover grayscale opacity-75 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-zinc-900 text-zinc-700 text-xl">
-                            ✓
-                          </div>
-                        )}
-                        {/* Stamp indicating watched status */}
-                        <div className="absolute top-2 right-2 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[8px] font-sans px-1.5 py-0.5 rounded uppercase tracking-wider z-20 shadow-md font-medium">
-                          Watched
-                        </div>
-                      </div>
-
-                      {/* Label Pane */}
-                      <div className="mt-3.5 space-y-1.5 px-0.5">
-                        <div className="space-y-0.5">
-                          <h4 className="text-[11px] sm:text-[11.5px] font-sans font-medium text-zinc-300 truncate group-hover:text-white transition-colors" title={movie.title}>
-                            {movie.title}
-                          </h4>
-                          <p className="text-[9.5px] text-zinc-550 font-sans font-normal">
-                            {movie.year}
-                          </p>
-                        </div>
-
-                        <div className="text-[9.5px] text-zinc-500 font-sans truncate font-normal">
-                          {movie.streamingServices && movie.streamingServices.length > 0 
-                            ? `Stream: ${movie.streamingServices.slice(0, 2).join(', ')}`
-                            : 'Find channels'}
-                        </div>
-
-                        {movie.whySave && (
-                          <p className="text-[9.5px] text-zinc-600 italic font-sans truncate font-normal leading-normal border-l border-zinc-900 pl-1.5" title={movie.whySave}>
-                            "{movie.whySave}"
-                          </p>
-                        )}
-                      </div>
-                    </motion.div>
+                      isCompleted={true}
+                    />
                   ))}
                 </div>
               ) : (

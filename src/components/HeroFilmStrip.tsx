@@ -616,8 +616,8 @@ export default function HeroFilmStrip() {
       <div className="absolute inset-0 bg-radial from-[#0E121E]/70 via-[#070708]/90 to-[#070708] blur-3xl opacity-90" />
       <div className="absolute w-[140%] h-[500px] bg-gradient-to-r from-[#7F72FF]/08 via-[#A3B0FF]/08 to-[#7F72FF]/08 blur-3xl transform -rotate-3" />
 
-      {/* THREE LAYER PERSPECTIVE STACK - Moved down ~140px to leave generous empty space for typography */}
-      <div className="relative w-full h-full flex flex-col justify-end items-center pointer-events-auto transform translate-y-[135px] sm:translate-y-[150px]">
+      {/* THREE LAYER PERSPECTIVE STACK - Raised to intersect lower hero composition naturally */}
+      <div className="relative w-full h-full flex flex-col justify-end items-center pointer-events-auto transform translate-y-[55px] sm:translate-y-[65px]">
 
         {/* ==========================================
             LAYER 3: DEEPEST BACKGROUND (40% Speed, Soft Blur, 20 Curated Iconic Films)
@@ -790,13 +790,13 @@ export default function HeroFilmStrip() {
           OPENING CINEMA CURTAINS & ATMOSPHERIC VIGNETTE
          ========================================== */}
       {/* Left Velvet Curtain Fade */}
-      <div className="absolute inset-y-0 left-0 w-64 sm:w-80 bg-gradient-to-r from-[#070708] via-[#070708]/90 to-transparent pointer-events-none z-30" />
+      <div className="absolute inset-y-0 left-0 w-64 sm:w-80 bg-gradient-to-r from-[#050505] via-[#050505]/90 to-transparent pointer-events-none z-30" />
       {/* Right Velvet Curtain Fade */}
-      <div className="absolute inset-y-0 right-0 w-64 sm:w-80 bg-gradient-to-l from-[#070708] via-[#070708]/90 to-transparent pointer-events-none z-30" />
+      <div className="absolute inset-y-0 right-0 w-64 sm:w-80 bg-gradient-to-l from-[#050505] via-[#050505]/90 to-transparent pointer-events-none z-30" />
       {/* Top Arch Curtain Vignette */}
-      <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#070708] via-[#070708]/80 to-transparent pointer-events-none z-30" />
+      <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#050505] via-[#050505]/80 to-transparent pointer-events-none z-30" />
       {/* Bottom Stage Base Vignette */}
-      <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-[#070708] via-[#070708]/90 to-transparent pointer-events-none z-30" />
+      <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-[#050505] via-[#050505]/90 to-transparent pointer-events-none z-30" />
     </div>
   );
 }
