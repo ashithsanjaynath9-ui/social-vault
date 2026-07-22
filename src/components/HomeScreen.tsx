@@ -8,47 +8,44 @@ import { motion, AnimatePresence } from 'motion/react';
 import { 
   ArrowRight, 
   Check, 
-  AlertCircle
+  AlertCircle,
+  Link as LinkIcon,
+  FileText,
+  Film,
+  X
 } from 'lucide-react';
 import { Movie } from '../types';
-import { REEL_TEMPLATES, ReelTemplate } from '../data';
 import { detectPlatform } from '../utils';
+import HeroFilmStrip from './HeroFilmStrip';
 
 interface HomeScreenProps {
-  movies: Movie[];
-  onToggleWatched: (id: string) => void;
-  onDelete: (id: string) => void;
-  onViewAllWatchlist: () => void;
+  movies?: Movie[];
+  onToggleWatched?: (id: string) => void;
+  onDelete?: (id: string) => void;
+  onViewAllWatchlist?: () => void;
   onSelectMovie?: (id: string) => void;
   onAddMovie?: (movie: Omit<Movie, 'id' | 'addedAt' | 'watched'>) => void;
   onMoviesAdded?: (newMovies: Omit<Movie, 'id' | 'addedAt' | 'watched'>[]) => void;
+  onOpenAssistant?: () => void;
 }
 
 export default function HomeScreen({
-  movies,
-  onToggleWatched,
-  onDelete,
-  onViewAllWatchlist,
-  onSelectMovie,
-  onAddMovie,
   onMoviesAdded
 }: HomeScreenProps) {
-  const [pastedText, setPastedText] = useState('');
+  const [inputText, setInputText] = useState('');
+  const [isTextMode, setIsTextMode] = useState(false); // Default flow is link-first
   const [isExtracting, setIsExtracting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [previewMovies, setPreviewMovies] = useState<Omit<Movie, 'id' | 'addedAt' | 'watched'>[] | null>(null);
   const [selectedIndices, setSelectedIndices] = useState<Record<number, boolean>>({});
-  
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const focusInput = () => {
-    textareaRef.current?.focus();
-  };
+  const inputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleImport = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!pastedText.trim()) return;
+    if (!inputText.trim()) return;
 
     setIsExtracting(true);
     setError(null);
@@ -56,8 +53,8 @@ export default function HomeScreen({
     setSuccessMessage(null);
 
     try {
-      const isUrl = pastedText.trim().startsWith('http://') || pastedText.trim().startsWith('https://');
-      const platform = detectPlatform(pastedText, '');
+      const isUrl = inputText.trim().startsWith('http://') || inputText.trim().startsWith('https://');
+      const platform = detectPlatform(inputText, '');
 
       const response = await fetch('/api/extract', {
         method: 'POST',
@@ -65,8 +62,8 @@ export default function HomeScreen({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          text: pastedText,
-          url: isUrl ? pastedText : undefined,
+          text: inputText,
+          url: isUrl ? inputText : undefined,
         }),
       });
 
@@ -76,16 +73,16 @@ export default function HomeScreen({
       }
 
       if (!data.movies || data.movies.length === 0) {
-        throw new Error("We couldn't find any movie recommendations in that text. Try pasting a transcript or description containing movie titles.");
+        throw new Error("We couldn't find any movie recommendations in that link. Try pasting a direct post link or switching to text mode.");
       }
 
       const decorated = data.movies.map((m: any) => ({
         ...m,
         socialSource: {
           platform,
-          url: isUrl ? pastedText : undefined,
+          url: isUrl ? inputText : undefined,
           author: m.socialSource?.author || 'Recommendation',
-          textSnippet: pastedText.substring(0, 100) + '...'
+          textSnippet: inputText.substring(0, 100) + '...'
         }
       }));
 
@@ -95,55 +92,7 @@ export default function HomeScreen({
       });
       setSelectedIndices(initialSelected);
       setPreviewMovies(decorated);
-    } catch (err: any) {
-      console.error(err);
-      setError(err.message || 'Something went wrong while identifying movies.');
-    } finally {
-      setIsExtracting(false);
-    }
-  };
 
-  const handleApplyTemplate = async (template: ReelTemplate) => {
-    setPastedText(template.text);
-    setError(null);
-    setSuccessMessage(null);
-    setPreviewMovies(null);
-    setIsExtracting(true);
-
-    try {
-      const response = await fetch('/api/extract', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          text: template.text,
-          url: `https://www.${template.platform}.com/reel/${template.id}`
-        }),
-      });
-
-      const data = await response.json();
-      if (!response.ok || !data.success) {
-        throw new Error(data.error || 'Failed to find movie recommendations.');
-      }
-
-      const platform = template.platform;
-      const decorated = data.movies.map((m: any) => ({
-        ...m,
-        socialSource: {
-          platform,
-          url: `https://www.${template.platform}.com/reel/${template.id}`,
-          author: template.creator,
-          textSnippet: template.text.substring(0, 100) + '...'
-        }
-      }));
-
-      const initialSelected: Record<number, boolean> = {};
-      decorated.forEach((_, idx) => {
-        initialSelected[idx] = true;
-      });
-      setSelectedIndices(initialSelected);
-      setPreviewMovies(decorated);
     } catch (err: any) {
       console.error(err);
       setError(err.message || 'Something went wrong while identifying movies.');
@@ -171,8 +120,7 @@ export default function HomeScreen({
       onMoviesAdded(selected);
     }
 
-    // Reset flow beautifully
-    setPastedText('');
+    setInputText('');
     setPreviewMovies(null);
     setSelectedIndices({});
     setSuccessMessage('Saved to your Library.');
@@ -182,202 +130,247 @@ export default function HomeScreen({
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-8 py-4 px-4 font-sans text-zinc-100" id="apple-notes-lobby">
+    <div className="w-full h-[calc(100vh-8.5rem)] min-h-[500px] max-h-[820px] relative flex flex-col justify-between items-center text-center overflow-hidden rounded-3xl bg-[#070708] border border-[#111214] select-none p-4 sm:p-6 shadow-2xl">
       
-      {/* Calm, Premium Hero Section */}
-      <div className="text-center space-y-3 py-6 select-none max-w-lg mx-auto">
-        <p className="text-[10px] tracking-wider uppercase font-medium text-zinc-500">
-          Movie Discovery & Capture
-        </p>
-        <h1 className="text-3xl sm:text-4xl font-display font-light italic tracking-tight text-zinc-100">
-          We always forget the movies people recommend.
-        </h1>
-        <p className="text-zinc-400 text-xs sm:text-sm max-w-sm mx-auto font-normal leading-relaxed">
-          A quiet, private database to collect and remember recommendation notes from friends, threads, and feeds.
-        </p>
+      {/* Animated 35mm Film Reel Background */}
+      <HeroFilmStrip />
+
+      {/* Top Floating Badge */}
+      <div className="relative z-20 pt-2 pointer-events-auto">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 bg-[#111214]/90 border border-[#7F72FF]/30 rounded-full backdrop-blur-md shadow-lg">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#7F72FF] animate-pulse" />
+          <p className="text-[10px] tracking-widest uppercase font-semibold text-[#7F72FF] font-mono">
+            CineSave • Instant Capture
+          </p>
+        </div>
       </div>
 
-      {/* Main Interactive Workstation */}
-      <div className="space-y-6">
-        <div className="space-y-2">
-          <form onSubmit={handleImport} className="space-y-4">
-            <div className="bg-zinc-900/40 border border-zinc-850/80 focus-within:border-zinc-800/80 rounded-2xl p-3 transition-all duration-300 shadow-xl backdrop-blur-sm">
-              <textarea
-                ref={textareaRef}
-                value={pastedText}
-                onChange={(e) => setPastedText(e.target.value)}
-                placeholder="Paste the raw, messy list of movie recommendations you've been saving..."
-                rows={4}
-                disabled={isExtracting}
-                className="w-full bg-transparent px-3 py-2 text-sm text-zinc-200 placeholder-zinc-550 focus:outline-none resize-none border-0 leading-relaxed font-sans"
-              />
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-3 px-1 border-t border-zinc-900/80 gap-3">
-                <div className="text-[11px] text-zinc-500 font-normal px-1 leading-relaxed text-left">
-                  Extracts titles, streaming details, and posters instantly.
+      {/* Center Main Content: Headline, Subtext, Compact Input */}
+      <div className="relative z-20 w-full max-w-2xl mx-auto space-y-5 px-2 pointer-events-auto my-auto">
+        
+        {/* Headline & Supporting Subtext */}
+        <div className="space-y-3">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-display font-light tracking-tight text-[#F5F5F3] drop-shadow-[0_10px_25px_rgba(0,0,0,0.9)] leading-[1.12]">
+            A home for every movie <br className="hidden sm:inline" />
+            you've been <span className="italic text-transparent bg-clip-text bg-gradient-to-r from-[#D0CBFF] via-[#7F72FF] to-[#B0A7FF]">meaning to watch.</span>
+          </h1>
+
+          <p className="text-[#A7A7A2] text-xs sm:text-sm max-w-lg mx-auto font-normal leading-relaxed drop-shadow-md">
+            Save recommendations from anywhere. Organize. Remember. Finally watch.
+          </p>
+        </div>
+
+        {/* COMPACT CAPTURE INPUT (Link-First with Text Toggle) */}
+        <div className="pt-2">
+          <form onSubmit={handleImport} className="w-full max-w-xl mx-auto">
+            <div className="bg-[#111214]/95 border border-[#1A1C20] focus-within:border-[#7F72FF]/80 rounded-2xl p-2 sm:p-2.5 transition-all duration-300 shadow-[0_20px_50px_rgba(0,0,0,0.8)] backdrop-blur-xl">
+              
+              {!isTextMode ? (
+                /* Mode 1: Compact Single-Line Link Input */
+                <div className="flex items-center gap-2">
+                  <div className="pl-2.5 text-[#7F72FF] shrink-0">
+                    <LinkIcon className="w-4 h-4" />
+                  </div>
+                  
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={inputText}
+                    onChange={(e) => setInputText(e.target.value)}
+                    placeholder="Paste an Instagram Reel, TikTok, YouTube or movie link..."
+                    disabled={isExtracting}
+                    className="w-full bg-transparent px-1 py-2 text-xs sm:text-sm text-[#F5F5F3] placeholder-[#A7A7A2]/60 focus:outline-none border-0 font-sans"
+                  />
+
+                  <motion.button
+                    type="submit"
+                    disabled={!inputText.trim() || isExtracting}
+                    whileHover={inputText.trim() && !isExtracting ? { scale: 1.03 } : {}}
+                    whileTap={inputText.trim() && !isExtracting ? { scale: 0.97 } : {}}
+                    className={`px-5 py-2.5 rounded-xl text-xs font-sans font-semibold flex items-center justify-center gap-1.5 shrink-0 transition-all duration-200 ${
+                      inputText.trim() && !isExtracting
+                        ? 'bg-[#7F72FF] text-white cursor-pointer shadow-[0_0_20px_rgba(127,114,255,0.4)]'
+                        : 'bg-[#1A1C20] text-[#A7A7A2]/50 cursor-not-allowed'
+                    }`}
+                  >
+                    <span>Extract</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </motion.button>
                 </div>
-                <motion.button
-                  type="submit"
-                  disabled={!pastedText.trim() || isExtracting}
-                  whileHover={pastedText.trim() && !isExtracting ? { scale: 1.02, backgroundColor: "#E4E4E7" } : {}}
-                  whileTap={pastedText.trim() && !isExtracting ? { scale: 0.98 } : {}}
-                  transition={{ type: "spring", stiffness: 250, damping: 20 }}
-                  className={`px-5 py-2.5 rounded-xl text-xs font-sans font-medium flex items-center justify-center gap-2 transition-all duration-200 ${
-                    pastedText.trim() && !isExtracting
-                      ? 'bg-zinc-100 text-zinc-950 cursor-pointer shadow-md'
-                      : 'bg-zinc-850/50 text-zinc-500 cursor-not-allowed'
-                  }`}
-                >
-                  <span>Transform into Library</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </motion.button>
-              </div>
+              ) : (
+                /* Mode 2: Multiline Textarea Mode */
+                <div className="space-y-2">
+                  <textarea
+                    ref={textareaRef}
+                    value={inputText}
+                    onChange={(e) => setInputText(e.target.value)}
+                    placeholder="Paste raw text, transcript, or movie recommendation notes..."
+                    rows={3}
+                    disabled={isExtracting}
+                    className="w-full bg-transparent px-3 py-2 text-xs sm:text-sm text-[#F5F5F3] placeholder-[#A7A7A2]/60 focus:outline-none resize-none border-0 font-sans leading-relaxed"
+                  />
+                  
+                  <div className="flex items-center justify-between pt-2 px-1 border-t border-[#1A1C20]">
+                    <span className="text-[11px] text-[#A7A7A2] font-mono">
+                      Extracts titles & details instantly
+                    </span>
+                    
+                    <motion.button
+                      type="submit"
+                      disabled={!inputText.trim() || isExtracting}
+                      whileHover={inputText.trim() && !isExtracting ? { scale: 1.03 } : {}}
+                      whileTap={inputText.trim() && !isExtracting ? { scale: 0.97 } : {}}
+                      className={`px-4 py-2 rounded-xl text-xs font-sans font-semibold flex items-center justify-center gap-1.5 transition-all duration-200 ${
+                        inputText.trim() && !isExtracting
+                          ? 'bg-[#7F72FF] text-white cursor-pointer shadow-[0_0_20px_rgba(127,114,255,0.4)]'
+                          : 'bg-[#1A1C20] text-[#A7A7A2]/50 cursor-not-allowed'
+                      }`}
+                    >
+                      <span>Extract Titles</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </motion.button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Secondary Action: Toggle between link and raw text mode */}
+            <div className="mt-2.5 flex items-center justify-center">
+              <button
+                type="button"
+                onClick={() => setIsTextMode(!isTextMode)}
+                className="inline-flex items-center gap-1.5 text-[11px] font-sans text-[#A7A7A2] hover:text-[#F5F5F3] transition-colors cursor-pointer py-1 px-2 rounded-lg hover:bg-[#111214]/60"
+              >
+                {isTextMode ? (
+                  <>
+                    <LinkIcon className="w-3 h-3 text-[#7F72FF]" />
+                    <span>Paste a link instead</span>
+                  </>
+                ) : (
+                  <>
+                    <FileText className="w-3 h-3 text-[#7F72FF]" />
+                    <span>Paste text instead</span>
+                  </>
+                )}
+              </button>
             </div>
           </form>
-        </div>
- 
-        {/* Quick Instant Experiences / Samples */}
-        {!isExtracting && !previewMovies && (
-          <div className="space-y-2 text-center sm:text-left">
-            <p className="text-[11px] font-sans text-zinc-500 font-normal">
-              Or load a sample recommendation note:
-            </p>
-            <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
-              {REEL_TEMPLATES.map((tmpl) => (
-                <motion.button
-                  key={tmpl.id}
-                  type="button"
-                  onClick={() => handleApplyTemplate(tmpl)}
-                  whileHover={{ scale: 1.02, backgroundColor: "rgba(24, 24, 27, 0.8)", borderColor: "rgba(63, 63, 70, 0.6)" }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: "spring", stiffness: 250, damping: 20 }}
-                  className="px-3 py-2 rounded-xl bg-zinc-900/30 border border-zinc-850 text-xs text-zinc-400 hover:text-zinc-200 flex items-center gap-1.5 cursor-pointer transition-colors duration-200"
-                >
-                  <span>{tmpl.title.split(' ').slice(1).join(' ')}</span>
-                </motion.button>
-              ))}
-            </div>
-          </div>
-        )}
 
-        {/* Error Indicator */}
-        <AnimatePresence>
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, y: -8, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -4, scale: 0.98 }}
-              transition={{ type: "spring", stiffness: 220, damping: 25 }}
-              className="bg-red-950/20 border border-red-900/40 rounded-xl p-3 flex items-start gap-2.5 text-xs text-red-400"
-            >
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-              <p>{error}</p>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Success Feedback */}
-        <AnimatePresence>
-          {successMessage && (
-            <motion.div
-              initial={{ opacity: 0, y: -8, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -4, scale: 0.98 }}
-              transition={{ type: "spring", stiffness: 220, damping: 25 }}
-              className="bg-emerald-950/20 border border-emerald-900/40 rounded-xl p-3 flex items-center gap-2.5 text-xs text-emerald-400"
-            >
-              <Check className="w-4 h-4 shrink-0" />
-              <p>{successMessage}</p>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Elegant Non-Technical Processing State */}
-        {isExtracting && (
-          <div className="py-20 flex flex-col items-center justify-center space-y-8 max-w-sm mx-auto">
-            <div className="relative w-20 h-28 rounded-2xl bg-zinc-900 border border-zinc-800 overflow-hidden flex items-center justify-center shadow-[0_20px_50px_rgba(124,140,255,0.1)]">
-              {/* Beautiful subtle scanning light ray representing transformation */}
+          {/* Error Feedback */}
+          <AnimatePresence>
+            {error && (
               <motion.div
-                animate={{
-                  y: [-56, 56, -56],
-                }}
-                transition={{
-                  duration: 2.5,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-                className="absolute inset-x-0 h-1 bg-[#7C8CFF]/40 blur-[2px]"
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                className="mt-3 max-w-xl mx-auto bg-red-950/40 border border-red-900/60 rounded-xl p-3 flex items-start gap-2.5 text-xs text-red-300 text-left backdrop-blur-md"
+              >
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-400" />
+                <p className="flex-1">{error}</p>
+                <button 
+                  onClick={() => setError(null)}
+                  className="text-red-400 hover:text-red-200 cursor-pointer"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Success Feedback */}
+          <AnimatePresence>
+            {successMessage && (
+              <motion.div
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                className="mt-3 max-w-xl mx-auto bg-emerald-950/40 border border-emerald-900/60 rounded-xl p-3 flex items-center gap-2.5 text-xs text-emerald-300 backdrop-blur-md"
+              >
+                <Check className="w-4 h-4 shrink-0 text-emerald-400" />
+                <p className="flex-1 text-left">{successMessage}</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+
+      {/* Empty bottom spacer for balance */}
+      <div className="relative z-20 pb-2 pointer-events-none" />
+
+      {/* =========================================================
+          EXTRACTION PROCESSING & RESULTS OVERLAY MODAL
+          Appears over the single screen when extracting or showing results
+         ========================================================= */}
+      
+      {/* Loading Overlay */}
+      {isExtracting && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md p-4">
+          <div className="bg-[#111214] border border-[#1A1C20] rounded-3xl p-8 max-w-sm w-full flex flex-col items-center justify-center space-y-6 shadow-2xl text-center">
+            <div className="relative w-16 h-24 rounded-2xl bg-[#1A1C20] border border-[#7F72FF]/30 overflow-hidden flex items-center justify-center shadow-2xl">
+              <motion.div
+                animate={{ y: [-48, 48, -48] }}
+                transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute inset-x-0 h-1 bg-[#7F72FF] blur-[2px]"
               />
-              <div className="w-10 h-16 rounded-lg bg-zinc-950 border border-zinc-850 opacity-40 flex flex-col justify-between p-1">
-                <div className="w-full h-1 bg-zinc-900 rounded" />
-                <div className="w-2/3 h-1 bg-zinc-900 rounded" />
-              </div>
+              <Film className="w-6 h-6 text-[#7F72FF]" />
             </div>
-            <div className="space-y-2 text-center select-none">
-              <p className="text-sm text-zinc-100 font-display font-light italic tracking-wide animate-pulse">
-                Transforming raw recommendations...
+            <div className="space-y-1.5">
+              <p className="text-sm text-[#F5F5F3] font-display font-light italic tracking-wide animate-pulse">
+                Extracting movie recommendations...
               </p>
-              <p className="text-xs text-zinc-500 font-sans max-w-[280px] leading-relaxed">
-                Unfolding titles, directors, and beautiful posters into curated cinema cards.
+              <p className="text-xs text-[#A7A7A2] font-sans">
+                Unfolding titles, directors, and posters.
               </p>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Beautiful Movie Cards Results */}
-        {previewMovies && (
-          <motion.div 
-            initial="hidden"
-            animate="show"
-            variants={{
-              hidden: { opacity: 0 },
-              show: {
-                opacity: 1,
-                transition: {
-                  staggerChildren: 0.15,
-                  delayChildren: 0.1
-                }
-              }
-            }}
-            className="space-y-8"
+      {/* Extracted Movies Result Modal */}
+      {previewMovies && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="bg-[#111214] border border-[#1A1C20] rounded-3xl p-6 max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl space-y-5 text-left"
           >
-            {/* Transforming magical moment headline */}
-            <div className="text-center space-y-2.5 py-2 border-b border-zinc-900 pb-6">
-              <motion.span
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="inline-block px-2.5 py-1 bg-[#7C8CFF]/10 text-[#7C8CFF] border border-[#7C8CFF]/20 rounded-full text-[10px] font-sans font-medium uppercase tracking-wider"
+            <div className="flex items-center justify-between pb-3 border-b border-[#1A1C20]">
+              <div>
+                <span className="inline-block px-2.5 py-0.5 bg-[#7F72FF]/10 text-[#7F72FF] border border-[#7F72FF]/20 rounded-full text-[10px] font-sans font-semibold uppercase tracking-wider">
+                  Extracted Results
+                </span>
+                <h3 className="text-lg font-display font-light italic text-[#F5F5F3] mt-1">
+                  Found {previewMovies.length} {previewMovies.length === 1 ? 'movie' : 'movies'}
+                </h3>
+              </div>
+              
+              <button
+                type="button"
+                onClick={() => {
+                  setPreviewMovies(null);
+                  setSelectedIndices({});
+                }}
+                className="p-1.5 rounded-full bg-[#1A1C20] text-[#A7A7A2] hover:text-[#F5F5F3] cursor-pointer"
               >
-                Transformation Complete
-              </motion.span>
-              <h2 className="text-2xl sm:text-3xl font-display font-light italic text-zinc-100 tracking-tight leading-tight">
-                We found {previewMovies.length} {previewMovies.length === 1 ? 'movie' : 'movies'}
-              </h2>
-              <p className="text-zinc-500 text-xs font-sans max-w-sm mx-auto leading-relaxed">
-                Review and save these extracted movie cards directly into your personal shelves.
-              </p>
+                <X className="w-4 h-4" />
+              </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="overflow-y-auto space-y-3 pr-1 max-h-[50vh]">
               {previewMovies.map((movie, idx) => {
                 const isSelected = selectedIndices[idx] !== false;
                 return (
-                  <motion.div
+                  <div
                     key={idx}
-                    variants={{
-                      hidden: { opacity: 0, y: 24, scale: 0.95, rotate: -0.5 },
-                      show: { opacity: 1, y: 0, scale: 1, rotate: 0, transition: { type: "spring", stiffness: 100, damping: 18 } }
-                    }}
-                    whileHover={{ y: -3, scale: 1.015, transition: { duration: 0.2 } }}
-                    whileTap={{ scale: 0.99 }}
                     onClick={() => handleToggleSelect(idx)}
-                    className={`group relative flex gap-4 p-4 rounded-2xl border transition-all duration-300 cursor-pointer select-none ${
+                    className={`group relative flex gap-4 p-3.5 rounded-2xl border transition-all duration-300 cursor-pointer select-none ${
                       isSelected 
-                        ? 'bg-zinc-900/50 border-zinc-800 shadow-[0_12px_40px_rgba(0,0,0,0.5)]' 
-                        : 'bg-zinc-950/10 border-zinc-900/40 opacity-40 hover:opacity-60'
+                        ? 'bg-[#1A1C20] border-[#7F72FF]/40 shadow-md' 
+                        : 'bg-[#070708]/60 border-[#1A1C20] opacity-50 hover:opacity-80'
                     }`}
                   >
-                    {/* Poster */}
-                    <div className="relative w-24 h-34 rounded-xl bg-zinc-950 overflow-hidden shrink-0 border border-zinc-850 shadow-md transition-all duration-300 group-hover:scale-[1.02] group-hover:rotate-[0.5deg]">
+                    <div className="relative w-16 h-22 rounded-xl bg-[#070708] overflow-hidden shrink-0 border border-[#1A1C20]">
                       {movie.posterUrl ? (
                         <img
                           src={movie.posterUrl}
@@ -386,87 +379,67 @@ export default function HomeScreen({
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-zinc-900 text-zinc-600 text-2xl">
+                        <div className="w-full h-full flex items-center justify-center text-[#A7A7A2] text-lg">
                           🍿
                         </div>
                       )}
                       
-                      {/* Interactive Selection Checkbox Overlay on the Poster */}
-                      <div className="absolute top-2 right-2 z-20">
-                        <div className={`w-5 h-5 rounded-full flex items-center justify-center border transition-all duration-200 ${
+                      <div className="absolute top-1.5 right-1.5 z-20">
+                        <div className={`w-4 h-4 rounded-full flex items-center justify-center border transition-all ${
                           isSelected 
-                            ? 'bg-zinc-100 border-zinc-100 text-zinc-950 scale-100' 
-                            : 'bg-zinc-950/80 border-zinc-800 text-transparent scale-95 group-hover:border-zinc-700'
+                            ? 'bg-[#7F72FF] border-[#7F72FF] text-white' 
+                            : 'bg-[#070708]/80 border-[#1A1C20] text-transparent'
                         }`}>
-                          <Check className="w-3 h-3 stroke-[3]" />
+                          <Check className="w-2.5 h-2.5 stroke-[3]" />
                         </div>
                       </div>
                     </div>
 
-                    {/* Museum-Grade Label Pane answering ONLY: What movie? Where can I watch? Why saved? */}
-                    <div className="flex-1 min-w-0 flex flex-col justify-between py-1.5 space-y-2.5">
-                      {/* What movie? */}
-                      <div className="space-y-0.5">
-                        <div className="flex flex-wrap items-baseline gap-x-1.5">
-                          <h4 className="text-sm font-medium text-zinc-100 group-hover:text-white transition-colors tracking-tight truncate">
-                            {movie.title}
-                          </h4>
-                          <span className="text-[11px] text-zinc-500 font-sans">
-                            ({movie.year})
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Where can I watch? */}
-                      <div className="text-xs text-zinc-400 font-sans font-normal truncate">
-                        {movie.streamingServices && movie.streamingServices.length > 0 
-                          ? `Stream on: ${movie.streamingServices.slice(0, 2).join(', ')}`
-                          : 'Find channels'}
-                      </div>
-
-                      {/* Why did I save it? */}
-                      {movie.whySave && (
-                        <p className="text-xs text-zinc-550 italic font-sans leading-relaxed border-l border-zinc-800 pl-2.5 line-clamp-2" title={movie.whySave}>
-                          "{movie.whySave}"
+                    <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5 space-y-1">
+                      <div>
+                        <h4 className="text-xs sm:text-sm font-semibold text-[#F5F5F3] truncate">
+                          {movie.title}
+                        </h4>
+                        <p className="text-[10px] text-[#A7A7A2] font-mono">
+                          {movie.year} • {movie.genre || 'Cinema'}
                         </p>
-                      )}
+                      </div>
+
+                      <p className="text-[11px] text-[#A7A7A2] line-clamp-2 italic">
+                        "{movie.whySave || 'Saved recommendation'}"
+                      </p>
                     </div>
-                  </motion.div>
+                  </div>
                 );
               })}
             </div>
 
-            {/* Large centered Save All button */}
-            <div className="pt-6 flex flex-col items-center gap-4 border-t border-zinc-900">
-              <motion.button
-                type="button"
-                onClick={handleSave}
-                whileHover={{ scale: 1.015, backgroundColor: "#FFFFFF" }}
-                whileTap={{ scale: 0.985 }}
-                transition={{ type: "spring", stiffness: 250, damping: 20 }}
-                className="w-full sm:w-auto px-12 py-4 bg-zinc-100 text-zinc-950 hover:bg-white text-xs font-sans font-medium rounded-xl transition-all shadow-xl flex items-center justify-center gap-2.5 cursor-pointer"
-              >
-                <span>Save All to My Library</span>
-                <ArrowRight className="w-4 h-4 text-zinc-950" />
-              </motion.button>
-              
-              <motion.button
+            <div className="pt-3 border-t border-[#1A1C20] flex items-center justify-end gap-3">
+              <button
                 type="button"
                 onClick={() => {
                   setPreviewMovies(null);
                   setSelectedIndices({});
                 }}
-                whileHover={{ scale: 1.02, color: "#E4E4E7" }}
-                whileTap={{ scale: 0.98 }}
-                transition={{ type: "spring", stiffness: 250, damping: 20 }}
-                className="px-4 py-2 text-xs font-sans text-zinc-550 hover:text-zinc-300 transition-all cursor-pointer underline decoration-zinc-800 hover:decoration-zinc-500 underline-offset-4"
+                className="px-4 py-2 text-xs font-sans text-[#A7A7A2] hover:text-[#F5F5F3] transition-colors cursor-pointer"
               >
-                Clear and start over
+                Cancel
+              </button>
+
+              <motion.button
+                type="button"
+                onClick={handleSave}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="px-6 py-2.5 bg-[#7F72FF] hover:bg-[#6E60FF] text-white text-xs font-sans font-semibold rounded-xl transition-all shadow-lg flex items-center gap-2 cursor-pointer"
+              >
+                <span>Save to Library</span>
+                <ArrowRight className="w-3.5 h-3.5" />
               </motion.button>
             </div>
           </motion.div>
-        )}
-      </div>
+        </div>
+      )}
 
     </div>
   );

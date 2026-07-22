@@ -22,6 +22,8 @@ interface CineSaveAssistantProps {
   onMarkWatched: (id: string) => void;
   onSelectMovie: (id: string) => void;
   activeIdentity: string;
+  isOpenControlled?: boolean;
+  onToggleControlled?: (open: boolean) => void;
 }
 
 // 3-Step Flow Types
@@ -57,9 +59,19 @@ export default function CineSaveAssistant({
   movies, 
   onMarkWatched, 
   onSelectMovie,
-  activeIdentity 
+  activeIdentity,
+  isOpenControlled,
+  onToggleControlled
 }: CineSaveAssistantProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
+  const isOpen = isOpenControlled !== undefined ? isOpenControlled : internalIsOpen;
+  
+  const setIsOpen = (val: boolean) => {
+    setInternalIsOpen(val);
+    if (onToggleControlled) {
+      onToggleControlled(val);
+    }
+  };
   
   // Step states: 1, 2, 3 or 'results'
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 'results'>(1);
@@ -248,53 +260,6 @@ export default function CineSaveAssistant({
 
   return (
     <>
-      {/* PERSISTENT FLOATING ASSISTANT TRIGGER BUTTON */}
-      <AnimatePresence>
-        {!isOpen && (
-          <div className="fixed bottom-6 right-6 z-40">
-            <motion.button
-              initial={{ opacity: 0, scale: 0.8, y: 15 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.75, y: 25 }}
-              transition={{ type: 'spring', damping: 24, stiffness: 200 }}
-              onClick={() => {
-                setIsOpen(true);
-                handleReset(); // Start fresh when opened
-              }}
-              whileHover={{ 
-                scale: 1.05, 
-                y: -2,
-                backgroundColor: '#243155',
-                borderColor: 'rgba(124,140,255,0.32)'
-              }}
-              whileTap={{ 
-                scale: 0.95,
-                backgroundColor: '#2D3D6B'
-              }}
-              style={{
-                backgroundColor: '#1B2540',
-                border: '1px solid rgba(124,140,255,0.18)',
-                color: '#F8FAFF',
-                boxShadow: '0 10px 30px rgba(10,15,30,0.45)',
-              }}
-              className="flex items-center gap-2 px-4 py-3 sm:px-5 sm:py-3.5 rounded-full select-none cursor-pointer group transition-colors duration-200"
-              id="cine-assistant-trigger"
-            >
-              <div className="relative">
-                <Sparkles className="w-4 h-4 text-[#97A5FF] group-hover:animate-pulse" />
-                <span className="absolute -top-1 -right-1 flex h-1.5 w-1.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#97A5FF] opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#97A5FF]"></span>
-                </span>
-              </div>
-              <span className="text-xs font-sans font-semibold tracking-wide uppercase text-[#F8FAFF]">
-                Decide Tonight
-              </span>
-            </motion.button>
-          </div>
-        )}
-      </AnimatePresence>
-
       {/* DETACHED COLLAPSIBLE ASSISTANT DRAWER SHEET */}
       <AnimatePresence>
         {isOpen && (

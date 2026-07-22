@@ -33,6 +33,7 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoaded, setIsLoaded] = useState(false);
   const [selectedMovieId, setSelectedMovieId] = useState<string | null>(null);
+  const [isAssistantOpen, setIsAssistantOpen] = useState(false);
 
   // Computed selected movie
   const selectedMovie = useMemo(() => {
@@ -268,91 +269,91 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 pb-24 relative px-4 sm:px-6 lg:px-8 font-sans">
+    <div className="min-h-screen bg-[#070708] text-[#F5F5F3] pb-6 relative px-4 sm:px-6 lg:px-8 font-sans">
       
       {/* Main Container */}
-      <div className="w-full max-w-7xl mx-auto pt-8 sm:pt-12 space-y-8 relative">
+      <div className="w-full max-w-7xl mx-auto pt-4 sm:pt-6 space-y-8 relative">
         
         {/* Header Branding section */}
-        <header className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 pb-6 border-b border-zinc-900/60">
+        <header className="flex flex-col md:flex-row items-center justify-between gap-4 pb-6 border-b border-[#111214]">
+          
+          {/* Left: Logo */}
           <div className="flex items-center gap-3 select-none cursor-pointer" onClick={() => setViewMode('home')}>
-            <div className="p-2 w-10 h-10 rounded-xl bg-zinc-900/35 border border-zinc-850/50 text-[#7C8CFF] flex items-center justify-center shadow-sm">
-              {selectedIdentity.logoSvg("w-6 h-6")}
+            <div className="p-2 w-9 h-9 rounded-xl bg-[#111214] border border-[#7F72FF]/20 text-[#7F72FF] flex items-center justify-center shadow-sm">
+              {selectedIdentity.logoSvg("w-5 h-5")}
             </div>
             <div className="flex flex-col text-left">
               {selectedIdentity.wordmark("text-base sm:text-lg")}
-              <span className="text-[10px] text-zinc-500 font-sans tracking-wide leading-none mt-0.5">
+              <span className="text-[10px] text-[#A7A7A2] font-sans tracking-wide leading-none mt-0.5">
                 {selectedIdentity.name}
               </span>
             </div>
           </div>
 
-          {/* PERMANENT TOP NAV SEARCH BAR - Spotlight feel */}
-          <div className="w-full lg:w-auto flex-1 max-w-xs md:max-w-sm">
-            <GlobalSearch movies={movies} onAddMovie={handleAddSingleMovie} />
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3 self-stretch lg:self-auto justify-end">
+          {/* Center: Navigation Links with Glowing Active Bar */}
+          <nav className="flex items-center gap-8 py-1" id="main-tabs-nav">
+            <button
+              onClick={() => setViewMode('home')}
+              className={`relative py-1 text-xs sm:text-sm font-medium transition-all cursor-pointer tracking-wide ${
+                viewMode === 'home' ? 'text-[#F5F5F3]' : 'text-[#A7A7A2] hover:text-[#F5F5F3]'
+              }`}
+            >
+              <span>Home</span>
+              {viewMode === 'home' && (
+                <motion.div
+                  layoutId="mainNavIndicator"
+                  className="absolute -bottom-2.5 left-0 right-0 h-[2px] bg-[#7F72FF] shadow-[0_0_12px_#7F72FF]"
+                  transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                />
+              )}
+            </button>
             
-            {/* Unified 3-tab premium Segmented Controller */}
-            <nav className="bg-zinc-900/60 backdrop-blur-md border border-zinc-850/85 p-1 rounded-xl flex items-center relative" id="main-tabs-nav">
-              <button
-                onClick={() => setViewMode('home')}
-                className={`relative px-4 py-2.5 rounded-lg text-xs sm:text-sm font-medium transition-all flex items-center gap-2 cursor-pointer z-10 tracking-wide ${
-                  viewMode === 'home' 
-                    ? 'text-white' 
-                    : 'text-zinc-400 hover:text-zinc-200'
-                }`}
-              >
-                {viewMode === 'home' && (
-                  <motion.div
-                    layoutId="mainNavIndicator"
-                    className="absolute inset-0 bg-zinc-800 rounded-lg shadow-md -z-10"
-                    transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                  />
-                )}
-                <Compass className="w-4 h-4" />
-                <span>Home</span>
-              </button>
-              
-              <button
-                onClick={() => setViewMode('library')}
-                className={`relative px-4 py-2.5 rounded-lg text-xs sm:text-sm font-medium transition-all flex items-center gap-2 cursor-pointer z-10 tracking-wide ${
-                  viewMode === 'library' 
-                    ? 'text-white' 
-                    : 'text-zinc-400 hover:text-zinc-200'
-                }`}
-              >
-                {viewMode === 'library' && (
-                  <motion.div
-                    layoutId="mainNavIndicator"
-                    className="absolute inset-0 bg-zinc-800 rounded-lg shadow-md -z-10"
-                    transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                  />
-                )}
-                <Tv className="w-4 h-4" />
-                <span>Library</span>
-              </button>
+            <button
+              onClick={() => setViewMode('library')}
+              className={`relative py-1 text-xs sm:text-sm font-medium transition-all cursor-pointer tracking-wide ${
+                viewMode === 'library' ? 'text-[#F5F5F3]' : 'text-[#A7A7A2] hover:text-[#F5F5F3]'
+              }`}
+            >
+              <span>Library</span>
+              {viewMode === 'library' && (
+                <motion.div
+                  layoutId="mainNavIndicator"
+                  className="absolute -bottom-2.5 left-0 right-0 h-[2px] bg-[#7F72FF] shadow-[0_0_12px_#7F72FF]"
+                  transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                />
+              )}
+            </button>
 
-              <button
-                onClick={() => setViewMode('profile')}
-                className={`relative px-4 py-2.5 rounded-lg text-xs sm:text-sm font-medium transition-all flex items-center gap-2 cursor-pointer z-10 tracking-wide ${
-                  viewMode === 'profile' 
-                    ? 'text-white' 
-                    : 'text-zinc-400 hover:text-zinc-200'
-                }`}
-              >
-                {viewMode === 'profile' && (
-                  <motion.div
-                    layoutId="mainNavIndicator"
-                    className="absolute inset-0 bg-zinc-800 rounded-lg shadow-md -z-10"
-                    transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                  />
-                )}
-                <User className="w-4 h-4" />
-                <span>Profile</span>
-              </button>
-            </nav>
+            <button
+              onClick={() => setViewMode('profile')}
+              className={`relative py-1 text-xs sm:text-sm font-medium transition-all cursor-pointer tracking-wide ${
+                viewMode === 'profile' ? 'text-[#F5F5F3]' : 'text-[#A7A7A2] hover:text-[#F5F5F3]'
+              }`}
+            >
+              <span>Profile</span>
+              {viewMode === 'profile' && (
+                <motion.div
+                  layoutId="mainNavIndicator"
+                  className="absolute -bottom-2.5 left-0 right-0 h-[2px] bg-[#7F72FF] shadow-[0_0_12px_#7F72FF]"
+                  transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                />
+              )}
+            </button>
+          </nav>
+
+          {/* Right: Search & Decide Tonight Button */}
+          <div className="flex items-center gap-3 w-full md:w-auto justify-end">
+            <div className="w-full md:w-64">
+              <GlobalSearch movies={movies} onAddMovie={handleAddSingleMovie} />
+            </div>
+
+            <button
+              onClick={() => setIsAssistantOpen(true)}
+              className="px-3.5 py-2 rounded-xl bg-[#111214] border border-[#7F72FF]/25 hover:border-[#7F72FF]/50 text-[#F5F5F3] text-[11px] font-mono font-semibold tracking-wider uppercase flex items-center gap-2 cursor-pointer transition-all duration-300 shrink-0 shadow-md hover:shadow-[#7F72FF]/10"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-[#7F72FF]" />
+              <span className="hidden sm:inline">Decide Tonight</span>
+            </button>
           </div>
         </header>
 
@@ -374,6 +375,7 @@ export default function App() {
                 onSelectMovie={(id) => setSelectedMovieId(id)}
                 onAddMovie={handleAddSingleMovie}
                 onMoviesAdded={handleAddMovies}
+                onOpenAssistant={() => setIsAssistantOpen(true)}
               />
             </motion.div>
           )}
@@ -488,6 +490,8 @@ export default function App() {
           onMarkWatched={handleToggleWatched}
           onSelectMovie={(id) => setSelectedMovieId(id)}
           activeIdentity={activeIdentity}
+          isOpenControlled={isAssistantOpen}
+          onToggleControlled={setIsAssistantOpen}
         />
 
       </div>
