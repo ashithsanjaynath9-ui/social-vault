@@ -45,14 +45,14 @@ export default function HeroProductDemo({ onMoviesAdded, onImportSubmit }: HeroP
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[680px] h-[360px] bg-radial from-[#7F72FF]/14 via-[#7F72FF]/02 to-transparent blur-3xl pointer-events-none rounded-full z-0" />
 
       {/* EDITORIAL HEADLINE BLOCK */}
-      <div className="relative z-20 space-y-2.5 text-center mb-6">
-        <h1 className="text-3xl sm:text-4xl md:text-[2.85rem] font-display font-normal tracking-[-0.02em] text-[#F5F5F3] leading-[1.15] drop-shadow-[0_16px_36px_rgba(0,0,0,0.95)]">
-          Collect movies.<br />
-          <span className="font-light italic text-[#7F72FF]">Not screenshots.</span>
+      <div className="relative z-20 text-center mb-9 sm:mb-10">
+        <h1 className="text-4xl sm:text-5xl md:text-[3.45rem] font-display font-normal tracking-[0.015em] text-[#F5F5F3] leading-[1.08] drop-shadow-[0_16px_36px_rgba(0,0,0,0.95)]">
+          Every recommendation<br />
+          deserves a place.
         </h1>
 
-        <p className="text-[#A7A7A2] text-xs sm:text-[14px] max-w-md mx-auto font-sans font-normal leading-relaxed drop-shadow-md">
-          Save recommendations from Instagram, TikTok, YouTube and friends.
+        <p className="mt-6 text-[#F5F5F3]/70 text-[18px] sm:text-[19px] md:text-[20px] max-w-xl mx-auto font-sans font-normal leading-relaxed drop-shadow-md">
+          Save movies from Instagram Reels, TikToks, YouTube, and friends—so they&apos;re waiting when you&apos;re ready to watch.
         </p>
       </div>
 
