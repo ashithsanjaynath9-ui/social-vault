@@ -39,19 +39,19 @@ export default function HeroProductDemo({ onMoviesAdded, onImportSubmit }: HeroP
   };
 
   return (
-    <div className="relative z-20 w-full max-w-6xl mx-auto px-4 pt-10 sm:pt-14 md:pt-16 pb-4 flex flex-col items-center select-none">
+    <div className="relative z-20 w-full max-w-6xl mx-auto px-4 pt-20 sm:pt-28 md:pt-32 pb-4 flex flex-col items-center select-none">
       
-      {/* Soft Ambient Radial Spotlight */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[680px] h-[360px] bg-radial from-[#7F72FF]/14 via-[#7F72FF]/02 to-transparent blur-3xl pointer-events-none rounded-full z-0" />
+      {/* Faint Projector-Inspired Bloom behind Headline */}
+      <div className="absolute top-[22%] sm:top-[24%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[540px] sm:w-[680px] h-[280px] sm:h-[340px] bg-radial from-[#A78BFA]/12 via-[#F3EEE8]/03 to-transparent blur-3xl pointer-events-none rounded-full z-0" />
 
       {/* EDITORIAL HEADLINE BLOCK */}
-      <div className="relative z-20 text-center mb-9 sm:mb-10">
-        <h1 className="text-4xl sm:text-5xl md:text-[3.45rem] font-display font-normal tracking-[0.015em] text-[#F5F5F3] leading-[1.08] drop-shadow-[0_16px_36px_rgba(0,0,0,0.95)]">
+      <div className="relative z-20 text-center mb-9 sm:mb-10 max-w-3xl">
+        <h1 className="text-4xl sm:text-5xl md:text-[3.5rem] font-display font-normal tracking-[-0.012em] text-[#F3EEE8] leading-[1.06] drop-shadow-[0_12px_40px_rgba(0,0,0,0.85)]">
           Every recommendation<br />
           deserves a place.
         </h1>
 
-        <p className="mt-6 text-[#F5F5F3]/70 text-[18px] sm:text-[19px] md:text-[20px] max-w-xl mx-auto font-sans font-normal leading-relaxed drop-shadow-md">
+        <p className="mt-6 text-[#A8A4B3] text-[18px] sm:text-[19px] md:text-[20px] max-w-xl mx-auto font-sans font-normal leading-relaxed drop-shadow-md">
           Save movies from Instagram Reels, TikToks, YouTube, and friends—so they&apos;re waiting when you&apos;re ready to watch.
         </p>
       </div>
@@ -59,9 +59,9 @@ export default function HeroProductDemo({ onMoviesAdded, onImportSubmit }: HeroP
       {/* STATIC LUXURY COMMAND CAPTURE BAR (Z-30 so film reel passes elegantly behind it) */}
       <div className="relative z-30 w-full max-w-lg mb-2">
         <form onSubmit={handleManualSubmit} className="w-full">
-          <div className="relative flex items-center gap-2 bg-[#111214]/92 border border-[#1A1C20] focus-within:border-[#7F72FF]/80 rounded-2xl p-2 sm:p-2.5 transition-all duration-300 shadow-[0_25px_60px_rgba(0,0,0,0.95)] backdrop-blur-2xl">
-            <div className="pl-2.5 text-[#7F72FF] shrink-0">
-              <LinkIcon className="w-4 h-4 opacity-80" />
+          <div className="relative flex items-center gap-2 bg-[#111214]/92 border border-[#1A1C20] focus-within:border-[#A78BFA]/80 rounded-2xl p-2 sm:p-2.5 transition-all duration-300 shadow-[0_25px_60px_rgba(0,0,0,0.95)] backdrop-blur-2xl">
+            <div className="pl-2.5 text-[#A78BFA] shrink-0">
+              <LinkIcon className="w-4 h-4 opacity-85" />
             </div>
 
             <input
@@ -71,7 +71,7 @@ export default function HeroProductDemo({ onMoviesAdded, onImportSubmit }: HeroP
               onChange={(e) => setInputText(e.target.value)}
               placeholder="Paste an Instagram Reel, TikTok, YouTube or Letterboxd link..."
               disabled={isExtractingReal}
-              className="w-full bg-transparent px-1 py-1.5 text-xs sm:text-sm text-[#F5F5F3] placeholder-[#A7A7A2]/45 focus:outline-none border-0 font-sans tracking-wide"
+              className="w-full bg-transparent px-1 py-1.5 text-xs sm:text-sm text-[#F3EEE8] placeholder-[#A8A4B3]/50 focus:outline-none border-0 font-sans tracking-wide"
             />
 
             <button
@@ -80,7 +80,7 @@ export default function HeroProductDemo({ onMoviesAdded, onImportSubmit }: HeroP
               className={`px-4 sm:px-5 py-2 rounded-xl text-xs font-sans font-semibold flex items-center justify-center gap-2 shrink-0 transition-all duration-300 ${
                 inputText.trim() && !isExtractingReal
                   ? 'bg-[#7F72FF] hover:bg-[#8F83FF] text-white shadow-[0_0_24px_rgba(127,114,255,0.45)] cursor-pointer hover:scale-[1.02] active:scale-[0.98]'
-                  : 'bg-[#1A1C20] text-[#A7A7A2]/35 cursor-not-allowed'
+                  : 'bg-[#1A1C20] text-[#A8A4B3]/35 cursor-not-allowed'
               }`}
             >
               {isExtractingReal ? (
