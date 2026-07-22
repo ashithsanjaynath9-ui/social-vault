@@ -16,8 +16,8 @@ import {
 } from 'lucide-react';
 import { Movie } from '../types';
 import { detectPlatform } from '../utils';
-import HeroFilmStrip from './HeroFilmStrip';
 import CinemaAtmosphere from './CinemaAtmosphere';
+import HeroProductDemo from './HeroProductDemo';
 
 interface HomeScreenProps {
   movies?: Movie[];
@@ -44,9 +44,8 @@ export default function HomeScreen({
   const inputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleImport = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!inputText.trim()) return;
+  const handleImportWithText = async (textToExtract: string) => {
+    if (!textToExtract.trim()) return;
 
     setIsExtracting(true);
     setError(null);
@@ -54,8 +53,8 @@ export default function HomeScreen({
     setSuccessMessage(null);
 
     try {
-      const isUrl = inputText.trim().startsWith('http://') || inputText.trim().startsWith('https://');
-      const platform = detectPlatform(inputText, '');
+      const isUrl = textToExtract.trim().startsWith('http://') || textToExtract.trim().startsWith('https://');
+      const platform = detectPlatform(textToExtract, '');
 
       const response = await fetch('/api/extract', {
         method: 'POST',
@@ -63,8 +62,8 @@ export default function HomeScreen({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          text: inputText,
-          url: isUrl ? inputText : undefined,
+          text: textToExtract,
+          url: isUrl ? textToExtract : undefined,
         }),
       });
 
@@ -74,16 +73,16 @@ export default function HomeScreen({
       }
 
       if (!data.movies || data.movies.length === 0) {
-        throw new Error("We couldn't find any movie recommendations in that link. Try pasting a direct post link or switching to text mode.");
+        throw new Error("We couldn't find any movie recommendations in that link.");
       }
 
       const decorated = data.movies.map((m: any) => ({
         ...m,
         socialSource: {
           platform,
-          url: isUrl ? inputText : undefined,
+          url: isUrl ? textToExtract : undefined,
           author: m.socialSource?.author || 'Recommendation',
-          textSnippet: inputText.substring(0, 100) + '...'
+          textSnippet: textToExtract.substring(0, 100) + '...'
         }
       }));
 
@@ -97,6 +96,7 @@ export default function HomeScreen({
     } catch (err: any) {
       console.error(err);
       setError(err.message || 'Something went wrong while identifying movies.');
+      throw err;
     } finally {
       setIsExtracting(false);
     }
@@ -136,161 +136,47 @@ export default function HomeScreen({
       {/* Multi-layered Cinema Environmental Atmosphere */}
       <CinemaAtmosphere />
 
-      {/* Animated 35mm Film Reel Background */}
-      <HeroFilmStrip />
+      {/* Center Main Product Demonstration Hero Area */}
+      <HeroProductDemo 
+        onMoviesAdded={onMoviesAdded} 
+        onImportSubmit={handleImportWithText} 
+      />
 
-      {/* Center Main Content: Headline, Subtext, Compact Input - Grouped tightly as ONE block */}
-      <div className="relative z-20 w-full max-w-2xl mx-auto px-4 pointer-events-auto my-auto pt-6 sm:pt-8 pb-10 flex flex-col items-center">
-        
-        {/* Soft Radial Spotlight Behind Hero Copy */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[60%] w-[480px] h-[280px] bg-radial from-[#7F72FF]/12 via-[#7F72FF]/02 to-transparent blur-3xl pointer-events-none rounded-full z-0" />
+      {/* Global Error Feedback */}
+      <AnimatePresence>
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 max-w-xl w-full mx-auto bg-red-950/80 border border-red-900/80 rounded-2xl p-3.5 flex items-start gap-2.5 text-xs text-red-300 text-left backdrop-blur-xl shadow-2xl"
+          >
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-400" />
+            <p className="flex-1">{error}</p>
+            <button 
+              onClick={() => setError(null)}
+              className="text-red-400 hover:text-red-200 cursor-pointer"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-        {/* Text Block: Headline & Supporting Subtext (18px spacing) */}
-        <div className="relative z-10 space-y-[18px]">
-          <h1 className="text-2xl sm:text-[2.1rem] md:text-[2.35rem] font-display font-normal tracking-[-0.015em] text-[#F5F5F3] leading-[1.2] drop-shadow-[0_10px_25px_rgba(0,0,0,0.95)]">
-            Collect movies.<br />
-            <span className="font-light italic text-[#7F72FF]">Not screenshots.</span>
-          </h1>
-
-          <p className="text-[#A7A7A2] text-xs sm:text-[13.5px] max-w-md mx-auto font-sans font-normal leading-relaxed drop-shadow-md">
-            Save recommendations from Instagram, TikTok, YouTube and friends.<br className="hidden sm:inline" />
-            Find them when it matters.
-          </p>
-        </div>
-
-        {/* COMPACT CAPTURE INPUT - 24px spacing from subheading */}
-        <div className="relative z-10 w-full mt-6">
-          <form onSubmit={handleImport} className="w-full max-w-lg mx-auto">
-            <div className="bg-[#111214]/95 border border-[#1A1C20] focus-within:border-[#7F72FF]/80 rounded-2xl p-2 sm:p-2.5 transition-all duration-300 shadow-[0_20px_50px_rgba(0,0,0,0.8)] backdrop-blur-xl">
-              
-              {!isTextMode ? (
-                /* Mode 1: Compact Single-Line Link Input */
-                <div className="flex items-center gap-2">
-                  <div className="pl-2.5 text-[#7F72FF] shrink-0">
-                    <LinkIcon className="w-4 h-4" />
-                  </div>
-                  
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    value={inputText}
-                    onChange={(e) => setInputText(e.target.value)}
-                    placeholder="Paste an Instagram Reel, TikTok, YouTube or movie link..."
-                    disabled={isExtracting}
-                    className="w-full bg-transparent px-1 py-2 text-xs sm:text-sm text-[#F5F5F3] placeholder-[#A7A7A2]/60 focus:outline-none border-0 font-sans"
-                  />
-
-                  <motion.button
-                    type="submit"
-                    disabled={!inputText.trim() || isExtracting}
-                    whileHover={inputText.trim() && !isExtracting ? { scale: 1.03 } : {}}
-                    whileTap={inputText.trim() && !isExtracting ? { scale: 0.97 } : {}}
-                    className={`px-5 py-2.5 rounded-xl text-xs font-sans font-semibold flex items-center justify-center gap-1.5 shrink-0 transition-all duration-200 ${
-                      inputText.trim() && !isExtracting
-                        ? 'bg-[#7F72FF] text-white cursor-pointer shadow-[0_0_20px_rgba(127,114,255,0.4)]'
-                        : 'bg-[#1A1C20] text-[#A7A7A2]/50 cursor-not-allowed'
-                    }`}
-                  >
-                    <span>Extract</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </motion.button>
-                </div>
-              ) : (
-                /* Mode 2: Multiline Textarea Mode */
-                <div className="space-y-2">
-                  <textarea
-                    ref={textareaRef}
-                    value={inputText}
-                    onChange={(e) => setInputText(e.target.value)}
-                    placeholder="Paste raw text, transcript, or movie recommendation notes..."
-                    rows={3}
-                    disabled={isExtracting}
-                    className="w-full bg-transparent px-3 py-2 text-xs sm:text-sm text-[#F5F5F3] placeholder-[#A7A7A2]/60 focus:outline-none resize-none border-0 font-sans leading-relaxed"
-                  />
-                  
-                  <div className="flex items-center justify-between pt-2 px-1 border-t border-[#1A1C20]">
-                    <span className="text-[11px] text-[#A7A7A2] font-mono">
-                      Extracts titles & details instantly
-                    </span>
-                    
-                    <motion.button
-                      type="submit"
-                      disabled={!inputText.trim() || isExtracting}
-                      whileHover={inputText.trim() && !isExtracting ? { scale: 1.03 } : {}}
-                      whileTap={inputText.trim() && !isExtracting ? { scale: 0.97 } : {}}
-                      className={`px-4 py-2 rounded-xl text-xs font-sans font-semibold flex items-center justify-center gap-1.5 transition-all duration-200 ${
-                        inputText.trim() && !isExtracting
-                          ? 'bg-[#7F72FF] text-white cursor-pointer shadow-[0_0_20px_rgba(127,114,255,0.4)]'
-                          : 'bg-[#1A1C20] text-[#A7A7A2]/50 cursor-not-allowed'
-                      }`}
-                    >
-                      <span>Extract Titles</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </motion.button>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Secondary Action: Toggle between link and raw text mode */}
-            <div className="mt-2.5 flex items-center justify-center">
-              <button
-                type="button"
-                onClick={() => setIsTextMode(!isTextMode)}
-                className="inline-flex items-center gap-1.5 text-[11px] font-sans text-[#A7A7A2] hover:text-[#F5F5F3] transition-colors cursor-pointer py-1 px-2 rounded-lg hover:bg-[#111214]/60"
-              >
-                {isTextMode ? (
-                  <>
-                    <LinkIcon className="w-3 h-3 text-[#7F72FF]" />
-                    <span>Paste a link instead</span>
-                  </>
-                ) : (
-                  <>
-                    <FileText className="w-3 h-3 text-[#7F72FF]" />
-                    <span>Paste text instead</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
-
-          {/* Error Feedback */}
-          <AnimatePresence>
-            {error && (
-              <motion.div
-                initial={{ opacity: 0, y: -8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                className="mt-3 max-w-xl mx-auto bg-red-950/40 border border-red-900/60 rounded-xl p-3 flex items-start gap-2.5 text-xs text-red-300 text-left backdrop-blur-md"
-              >
-                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-400" />
-                <p className="flex-1">{error}</p>
-                <button 
-                  onClick={() => setError(null)}
-                  className="text-red-400 hover:text-red-200 cursor-pointer"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Success Feedback */}
-          <AnimatePresence>
-            {successMessage && (
-              <motion.div
-                initial={{ opacity: 0, y: -8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                className="mt-3 max-w-xl mx-auto bg-emerald-950/40 border border-emerald-900/60 rounded-xl p-3 flex items-center gap-2.5 text-xs text-emerald-300 backdrop-blur-md"
-              >
-                <Check className="w-4 h-4 shrink-0 text-emerald-400" />
-                <p className="flex-1 text-left">{successMessage}</p>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </div>
+      {/* Global Success Feedback */}
+      <AnimatePresence>
+        {successMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 max-w-xl w-full mx-auto bg-emerald-950/80 border border-emerald-900/80 rounded-2xl p-3.5 flex items-center gap-2.5 text-xs text-emerald-300 backdrop-blur-xl shadow-2xl"
+          >
+            <Check className="w-4 h-4 shrink-0 text-emerald-400" />
+            <p className="flex-1 text-left">{successMessage}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Empty bottom spacer for balance */}
       <div className="relative z-20 pb-2 pointer-events-none" />

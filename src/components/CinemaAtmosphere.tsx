@@ -43,44 +43,44 @@ export default function CinemaAtmosphere() {
       <div className="absolute inset-y-0 left-0 w-28 bg-gradient-to-r from-black/75 to-transparent pointer-events-none" />
       <div className="absolute inset-y-0 right-0 w-28 bg-gradient-to-l from-black/75 to-transparent pointer-events-none" />
 
-      {/* LAYER 2: Soft Midnight Indigo Atmosphere */}
+      {/* LAYER 2: Soft Midnight Indigo & Top-Center Projector Atmosphere */}
       <div 
-        className="absolute inset-0 opacity-40" 
+        className="absolute inset-0 opacity-50 pointer-events-none" 
         style={{
-          background: 'radial-gradient(circle at 50% 42%, rgba(15, 18, 30, 0.6) 0%, rgba(9, 10, 16, 0.4) 45%, rgba(5, 5, 5, 0) 80%)'
+          background: 'radial-gradient(ellipse 70% 55% at 50% 25%, rgba(127, 114, 255, 0.09) 0%, rgba(20, 22, 36, 0.45) 45%, rgba(5, 5, 5, 0) 85%)'
         }}
       />
 
-      {/* LAYER 3: Extremely Soft Radial Spotlight Behind Headline (Micro Breathing) */}
+      {/* LAYER 3: Soft Upper-Center Projector Spotlight (Gentle falloff pulling attention to headline & capture bar, no visible beams) */}
       <motion.div
         animate={{
-          opacity: [0.035, 0.055, 0.035],
-          scale: [0.97, 1.03, 0.97],
-        }}
-        transition={{
-          duration: 16,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-        className="absolute top-[38%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[380px] rounded-full blur-[110px] pointer-events-none"
-        style={{
-          background: 'radial-gradient(circle, rgba(127, 114, 255, 0.8) 0%, rgba(127, 114, 255, 0.15) 50%, transparent 80%)'
-        }}
-      />
-
-      {/* LAYER 4: Subtle Illumination Behind Animated Film Reel (Projector Catch Light) */}
-      <motion.div
-        animate={{
-          opacity: [0.02, 0.035, 0.02],
+          opacity: [0.06, 0.09, 0.06],
+          scale: [0.98, 1.02, 0.98],
         }}
         transition={{
           duration: 14,
           repeat: Infinity,
           ease: "easeInOut"
         }}
-        className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[900px] h-[450px] rounded-full blur-[130px] pointer-events-none"
+        className="absolute top-[22%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[720px] h-[420px] rounded-full blur-[120px] pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse at center, rgba(127, 114, 255, 0.25) 0%, rgba(200, 210, 255, 0.08) 40%, transparent 75%)'
+          background: 'radial-gradient(circle at center, rgba(160, 150, 255, 0.75) 0%, rgba(127, 114, 255, 0.18) 45%, transparent 75%)'
+        }}
+      />
+
+      {/* LAYER 4: Soft Subdued Ambient Glow Behind Film Reel */}
+      <motion.div
+        animate={{
+          opacity: [0.03, 0.05, 0.03],
+        }}
+        transition={{
+          duration: 16,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+        className="absolute top-[48%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1100px] h-[350px] rounded-full blur-[140px] pointer-events-none"
+        style={{
+          background: 'radial-gradient(ellipse at center, rgba(127, 114, 255, 0.3) 0%, rgba(90, 80, 200, 0.08) 50%, transparent 80%)'
         }}
       />
 
