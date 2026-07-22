@@ -20,7 +20,7 @@ export interface FilmItem {
 // Interleaved genres, balanced light/dark tone, 2:3 aspect ratio
 // =========================================================================
 
-// LAYER 1: FOREGROUND (20 Official Posters)
+// LAYER 1: FOREGROUND (20 Official Posters - Calmer dark palette in center slots)
 const LAYER_1_MOVIES: FilmItem[] = [
   {
     id: 'l1-1',
@@ -32,86 +32,22 @@ const LAYER_1_MOVIES: FilmItem[] = [
   },
   {
     id: 'l1-2',
-    title: 'La La Land',
-    year: 2016,
-    genre: 'Romance',
-    posterUrl: 'https://image.tmdb.org/t/p/w780/uDO8183183.jpg',
+    title: 'Blade Runner 2049',
+    year: 2017,
+    genre: 'Mind-Bending Sci-Fi',
+    posterUrl: 'https://image.tmdb.org/t/p/w780/gA9L31215.jpg',
     backupPosterUrl: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80'
   },
   {
     id: 'l1-3',
-    title: 'The Dark Knight',
-    year: 2008,
-    genre: 'Action',
-    posterUrl: 'https://image.tmdb.org/t/p/w780/qJ2tCh211.jpg',
-    backupPosterUrl: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=600&q=80'
+    title: 'Arrival',
+    year: 2016,
+    genre: 'Mind-Bending Sci-Fi',
+    posterUrl: 'https://image.tmdb.org/t/p/w780/x2LSRK2Cm7MZhjluni1msVJ3wDF.jpg',
+    backupPosterUrl: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80'
   },
   {
     id: 'l1-4',
-    title: 'Spirited Away',
-    year: 2001,
-    genre: 'Anime',
-    posterUrl: 'https://image.tmdb.org/t/p/w780/393911.jpg',
-    backupPosterUrl: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80'
-  },
-  {
-    id: 'l1-5',
-    title: 'Parasite',
-    year: 2019,
-    genre: 'Drama',
-    posterUrl: 'https://image.tmdb.org/t/p/w780/7IiT38S9S3A3M333qZ4N3162395.jpg',
-    backupPosterUrl: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=600&q=80'
-  },
-  {
-    id: 'l1-6',
-    title: 'The Grand Budapest Hotel',
-    year: 2014,
-    genre: 'Comedy',
-    posterUrl: 'https://image.tmdb.org/t/p/w780/eA22oA3.jpg',
-    backupPosterUrl: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=80'
-  },
-  {
-    id: 'l1-7',
-    title: 'Dune: Part Two',
-    year: 2024,
-    genre: 'Fantasy / Adventure',
-    posterUrl: 'https://image.tmdb.org/t/p/w780/1pdfLPoA6S3C239.jpg',
-    backupPosterUrl: 'https://images.unsplash.com/photo-1547483238-f400e65ccd56?auto=format&fit=crop&w=600&q=80'
-  },
-  {
-    id: 'l1-8',
-    title: 'Get Out',
-    year: 2017,
-    genre: 'Horror',
-    posterUrl: 'https://image.tmdb.org/t/p/w780/t2f2f3e821.jpg',
-    backupPosterUrl: 'https://images.unsplash.com/photo-1509281373149-e957c6296406?auto=format&fit=crop&w=600&q=80'
-  },
-  {
-    id: 'l1-9',
-    title: 'Pulp Fiction',
-    year: 1994,
-    genre: 'Cult Classics',
-    posterUrl: 'https://image.tmdb.org/t/p/w780/d5N022trI393911.jpg',
-    backupPosterUrl: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=600&q=80'
-  },
-  {
-    id: 'l1-10',
-    title: 'Amélie',
-    year: 2001,
-    genre: 'International Cinema',
-    posterUrl: 'https://image.tmdb.org/t/p/w780/bd93.jpg',
-    backupPosterUrl: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=600&q=80'
-  },
-  {
-    id: 'l1-11',
-    title: 'Inception',
-    year: 2010,
-    genre: 'Mind-Bending Sci-Fi',
-    posterUrl: 'https://image.tmdb.org/t/p/w780/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg',
-    backupPosterUrl: 'https://images.unsplash.com/photo-1500462818027-61845479a950?auto=format&fit=crop&w=600&q=80'
-  },
-  {
-    id: 'l1-12',
     title: 'Past Lives',
     year: 2023,
     genre: 'Romance',
@@ -119,23 +55,55 @@ const LAYER_1_MOVIES: FilmItem[] = [
     backupPosterUrl: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=600&q=80'
   },
   {
-    id: 'l1-13',
-    title: 'Mad Max: Fury Road',
-    year: 2015,
+    id: 'l1-5',
+    title: 'Dune: Part Two',
+    year: 2024,
+    genre: 'Fantasy / Adventure',
+    posterUrl: 'https://image.tmdb.org/t/p/w780/1pdfLPoA6S3C239.jpg',
+    backupPosterUrl: 'https://images.unsplash.com/photo-1547483238-f400e65ccd56?auto=format&fit=crop&w=600&q=80'
+  },
+  {
+    id: 'l1-6',
+    title: 'Inception',
+    year: 2010,
+    genre: 'Mind-Bending Sci-Fi',
+    posterUrl: 'https://image.tmdb.org/t/p/w780/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg',
+    backupPosterUrl: 'https://images.unsplash.com/photo-1500462818027-61845479a950?auto=format&fit=crop&w=600&q=80'
+  },
+  {
+    id: 'l1-7',
+    title: 'The Prestige',
+    year: 2006,
+    genre: 'Cult Classics',
+    posterUrl: 'https://image.tmdb.org/t/p/w780/bd93848.jpg',
+    backupPosterUrl: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=600&q=80'
+  },
+  {
+    id: 'l1-8',
+    title: 'The Dark Knight',
+    year: 2008,
     genre: 'Action',
-    posterUrl: 'https://image.tmdb.org/t/p/w780/8tA22oA3.jpg',
+    posterUrl: 'https://image.tmdb.org/t/p/w780/qJ2tCh211.jpg',
     backupPosterUrl: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=600&q=80'
   },
   {
-    id: 'l1-14',
-    title: 'Your Name',
-    year: 2016,
-    genre: 'Anime',
-    posterUrl: 'https://image.tmdb.org/t/p/w780/kA22oA3.jpg',
-    backupPosterUrl: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=600&q=80'
+    id: 'l1-9',
+    title: 'Ex Machina',
+    year: 2014,
+    genre: 'Mind-Bending Sci-Fi',
+    posterUrl: 'https://image.tmdb.org/t/p/w780/dmJw8A3sL3PqS6.jpg',
+    backupPosterUrl: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80'
   },
   {
-    id: 'l1-15',
+    id: 'l1-10',
+    title: 'Her',
+    year: 2013,
+    genre: 'Romance',
+    posterUrl: 'https://image.tmdb.org/t/p/w780/eP1f2f3e821.jpg',
+    backupPosterUrl: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=600&q=80'
+  },
+  {
+    id: 'l1-11',
     title: 'The Shawshank Redemption',
     year: 1994,
     genre: 'Drama',
@@ -143,44 +111,76 @@ const LAYER_1_MOVIES: FilmItem[] = [
     backupPosterUrl: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=600&q=80'
   },
   {
-    id: 'l1-16',
-    title: 'Superbad',
-    year: 2007,
-    genre: 'Comedy',
-    posterUrl: 'https://image.tmdb.org/t/p/w780/aA22oA3.jpg',
-    backupPosterUrl: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=600&q=80'
+    id: 'l1-12',
+    title: 'Parasite',
+    year: 2019,
+    genre: 'Drama',
+    posterUrl: 'https://image.tmdb.org/t/p/w780/7IiT38S9S3A3M333qZ4N3162395.jpg',
+    backupPosterUrl: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=600&q=80'
   },
   {
-    id: 'l1-17',
-    title: 'The Lord of the Rings: The Return of the King',
-    year: 2003,
-    genre: 'Fantasy / Adventure',
-    posterUrl: 'https://image.tmdb.org/t/p/w780/rC24239.jpg',
+    id: 'l1-13',
+    title: 'Spirited Away',
+    year: 2001,
+    genre: 'Anime',
+    posterUrl: 'https://image.tmdb.org/t/p/w780/393911.jpg',
+    backupPosterUrl: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80'
+  },
+  {
+    id: 'l1-14',
+    title: 'Amélie',
+    year: 2001,
+    genre: 'International Cinema',
+    posterUrl: 'https://image.tmdb.org/t/p/w780/bd93.jpg',
+    backupPosterUrl: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=600&q=80'
+  },
+  {
+    id: 'l1-15',
+    title: 'The Godfather',
+    year: 1972,
+    genre: 'Drama',
+    posterUrl: 'https://image.tmdb.org/t/p/w780/3bhkrj58Vtu7enYsA2f2f3e821.jpg',
+    backupPosterUrl: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=600&q=80'
+  },
+  {
+    id: 'l1-16',
+    title: 'La La Land',
+    year: 2016,
+    genre: 'Romance',
+    posterUrl: 'https://image.tmdb.org/t/p/w780/uDO8183183.jpg',
     backupPosterUrl: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80'
   },
   {
+    id: 'l1-17',
+    title: 'Pulp Fiction',
+    year: 1994,
+    genre: 'Cult Classics',
+    posterUrl: 'https://image.tmdb.org/t/p/w780/d5N022trI393911.jpg',
+    backupPosterUrl: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=600&q=80'
+  },
+  {
     id: 'l1-18',
-    title: 'The Shining',
-    year: 1980,
+    title: 'Get Out',
+    year: 2017,
     genre: 'Horror',
-    posterUrl: 'https://image.tmdb.org/t/p/w780/x2f2f3e821.jpg',
+    posterUrl: 'https://image.tmdb.org/t/p/w780/t2f2f3e821.jpg',
     backupPosterUrl: 'https://images.unsplash.com/photo-1509281373149-e957c6296406?auto=format&fit=crop&w=600&q=80'
   },
   {
     id: 'l1-19',
-    title: 'Fight Club',
-    year: 1999,
-    genre: 'Cult Classics',
-    posterUrl: 'https://image.tmdb.org/t/p/w780/pB8BM7pdSp6B3.jpg',
-    backupPosterUrl: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=600&q=80'
+    title: 'The Grand Budapest Hotel',
+    year: 2014,
+    genre: 'Comedy',
+    posterUrl: 'https://image.tmdb.org/t/p/w780/eA22oA3.jpg',
+    backupPosterUrl: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=80'
   },
   {
     id: 'l1-20',
-    title: 'City of God',
-    year: 2002,
-    genre: 'International Cinema',
-    posterUrl: 'https://image.tmdb.org/t/p/w780/qA22oA3.jpg',
-    backupPosterUrl: 'https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=600&q=80'
+    title: 'Mad Max: Fury Road',
+    year: 2015,
+    genre: 'Action',
+    posterUrl: 'https://image.tmdb.org/t/p/w780/8tA22oA3.jpg',
+    backupPosterUrl: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=600&q=80'
   }
 ];
 
@@ -549,13 +549,13 @@ function MoviePosterCard({
         whileHover={{ 
           scale: 1.06,
           translateY: waveY - 12,
-          filter: "brightness(1.15)",
+          filter: "brightness(1.2)",
           transition: { duration: 0.2, ease: "easeOut" }
         }}
-        className="group relative w-44 sm:w-56 md:w-64 h-[264px] sm:h-[336px] md:h-[384px] flex-shrink-0 bg-zinc-950 rounded-xl overflow-hidden border-[4px] sm:border-[6px] border-[#13151c] shadow-[0_25px_50px_rgba(0,0,0,0.92)] cursor-pointer ring-1 ring-white/10 transition-all duration-300 hover:border-[#7F72FF] hover:shadow-[0_20px_60px_rgba(127,114,255,0.4)] z-10"
+        className="group relative w-44 sm:w-56 md:w-64 h-[264px] sm:h-[336px] md:h-[384px] flex-shrink-0 bg-zinc-950 rounded-xl overflow-hidden border-[4px] sm:border-[5px] border-[#13151c]/90 shadow-[0_25px_50px_rgba(0,0,0,0.92)] cursor-pointer ring-1 ring-white/10 opacity-70 hover:opacity-100 transition-all duration-300 hover:border-[#7F72FF] hover:shadow-[0_20px_60px_rgba(127,114,255,0.4)] z-10"
       >
         {/* Subtle Celluloid Reflection Sheen */}
-        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent opacity-20 group-hover:opacity-50 transition-opacity duration-300 pointer-events-none z-20" />
+        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent opacity-15 group-hover:opacity-50 transition-opacity duration-300 pointer-events-none z-20" />
 
         {/* Real Official Movie Poster Artwork - Fills the Frame */}
         <img
@@ -576,7 +576,7 @@ function MoviePosterCard({
         style={{ 
           transform: `translateY(${waveY}px) rotate(${waveRotate}deg)`
         }}
-        className="relative w-36 sm:w-48 h-[216px] sm:h-[288px] flex-shrink-0 bg-zinc-950 rounded-lg overflow-hidden border-[3px] border-[#11141f] shadow-2xl"
+        className="relative w-36 sm:w-48 h-[216px] sm:h-[288px] flex-shrink-0 bg-zinc-950 rounded-lg overflow-hidden border-[3px] border-[#11141f] shadow-2xl opacity-60"
       >
         <img
           src={imgSrc}
@@ -595,7 +595,7 @@ function MoviePosterCard({
       style={{ 
         transform: `translateY(${waveY}px) rotate(${waveRotate}deg)`
       }}
-      className="relative w-28 sm:w-40 h-[168px] sm:h-[240px] flex-shrink-0 bg-zinc-950 rounded-md overflow-hidden border-[2px] border-[#0d1017] shadow-xl"
+      className="relative w-28 sm:w-40 h-[168px] sm:h-[240px] flex-shrink-0 bg-zinc-950 rounded-md overflow-hidden border-[2px] border-[#0d1017] shadow-xl opacity-50"
     >
       <img
         src={imgSrc}
@@ -613,11 +613,11 @@ export default function HeroFilmStrip() {
     <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none select-none z-0 flex items-end justify-center pb-2">
       
       {/* Deep Atmospheric Charcoal & Violet Cinema Lighting Base */}
-      <div className="absolute inset-0 bg-radial from-[#111214]/60 via-[#070708]/80 to-[#070708] blur-3xl opacity-90" />
-      <div className="absolute w-[140%] h-[500px] bg-gradient-to-r from-[#7F72FF]/10 via-[#A3B0FF]/12 to-[#7F72FF]/10 blur-3xl transform -rotate-3" />
+      <div className="absolute inset-0 bg-radial from-[#0E121E]/70 via-[#070708]/90 to-[#070708] blur-3xl opacity-90" />
+      <div className="absolute w-[140%] h-[500px] bg-gradient-to-r from-[#7F72FF]/08 via-[#A3B0FF]/08 to-[#7F72FF]/08 blur-3xl transform -rotate-3" />
 
-      {/* THREE LAYER PERSPECTIVE STACK */}
-      <div className="relative w-full h-full flex flex-col justify-end items-center pointer-events-auto">
+      {/* THREE LAYER PERSPECTIVE STACK - Moved down ~140px to leave generous empty space for typography */}
+      <div className="relative w-full h-full flex flex-col justify-end items-center pointer-events-auto transform translate-y-[135px] sm:translate-y-[150px]">
 
         {/* ==========================================
             LAYER 3: DEEPEST BACKGROUND (40% Speed, Soft Blur, 20 Curated Iconic Films)
@@ -626,8 +626,8 @@ export default function HeroFilmStrip() {
           style={{
             transform: 'perspective(1800px) rotateX(15deg) rotateY(-4deg) translateY(-130px) scale(0.95)',
             transformStyle: 'preserve-3d',
-            filter: 'blur(3.5px) brightness(0.65)',
-            opacity: 0.38
+            filter: 'blur(3.5px) brightness(0.6)',
+            opacity: 0.32
           }}
           className="absolute bottom-16 w-[170%] z-0"
         >
@@ -673,8 +673,8 @@ export default function HeroFilmStrip() {
           style={{
             transform: 'perspective(1600px) rotateX(13deg) rotateY(-3deg) translateY(-65px) scale(1.1)',
             transformStyle: 'preserve-3d',
-            filter: 'blur(1.5px) brightness(0.85)',
-            opacity: 0.65
+            filter: 'blur(1.5px) brightness(0.75)',
+            opacity: 0.48
           }}
           className="absolute bottom-10 w-[165%] z-10"
         >
@@ -714,14 +714,14 @@ export default function HeroFilmStrip() {
         </div>
 
         {/* ==========================================
-            LAYER 1: FOREGROUND (100% Speed, Sharp & Vivid, 20 Curated Iconic Films)
+            LAYER 1: FOREGROUND (100% Speed, Sharp & Ambient 50% opacity, 20 Curated Iconic Films)
            ========================================== */}
         <div 
           style={{
             transform: 'perspective(1500px) rotateX(10deg) rotateY(-2deg) scale(1.3)',
             transformStyle: 'preserve-3d',
             filter: 'blur(0px)',
-            opacity: 0.96
+            opacity: 0.52
           }}
           className="relative w-[160%] z-20 py-6 sm:py-8"
         >

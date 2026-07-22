@@ -135,34 +135,28 @@ export default function HomeScreen({
       {/* Animated 35mm Film Reel Background */}
       <HeroFilmStrip />
 
-      {/* Top Floating Badge */}
-      <div className="relative z-20 pt-2 pointer-events-auto">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 bg-[#111214]/90 border border-[#7F72FF]/30 rounded-full backdrop-blur-md shadow-lg">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#7F72FF] animate-pulse" />
-          <p className="text-[10px] tracking-widest uppercase font-semibold text-[#7F72FF] font-mono">
-            CineSave • Instant Capture
-          </p>
-        </div>
-      </div>
-
-      {/* Center Main Content: Headline, Subtext, Compact Input */}
-      <div className="relative z-20 w-full max-w-2xl mx-auto space-y-5 px-2 pointer-events-auto my-auto">
+      {/* Center Main Content: Headline, Subtext, Compact Input - Grouped tightly as ONE block */}
+      <div className="relative z-20 w-full max-w-2xl mx-auto px-4 pointer-events-auto my-auto pt-6 sm:pt-8 pb-10 flex flex-col items-center">
         
-        {/* Headline & Supporting Subtext */}
-        <div className="space-y-3">
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-display font-light tracking-tight text-[#F5F5F3] drop-shadow-[0_10px_25px_rgba(0,0,0,0.9)] leading-[1.12]">
-            A home for every movie <br className="hidden sm:inline" />
-            you've been <span className="italic text-transparent bg-clip-text bg-gradient-to-r from-[#D0CBFF] via-[#7F72FF] to-[#B0A7FF]">meaning to watch.</span>
+        {/* Soft Radial Spotlight Behind Hero Copy */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[60%] w-[480px] h-[280px] bg-radial from-[#7F72FF]/12 via-[#7F72FF]/02 to-transparent blur-3xl pointer-events-none rounded-full z-0" />
+
+        {/* Text Block: Headline & Supporting Subtext (18px spacing) */}
+        <div className="relative z-10 space-y-[18px]">
+          <h1 className="text-2xl sm:text-[2.1rem] md:text-[2.35rem] font-display font-normal tracking-[-0.015em] text-[#F5F5F3] leading-[1.2] drop-shadow-[0_10px_25px_rgba(0,0,0,0.95)]">
+            Collect movies.<br />
+            <span className="font-light italic text-[#7F72FF]">Not screenshots.</span>
           </h1>
 
-          <p className="text-[#A7A7A2] text-xs sm:text-sm max-w-lg mx-auto font-normal leading-relaxed drop-shadow-md">
-            Save recommendations from anywhere. Organize. Remember. Finally watch.
+          <p className="text-[#A7A7A2] text-xs sm:text-[13.5px] max-w-md mx-auto font-sans font-normal leading-relaxed drop-shadow-md">
+            Save recommendations from Instagram, TikTok, YouTube and friends.<br className="hidden sm:inline" />
+            Find them when it matters.
           </p>
         </div>
 
-        {/* COMPACT CAPTURE INPUT (Link-First with Text Toggle) */}
-        <div className="pt-2">
-          <form onSubmit={handleImport} className="w-full max-w-xl mx-auto">
+        {/* COMPACT CAPTURE INPUT - 24px spacing from subheading */}
+        <div className="relative z-10 w-full mt-6">
+          <form onSubmit={handleImport} className="w-full max-w-lg mx-auto">
             <div className="bg-[#111214]/95 border border-[#1A1C20] focus-within:border-[#7F72FF]/80 rounded-2xl p-2 sm:p-2.5 transition-all duration-300 shadow-[0_20px_50px_rgba(0,0,0,0.8)] backdrop-blur-xl">
               
               {!isTextMode ? (
