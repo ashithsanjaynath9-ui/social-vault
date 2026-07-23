@@ -63,10 +63,10 @@ const CAROUSEL_MOVIES: DemoMovieCard[] = [
   },
   {
     id: 'demo-5',
-    title: 'Inception',
-    displayTitle: 'INCEPTION',
-    posterUrl: 'https://images.unsplash.com/photo-1500462818027-61845479a950?auto=format&fit=crop&w=600&q=80',
-    backupPosterUrl: 'https://images.unsplash.com/photo-1500462818027-61845479a950?auto=format&fit=crop&w=600&q=80'
+    title: 'The Matrix',
+    displayTitle: 'THE MATRIX',
+    posterUrl: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80',
+    backupPosterUrl: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80'
   },
   {
     id: 'demo-6',
