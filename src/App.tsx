@@ -22,7 +22,7 @@ export default function App() {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [activeIdentity, setActiveIdentity] = useState<IdentityId>(() => {
     try {
-      const saved = localStorage.getItem('cinesave_identity');
+      const saved = localStorage.getItem('plot_identity');
       return (saved as IdentityId) || 'bookmark';
     } catch {
       return 'bookmark';
@@ -45,7 +45,8 @@ export default function App() {
     return IDENTITY_DIRECTIONS.find(d => d.id === activeIdentity) || IDENTITY_DIRECTIONS[0];
   }, [activeIdentity]);
 
-  // Onboarding
+  // User Account & Onboarding State
+  const [userEmail, setUserEmail] = useState<string>('batman@gotham.com');
   const [onboardingComplete, setOnboardingComplete] = useState<boolean>(false);
 
   // Premium Toast Notification State & Auto-dismiss (Delight Moment 3)
@@ -64,17 +65,17 @@ export default function App() {
   useEffect(() => {
     try {
       // Load watch list
-      const stored = localStorage.getItem('cine_extractor_watchlist');
+      const stored = localStorage.getItem('plot_watchlist') || localStorage.getItem('cine_extractor_watchlist');
       if (stored) {
         setMovies(JSON.parse(stored));
       } else {
         // Hydrate with default elegant curated movies if empty
         setMovies(INITIAL_MOVIES);
-        localStorage.setItem('cine_extractor_watchlist', JSON.stringify(INITIAL_MOVIES));
+        localStorage.setItem('plot_watchlist', JSON.stringify(INITIAL_MOVIES));
       }
 
       // Load onboarding progress state
-      const onboardingStored = localStorage.getItem('cine_save_onboarding_complete');
+      const onboardingStored = localStorage.getItem('plot_onboarding_complete') || localStorage.getItem('cine_save_onboarding_complete');
       if (onboardingStored === 'true') {
         setOnboardingComplete(true);
       }
@@ -88,13 +89,13 @@ export default function App() {
 
   useEffect(() => {
     if (isLoaded) {
-      localStorage.setItem('cine_extractor_watchlist', JSON.stringify(movies));
+      localStorage.setItem('plot_watchlist', JSON.stringify(movies));
     }
   }, [movies, isLoaded]);
 
   useEffect(() => {
     if (isLoaded) {
-      localStorage.setItem('cinesave_identity', activeIdentity);
+      localStorage.setItem('plot_identity', activeIdentity);
     }
   }, [activeIdentity, isLoaded]);
 
@@ -102,12 +103,13 @@ export default function App() {
   // Save onboarding state
   const handleCompleteOnboarding = () => {
     setOnboardingComplete(true);
-    localStorage.setItem('cine_save_onboarding_complete', 'true');
+    localStorage.setItem('plot_onboarding_complete', 'true');
     setViewMode('home');
   };
 
   const handleResetOnboarding = () => {
     setOnboardingComplete(false);
+    localStorage.removeItem('plot_onboarding_complete');
     localStorage.removeItem('cine_save_onboarding_complete');
   };
 
@@ -153,8 +155,8 @@ export default function App() {
     setViewMode('library');
 
     setToast({
-      message: "Extracted and Vaulted",
-      sub: `Added ${newMovies.length} recommendations directly onto your shelves!`,
+      message: "Added to plot.",
+      sub: `Successfully plotted ${newMovies.length} recommendations.`,
       visible: true
     });
   };
@@ -182,14 +184,14 @@ export default function App() {
     if (movieTitle) {
       if (isMarkedWatched) {
         setToast({
-          message: "Moved to Watched Archive",
-          sub: `"${movieTitle}" is now resting in your curated completed library.`,
+          message: "Moved to Watched",
+          sub: `"${movieTitle}" marked as watched.`,
           visible: true
         });
       } else {
         setToast({
-          message: "Returned to Watchlist",
-          sub: `"${movieTitle}" has been placed back in your active Watchlist queue.`,
+          message: "Returned to plot.",
+          sub: `"${movieTitle}" moved back to your active plot.`,
           visible: true
         });
       }
@@ -203,8 +205,8 @@ export default function App() {
   const handleAddSingleMovie = (newMovie: Omit<Movie, 'id' | 'addedAt' | 'watched'>) => {
     if (movies.some(m => m.title.toLowerCase() === newMovie.title.toLowerCase())) {
       setToast({
-        message: "Already Saved",
-        sub: `"${newMovie.title}" is already resting in your curated library.`,
+        message: "Already Plotted",
+        sub: `"${newMovie.title}" is already in your plot.`,
         visible: true
       });
       return;
@@ -217,8 +219,8 @@ export default function App() {
     };
     setMovies(prev => [decorated, ...prev]);
     setToast({
-      message: "Added to Library",
-      sub: `"${newMovie.title}" has been successfully vaulted onto your cinema shelf.`,
+      message: "Added to plot.",
+      sub: `"${newMovie.title}" added to plot.`,
       visible: true
     });
   };
@@ -256,7 +258,7 @@ export default function App() {
           </div>
           <div className="text-center space-y-1.5">
             {selectedIdentity.wordmark("text-xl")}
-            <p className="text-xs text-zinc-500 font-sans">Loading your cinema shelf...</p>
+            <p className="text-xs text-zinc-500 font-sans">Loading your plot...</p>
           </div>
         </div>
       </div>
@@ -278,16 +280,13 @@ export default function App() {
         <header className="flex flex-col md:flex-row items-center justify-between gap-4 pb-6 border-b border-[#111214]">
           
           {/* Left: Logo */}
-          <div className="flex items-center gap-3 select-none cursor-pointer" onClick={() => setViewMode('home')}>
-            <div className="p-2 w-9 h-9 rounded-xl bg-[#111214] border border-[#7F72FF]/20 text-[#7F72FF] flex items-center justify-center shadow-sm">
-              {selectedIdentity.logoSvg("w-5 h-5")}
-            </div>
-            <div className="flex flex-col text-left">
-              {selectedIdentity.wordmark("text-base sm:text-lg")}
-              <span className="text-[10px] text-[#A7A7A2] font-sans tracking-wide leading-none mt-0.5">
-                {selectedIdentity.name}
-              </span>
-            </div>
+          <div 
+            className="flex items-center select-none cursor-pointer group" 
+            onClick={() => setViewMode('home')}
+          >
+            <span className="font-sans font-semibold text-base sm:text-[17px] text-[#F5F5F3] tracking-[0.04em] lowercase transition-opacity group-hover:opacity-80">
+              plot
+            </span>
           </div>
 
           {/* Center: Navigation Links with Glowing Active Bar */}
@@ -314,7 +313,7 @@ export default function App() {
                 viewMode === 'library' ? 'text-[#F5F5F3]' : 'text-[#A7A7A2] hover:text-[#F5F5F3]'
               }`}
             >
-              <span>Library</span>
+              <span>Your Plot</span>
               {viewMode === 'library' && (
                 <motion.div
                   layoutId="mainNavIndicator"
@@ -420,7 +419,8 @@ export default function App() {
                 onReplayOnboarding={handleResetOnboarding}
                 activeIdentity={activeIdentity}
                 onChangeIdentity={setActiveIdentity}
-                userEmail="ashithsanjaynath9@gmail.com"
+                userEmail={userEmail}
+                onUpdateEmail={setUserEmail}
               />
             </motion.div>
           )}
@@ -435,7 +435,7 @@ export default function App() {
               onToggleWatched={handleToggleWatched}
               onToggleFavorite={handleToggleFavorite}
               activeIdentity={activeIdentity}
-              userEmail="ashithsanjaynath9@gmail.com"
+              userEmail={userEmail}
             />
           )}
         </AnimatePresence>
@@ -443,7 +443,7 @@ export default function App() {
         {/* Subtle, ultra-clean Footer */}
         <footer className="pt-16 border-t border-zinc-950 flex flex-col sm:flex-row items-center justify-between text-xs text-zinc-500 font-sans gap-4">
           <div className="flex flex-wrap items-center gap-3">
-            <p>© {new Date().getFullYear()} CineSave.</p>
+            <p>© {new Date().getFullYear()} plot.</p>
             <motion.button
               onClick={handleResetOnboarding}
               whileHover={{ scale: 1.02, color: "#7C8CFF" }}

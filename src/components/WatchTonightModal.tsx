@@ -52,7 +52,7 @@ const MOOD_DRAWS = [
     title: 'From Friends',
     pill: 'From Friends',
     whyGenerator: (m: Movie) => m.socialSource?.author 
-      ? `Saved from a recommendation by ${m.socialSource.author}.` 
+      ? `Plotted from a recommendation by ${m.socialSource.author}.` 
       : `An acclaimed recommendation that arrived from your shared circle of friends.`,
     filter: (m: Movie) => {
       const text = `${m.socialSource?.author || ''} ${m.socialSource?.platform || ''}`.toLowerCase();
@@ -104,7 +104,7 @@ export default function WatchTonightModal({
   // Read selected active brand identity for custom styled drawing orb
   const activeIdentityId = useMemo(() => {
     try {
-      return localStorage.getItem('cinesave_identity') || 'bookmark';
+      return localStorage.getItem('plot_identity') || localStorage.getItem('cinesave_identity') || 'bookmark';
     } catch {
       return 'bookmark';
     }
@@ -211,13 +211,13 @@ export default function WatchTonightModal({
         {searchQuery === '' && (
           <div className="text-center space-y-3 py-6 select-none max-w-lg mx-auto">
             <p className="text-[10px] tracking-wider uppercase font-medium text-zinc-500">
-              Private Shelf Draws
+              Private Plot Draws
             </p>
             <h2 className="text-3xl sm:text-4xl font-display font-light italic text-zinc-100 tracking-tight">
               Decide Tonight
             </h2>
             <p className="text-zinc-500 text-xs sm:text-sm leading-relaxed font-sans">
-              Draw suggestions from your custom shelves, or search your private movie notebook directly.
+              Draw suggestions from your plot, or search your saved recommendations directly.
             </p>
           </div>
         )}
@@ -237,7 +237,7 @@ export default function WatchTonightModal({
                   setIsDjActive(false);
                 }
               }}
-              placeholder="Search your movie shelf by title, genre, vibe..."
+              placeholder="Search your plot by title, genre, vibe..."
               className="w-full pl-13 pr-6 py-4 rounded-2xl bg-zinc-900/30 border border-zinc-800/80 text-zinc-100 text-sm placeholder-zinc-500 focus:outline-none focus:border-zinc-750 focus:bg-zinc-900/50 transition-all duration-300 shadow-lg"
             />
             {searchQuery && (
@@ -267,13 +267,13 @@ export default function WatchTonightModal({
               >
                 <div className="flex items-center justify-between border-b border-zinc-900 pb-3">
                   <span className="text-xs font-sans text-zinc-400 font-medium">
-                    Search Shelf Results ({searchResults.length})
+                    Search Plot Results ({searchResults.length})
                   </span>
                 </div>
 
                 {searchResults.length === 0 ? (
-                  <div className="text-center py-20 text-zinc-600 text-xs font-sans">
-                    No matching movies found on your shelf.
+                  <div className="text-center py-20 text-zinc-500 text-xs font-sans">
+                    Your plot is quiet—no matching films found.
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
@@ -349,7 +349,7 @@ export default function WatchTonightModal({
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-zinc-900 pb-4">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-sans tracking-wide text-zinc-400 font-medium uppercase">
-                      Shelf Suggestion Deck
+                      Plot Suggestion Deck
                     </span>
                   </div>
 
@@ -377,7 +377,7 @@ export default function WatchTonightModal({
                     <div className="absolute inset-0 flex items-center justify-center py-20">
                       <div className="flex items-center gap-2.5 text-zinc-500 text-xs font-mono">
                         <RotateCw className="w-4 h-4 animate-spin text-zinc-400" />
-                        <span>Drawing from notebook shelf...</span>
+                        <span>Drawing from your plot...</span>
                       </div>
                     </div>
                   ) : (
@@ -476,9 +476,9 @@ export default function WatchTonightModal({
                   🍿
                 </div>
                 <div className="space-y-1">
-                  <p className="text-xs text-zinc-400 font-medium">Your movie deck is clear.</p>
+                  <p className="text-xs text-zinc-300 font-medium font-display italic text-sm">Your plot is waiting.</p>
                   <p className="text-[11px] text-zinc-500 font-normal max-w-xs mx-auto leading-relaxed">
-                    Search above to retrieve a specific card, or tap the drawing seal below to open suggestions instantly.
+                    Search above to retrieve a specific film, or tap the drawing seal below to open suggestions instantly.
                   </p>
                 </div>
               </motion.div>
@@ -515,7 +515,7 @@ export default function WatchTonightModal({
               ? 'bg-zinc-900 border-zinc-700 shadow-zinc-950/50' 
               : 'bg-zinc-950 border-zinc-850 hover:border-zinc-750 hover:bg-zinc-900'
           }`}
-          title="Draw suggestions from your shelf"
+          title="Draw suggestions from your plot"
         >
           {/* Background Highlight derived from selected brand identity metadata logo */}
           <div className="relative z-10 flex items-center justify-center text-[#7C8CFF]">

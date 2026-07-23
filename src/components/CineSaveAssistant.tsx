@@ -229,7 +229,7 @@ export default function CineSaveAssistant({
     if (selectedTime === 'under_90') {
       return `A compact, high-velocity masterpiece running at a respectful ${movie.runtime || '90 mins'} for ${withLabel}.`;
     }
-    return `Saved directly to your library ${movie.vibe ? `matching your '${movie.vibe}' style` : ''}, chosen for a perfect film night.`;
+    return `Plotted directly to your plot ${movie.vibe ? `matching your '${movie.vibe}' style` : ''}, chosen for a perfect film night.`;
   };
 
   // Progress helper
@@ -464,10 +464,10 @@ export default function CineSaveAssistant({
                         {/* EXACTLY THREE PREMIUM RECS GRID */}
                         {currentRecommendations.length === 0 ? (
                           <div className="py-12 text-center space-y-2">
-                            <span className="text-3xl">🏜️</span>
-                            <h4 className="text-zinc-200 font-display">No matches found on your shelf</h4>
+                            <span className="text-3xl">🍿</span>
+                            <h4 className="text-zinc-200 font-display italic text-lg font-light">Your plot is quiet</h4>
                             <p className="text-xs text-zinc-500 max-w-md mx-auto">
-                              Try resetting your filters or adding more movies to your library to let the assistant search.
+                              Try resetting your choices or paste a Reel to start your plot.
                             </p>
                             <button
                               onClick={handleReset}
@@ -598,7 +598,7 @@ export default function CineSaveAssistant({
                 {/* Footer disclaimer stamp */}
                 <div className="py-2 text-center shrink-0">
                   <p className="text-[10px] text-zinc-600 font-sans max-w-md mx-auto">
-                    CineSave Assistant filters your own saved films. There are no social feeds, no sponsored bias, and no artificial loops. Just the films you trusted yourself to remember.
+                    plot Assistant filters your own saved films. There are no social feeds, no sponsored bias, and no artificial loops. Just the films you trusted yourself to remember.
                   </p>
                 </div>
 

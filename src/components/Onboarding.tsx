@@ -158,7 +158,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
           <div className="w-7 h-7 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center">
             <Film className="w-3.5 h-3.5 text-[#7C8CFF]" />
           </div>
-          <span className="text-xs font-display italic tracking-widest text-zinc-300">CineSave</span>
+          <span className="text-xs font-display italic tracking-widest text-zinc-300">plot</span>
         </div>
 
         <button 
@@ -291,7 +291,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                         exit={{ scale: 0.8, opacity: 0 }}
                       >
                         <Film className="w-7 h-7 text-zinc-500 animate-pulse" />
-                        <span className="text-[10px] font-display italic text-zinc-400">CineSave</span>
+                        <span className="text-[10px] font-display italic text-zinc-400">plot</span>
                       </motion.div>
                     ) : (
                       <motion.div 
@@ -448,7 +448,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                 </span>
                 <h1 className="text-3xl sm:text-5xl font-display font-light italic text-zinc-100 tracking-tight leading-[1.1]">
                   From a friend's text, <br />
-                  <span className="text-[#7C8CFF]">straight to your shelf.</span>
+                  <span className="text-[#7C8CFF]">straight to your plot.</span>
                 </h1>
                 <p className="text-xs text-zinc-400 font-sans">
                   Instantly capture descriptions, years, and directors.
@@ -490,8 +490,8 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                       <Bookmark className="w-4 h-4 text-[#7C8CFF]" />
                     </div>
                     <div>
-                      <h4 className="text-xs font-bold text-zinc-300 font-display italic">Your Library</h4>
-                      <p className="text-xs font-sans text-zinc-400 font-normal">✓ Saved Forever</p>
+                      <h4 className="text-xs font-bold text-zinc-300 font-display italic">Your Plot</h4>
+                      <p className="text-xs font-sans text-zinc-400 font-normal">✓ Plotted Forever</p>
                     </div>
                   </div>
                 </div>

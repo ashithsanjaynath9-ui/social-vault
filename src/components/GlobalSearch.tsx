@@ -177,8 +177,8 @@ export default function GlobalSearch({ movies, onAddMovie }: GlobalSearchProps) 
 
                 {searchResults.length === 0 ? (
                   <div className="py-16 text-center space-y-2">
-                    <span className="text-3xl">📡</span>
-                    <h5 className="text-sm font-medium text-zinc-300">No global matches found for "{query}"</h5>
+                    <span className="text-3xl">🍿</span>
+                    <h5 className="text-sm font-display font-light italic text-zinc-200">Your plot found no matches for "{query}"</h5>
                     <p className="text-xs text-zinc-500 max-w-xs mx-auto leading-relaxed">
                       Try searching broader terms like "Sci-Fi", "Christopher Nolan", "Drama", or "Comedy".
                     </p>
@@ -250,7 +250,7 @@ export default function GlobalSearch({ movies, onAddMovie }: GlobalSearchProps) 
                             {saved ? (
                               <div className="flex items-center gap-1 bg-emerald-500/10 text-emerald-400 text-xs px-3 py-1.5 rounded-lg border border-emerald-500/20 font-medium">
                                 <Check className="w-3.5 h-3.5" />
-                                <span>In Library</span>
+                                <span>Plotted</span>
                               </div>
                             ) : (
                               <button
@@ -261,7 +261,7 @@ export default function GlobalSearch({ movies, onAddMovie }: GlobalSearchProps) 
                                 className="w-full sm:w-auto flex items-center justify-center gap-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 text-xs font-semibold px-3 py-1.5 rounded-lg border border-zinc-700 transition-colors cursor-pointer"
                               >
                                 <Plus className="w-3.5 h-3.5" />
-                                <span>Add to Library</span>
+                                <span>Plot</span>
                               </button>
                             )}
                           </div>

@@ -38,7 +38,7 @@ export default function MovieDetailModal({
   onToggleWatched, 
   onToggleFavorite,
   activeIdentity = 'bookmark',
-  userEmail = 'cinephile@cinesave.com'
+  userEmail = 'cinephile@plot.com'
 }: MovieDetailModalProps) {
   const [copied, setCopied] = useState(false);
   
@@ -77,7 +77,7 @@ export default function MovieDetailModal({
             {/* Top blue silk loop ribbon graphic */}
             <div className="absolute top-0 right-8 w-4 h-8 bg-[#7C8CFF] rounded-b-md shadow-sm z-10" />
             <div className="flex justify-between items-start border-b border-[#EBE7DF] pb-2.5">
-              <span className="text-[10px] uppercase tracking-wider font-semibold text-[#8B867A] font-mono">Le Signet Registry</span>
+              <span className="text-[10px] uppercase tracking-wider font-semibold text-[#8B867A] font-mono">plot Registry</span>
               <span className="text-[10px] font-mono text-[#8B867A]">No. CS-0{serialNum}</span>
             </div>
             <div className="space-y-2 text-left">
@@ -85,11 +85,11 @@ export default function MovieDetailModal({
                 “Marking a chapter of your story.”
               </h5>
               <p className="text-xs text-[#5C574F] leading-relaxed">
-                Saved under your personal library ribbon on <span className="font-medium text-[#1A1917]">{dateStr}</span>. This film is held safe for you until a quiet, reflective evening. No ads, no commercial rush.
+                Plotted under your personal library ribbon on <span className="font-medium text-[#1A1917]">{dateStr}</span>. This film is held safe for you until a quiet, reflective evening. No ads, no commercial rush.
               </p>
             </div>
             <div className="flex justify-between items-center text-[10px] text-[#8B867A] pt-1.5 border-t border-dashed border-[#EBE7DF]">
-              <span>CineSave Personal Collection</span>
+              <span>plot Personal Collection</span>
               <span className="italic">ex libris {emailPrefix}</span>
             </div>
           </div>
@@ -288,7 +288,7 @@ export default function MovieDetailModal({
           {/* Discovered / saved reason */}
           {movie.whySave && (
             <div className="space-y-1.5">
-              <h4 className="text-xs font-sans font-medium text-zinc-500">Why you saved this</h4>
+              <h4 className="text-xs font-sans font-medium text-zinc-500">Why you plotted this</h4>
               <div className="bg-zinc-900/50 border border-zinc-850 p-4 rounded-xl text-xs text-zinc-300 italic leading-relaxed">
                 "{movie.whySave}"
               </div>
@@ -297,16 +297,16 @@ export default function MovieDetailModal({
 
           {/* Handcrafted tactile catalog card reflecting the selected identity */}
           <div className="space-y-1.5 pt-1.5">
-            <h4 className="text-xs font-sans font-medium text-zinc-500">CineSave Authenticity Seal</h4>
+            <h4 className="text-xs font-sans font-medium text-zinc-500">plot Authenticity Seal</h4>
             {renderTactileIdentityCard()}
           </div>
 
           {/* Original source transcript stub */}
           <div className="space-y-1.5">
-            <h4 className="text-xs font-sans font-medium text-zinc-500">Source recommendation snippet</h4>
+            <h4 className="text-xs font-sans font-medium text-zinc-500">Plot source recommendation</h4>
             <div className="bg-zinc-900/30 border border-zinc-900 p-4 rounded-xl space-y-2">
               <div className="flex items-center justify-between text-xs text-zinc-500 font-sans">
-                <span>Saved from @{movie.socialSource.author || 'creator'} via {movie.socialSource.platform}</span>
+                <span>Plotted from @{movie.socialSource.author || 'creator'} via {movie.socialSource.platform}</span>
                 <span>{getRelativeTime(movie.addedAt)}</span>
               </div>
               <p className="text-xs text-zinc-400 leading-relaxed italic">

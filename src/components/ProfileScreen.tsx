@@ -21,6 +21,8 @@ import {
 } from 'lucide-react';
 import { Movie, AppStats } from '../types';
 
+import AuthModal from './AuthModal';
+
 interface ProfileScreenProps {
   movies: Movie[];
   stats: AppStats;
@@ -28,15 +30,17 @@ interface ProfileScreenProps {
   userEmail?: string;
   activeIdentity?: string;
   onChangeIdentity?: (id: any) => void;
+  onUpdateEmail?: (email: string) => void;
 }
 
 export default function ProfileScreen({
   movies,
   stats,
   onReplayOnboarding,
-  userEmail = 'cinephile@cinesave.com',
+  userEmail = 'cinephile@plot.com',
   activeIdentity,
-  onChangeIdentity
+  onChangeIdentity,
+  onUpdateEmail
 }: ProfileScreenProps) {
   
   // Calculate Favorite Genres from actual live movie list data
@@ -64,13 +68,15 @@ export default function ProfileScreen({
   const [showAbout, setShowAbout] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [isLoggedOut, setIsLoggedOut] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
 
   // Real Export Library logic - triggers watchlist file download
   const handleExportLibrary = () => {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(movies, null, 2));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", "cinesave_watchlist.json");
+    downloadAnchor.setAttribute("download", "plot_watchlist.json");
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
@@ -78,22 +84,45 @@ export default function ProfileScreen({
 
   if (isLoggedOut) {
     return (
-      <div className="max-w-md mx-auto py-24 px-6 text-center space-y-6 select-none font-sans" id="logged-out-state">
-        <div className="w-16 h-16 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-500 mx-auto">
-          <LogOut className="w-6 h-6 text-zinc-500" />
+      <div className="max-w-md mx-auto py-16 px-6 text-center space-y-6 select-none font-sans" id="logged-out-state">
+        <div className="w-16 h-16 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-[#7F72FF] mx-auto shadow-inner">
+          <User className="w-6 h-6 text-[#7F72FF]" />
         </div>
         <div className="space-y-2">
-          <h2 className="text-xl font-display italic text-zinc-100">Signed Out</h2>
+          <h2 className="text-2xl font-display italic text-zinc-100">Welcome back to plot</h2>
           <p className="text-xs text-zinc-500 max-w-xs mx-auto leading-relaxed">
-            You have successfully signed out of CineSave. Refresh the application to start a fresh browsing session.
+            Sign in or create your plot to manage your movie recommendations and sync across devices.
           </p>
         </div>
-        <button
-          onClick={() => setIsLoggedOut(false)}
-          className="px-4 py-2 bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 text-xs font-medium rounded-xl text-zinc-300 hover:text-white transition-all cursor-pointer"
-        >
-          Return to App
-        </button>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-xs mx-auto pt-2">
+          <button
+            onClick={() => {
+              setAuthMode('login');
+              setAuthModalOpen(true);
+            }}
+            className="w-full py-2.5 bg-[#7F72FF] hover:bg-[#6E60FF] text-white text-xs font-semibold rounded-xl transition-all cursor-pointer shadow-md"
+          >
+            Welcome back to plot
+          </button>
+          <button
+            onClick={() => {
+              setAuthMode('signup');
+              setAuthModalOpen(true);
+            }}
+            className="w-full py-2.5 bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 text-xs font-medium rounded-xl text-zinc-300 hover:text-white transition-all cursor-pointer"
+          >
+            Create your plot
+          </button>
+        </div>
+
+        <AuthModal
+          isOpen={authModalOpen}
+          onClose={() => setAuthModalOpen(false)}
+          initialMode={authMode}
+          onAuthenticate={(email) => {
+            setIsLoggedOut(false);
+          }}
+        />
       </div>
     );
   }
@@ -115,17 +144,40 @@ export default function ProfileScreen({
       </div>
 
       {/* 1. Spotify-style Minimal Avatar Header */}
-      <div className="flex items-center gap-4 py-2">
-        <div className="relative w-12 h-12 rounded-full bg-gradient-to-tr from-zinc-900 to-zinc-950 border border-zinc-800 flex items-center justify-center text-xl shadow-md overflow-hidden shrink-0">
-          <User className="w-5 h-5 text-zinc-500" />
+      <div className="flex items-center justify-between gap-4 py-2">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="relative w-12 h-12 rounded-full bg-gradient-to-tr from-zinc-900 to-zinc-950 border border-zinc-800 flex items-center justify-center text-xl shadow-md overflow-hidden shrink-0">
+            <User className="w-5 h-5 text-zinc-500" />
+          </div>
+          <div className="min-w-0 text-left">
+            <h3 className="text-sm font-medium text-zinc-200 truncate">
+              {userEmail.split('@')[0]}
+            </h3>
+            <p className="text-[11px] text-zinc-500 truncate mt-0.5">
+              {userEmail}
+            </p>
+          </div>
         </div>
-        <div className="min-w-0 text-left">
-          <h3 className="text-sm font-medium text-zinc-200 truncate">
-            {userEmail.split('@')[0]}
-          </h3>
-          <p className="text-[11px] text-zinc-500 truncate mt-0.5">
-            {userEmail}
-          </p>
+
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            onClick={() => {
+              setAuthMode('login');
+              setAuthModalOpen(true);
+            }}
+            className="px-2.5 py-1.5 bg-zinc-900 hover:bg-zinc-850 text-[11px] font-medium rounded-lg text-zinc-300 hover:text-white border border-zinc-800 transition-all cursor-pointer"
+          >
+            Sign In
+          </button>
+          <button
+            onClick={() => {
+              setAuthMode('signup');
+              setAuthModalOpen(true);
+            }}
+            className="px-2.5 py-1.5 bg-[#7F72FF]/15 hover:bg-[#7F72FF]/25 text-[11px] font-medium rounded-lg text-[#7F72FF] border border-[#7F72FF]/30 transition-all cursor-pointer"
+          >
+            Create Plot
+          </button>
         </div>
       </div>
 
@@ -134,7 +186,7 @@ export default function ProfileScreen({
         <p className="text-[10px] tracking-wider uppercase font-medium text-zinc-500 px-1">Your Screening Stats</p>
         <div className="bg-zinc-900/30 border border-zinc-850/60 rounded-2xl p-4 space-y-3.5">
           <div className="flex justify-between items-center text-xs">
-            <span className="text-zinc-400">Movies Saved</span>
+            <span className="text-zinc-400">Plotted</span>
             <span className="font-mono text-zinc-200 bg-zinc-900/60 border border-zinc-800 px-2 py-0.5 rounded text-[11px]">
               {movies.length}
             </span>
@@ -234,7 +286,7 @@ export default function ProfileScreen({
                 <Info className="w-4 h-4 text-zinc-400" />
               </div>
               <div className="text-left min-w-0">
-                <p className="text-xs font-medium text-zinc-200">About CineSave</p>
+                <p className="text-xs font-medium text-zinc-200">About plot</p>
                 <p className="text-[10px] text-zinc-500 mt-0.5 truncate">Learn about this quiet cinematic sanctuary</p>
               </div>
             </div>
@@ -268,11 +320,11 @@ export default function ProfileScreen({
           className="w-full py-3.5 bg-zinc-900/40 hover:bg-red-550/10 border border-zinc-900 hover:border-red-500/25 rounded-2xl text-xs font-medium text-zinc-400 hover:text-red-400 transition-all cursor-pointer flex items-center justify-center gap-2 shadow-sm"
         >
           <LogOut className="w-3.5 h-3.5" />
-          <span>Sign Out of CineSave</span>
+          <span>Sign Out of plot</span>
         </button>
       </div>
 
-      {/* About CineSave Overlay Modal */}
+      {/* About plot Overlay Modal */}
       <AnimatePresence>
         {showAbout && (
           <motion.div
@@ -295,16 +347,16 @@ export default function ProfileScreen({
               </button>
               
               <div className="space-y-1 select-none">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-400 font-semibold">CineSave</span>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-indigo-400 font-semibold">plot</span>
                 <h3 className="text-base font-display italic text-zinc-100">Quiet Sanctuary</h3>
               </div>
 
               <div className="text-xs text-zinc-400 leading-relaxed font-sans space-y-3">
                 <p>
-                  CineSave is designed as a peaceful, visual database for your curated watch list. By eliminating aggressive algorithms, infinite scroll feeds, and comment section noise, we return control to the curator.
+                  plot is designed as a peaceful, visual database for your curated plot. By eliminating aggressive algorithms, infinite scroll feeds, and comment section noise, we return control to the curator.
                 </p>
                 <p>
-                  Save movie suggestions immediately from messaging lists, podcasts, or friends. Categorize them under custom vibe tags, and let CineSave's calm recommendation assistant pick the absolute perfect choice for tonight.
+                  Plot movie suggestions immediately from messaging lists, podcasts, or friends. Categorize them under custom vibe tags, and let plot's calm recommendation assistant pick the absolute perfect choice for tonight.
                 </p>
               </div>
 
@@ -339,7 +391,7 @@ export default function ProfileScreen({
               <div className="space-y-1 select-none">
                 <h3 className="text-sm font-sans font-medium text-zinc-100">Sign Out</h3>
                 <p className="text-xs text-zinc-400 leading-normal font-normal">
-                  Are you sure you want to sign out of CineSave? Your local shelf state will be securely preserved on this browser cache.
+                  Are you sure you want to sign out of plot? Your plot state will be securely preserved on this browser cache.
                 </p>
               </div>
 
@@ -364,6 +416,15 @@ export default function ProfileScreen({
           </motion.div>
         )}
       </AnimatePresence>
+
+      <AuthModal
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+        initialMode={authMode}
+        onAuthenticate={(email) => {
+          if (onUpdateEmail) onUpdateEmail(email);
+        }}
+      />
 
     </div>
   );

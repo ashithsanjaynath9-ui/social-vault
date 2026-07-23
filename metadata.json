@@ -1,6 +1,6 @@
 {
-  "name": "CineSave",
-  "description": "The fastest way to convert social media recommendations (Instagram Reels, TikToks, YouTube, Twitter) into a beautifully organized watchlist with streaming availability.",
+  "name": "plot",
+  "description": "Every recommendation deserves a place.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

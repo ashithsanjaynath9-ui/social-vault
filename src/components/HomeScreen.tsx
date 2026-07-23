@@ -113,7 +113,7 @@ export default function HomeScreen({
     if (!previewMovies) return;
     const selected = previewMovies.filter((_, idx) => selectedIndices[idx]);
     if (selected.length === 0) {
-      setError('Please select at least one movie to save.');
+      setError('Please select at least one movie to plot.');
       return;
     }
 
@@ -124,7 +124,7 @@ export default function HomeScreen({
     setInputText('');
     setPreviewMovies(null);
     setSelectedIndices({});
-    setSuccessMessage('Saved to your Library.');
+    setSuccessMessage('Added to plot.');
     setTimeout(() => {
       setSuccessMessage(null);
     }, 4000);
@@ -200,7 +200,7 @@ export default function HomeScreen({
             </div>
             <div className="space-y-1.5">
               <p className="text-sm text-[#F5F5F3] font-display font-light italic tracking-wide animate-pulse">
-                Extracting movie recommendations...
+                Unspooling plot recommendations...
               </p>
               <p className="text-xs text-[#A7A7A2] font-sans">
                 Unfolding titles, directors, and posters.
@@ -222,7 +222,7 @@ export default function HomeScreen({
             <div className="flex items-center justify-between pb-3 border-b border-[#1A1C20]">
               <div>
                 <span className="inline-block px-2.5 py-0.5 bg-[#7F72FF]/10 text-[#7F72FF] border border-[#7F72FF]/20 rounded-full text-[10px] font-sans font-semibold uppercase tracking-wider">
-                  Extracted Results
+                  Plotted Results
                 </span>
                 <h3 className="text-lg font-display font-light italic text-[#F5F5F3] mt-1">
                   Found {previewMovies.length} {previewMovies.length === 1 ? 'movie' : 'movies'}
@@ -290,7 +290,7 @@ export default function HomeScreen({
                       </div>
 
                       <p className="text-[11px] text-[#A7A7A2] line-clamp-2 italic">
-                        "{movie.whySave || 'Saved recommendation'}"
+                        "{movie.whySave || 'Plotted recommendation'}"
                       </p>
                     </div>
                   </div>
@@ -317,7 +317,7 @@ export default function HomeScreen({
                 whileTap={{ scale: 0.98 }}
                 className="px-6 py-2.5 bg-[#7F72FF] hover:bg-[#6E60FF] text-white text-xs font-sans font-semibold rounded-xl transition-all shadow-lg flex items-center gap-2 cursor-pointer"
               >
-                <span>Save to Library</span>
+                <span>Plot</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </motion.button>
             </div>

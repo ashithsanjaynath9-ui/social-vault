@@ -31,7 +31,7 @@ export default function HeroProductDemo({ onMoviesAdded, onImportSubmit }: HeroP
         await onImportSubmit(inputText);
         setInputText('');
       } catch (err: any) {
-        setRealError(err.message || 'Unable to extract film recommendations from link.');
+        setRealError(err.message || 'Unable to plot film recommendations from link.');
       } finally {
         setIsExtractingReal(false);
       }
@@ -52,7 +52,7 @@ export default function HeroProductDemo({ onMoviesAdded, onImportSubmit }: HeroP
         </h1>
 
         <p className="mt-6 text-[#B4AFBA] text-[18px] sm:text-[19px] md:text-[20px] max-w-[520px] mx-auto font-sans font-normal leading-relaxed drop-shadow-md">
-          Save movies from Instagram Reels, TikToks, YouTube, and friends—so they&apos;re waiting when you&apos;re ready to watch.
+          Save movie recommendations from Instagram Reels, TikTok, YouTube, Reddit and your friends so they&apos;re waiting when you&apos;re ready to watch.
         </p>
       </div>
 
@@ -69,7 +69,7 @@ export default function HeroProductDemo({ onMoviesAdded, onImportSubmit }: HeroP
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              placeholder="Paste an Instagram Reel, TikTok, YouTube or Letterboxd link..."
+              placeholder="Paste an Instagram Reel, TikTok or YouTube link..."
               disabled={isExtractingReal}
               className="w-full bg-transparent px-1 py-1.5 text-xs sm:text-sm text-[#F2ECE3] placeholder-[#B4AFBA]/50 focus:outline-none border-0 font-sans tracking-wide"
             />
@@ -86,11 +86,11 @@ export default function HeroProductDemo({ onMoviesAdded, onImportSubmit }: HeroP
               {isExtractingReal ? (
                 <>
                   <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
-                  <span>Extracting...</span>
+                  <span>Plotting...</span>
                 </>
               ) : (
                 <>
-                  <span>Extract</span>
+                  <span>Plot</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </>
               )}

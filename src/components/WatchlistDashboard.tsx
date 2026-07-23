@@ -56,9 +56,9 @@ export default function WatchlistDashboard({
   const COLLECTIONS: EmotionalCollection[] = useMemo(() => [
     {
       id: 'recently-saved',
-      name: 'Recently Saved',
+      name: 'Recently Plotted',
       emoji: '✨',
-      description: 'Quiet discoveries and fresh captures waiting to be unspooled.',
+      description: 'Quiet discoveries and fresh plots waiting to be unspooled.',
       filterFn: (m) => !m.watched
     },
     {
@@ -216,7 +216,7 @@ export default function WatchlistDashboard({
 
   // Remember the user's last selected collection across sessions
   const [activeCollectionId, setActiveCollectionId] = useState<string>(() => {
-    const saved = localStorage.getItem('cinesave_active_collection');
+    const saved = localStorage.getItem('plot_active_collection') || localStorage.getItem('cinesave_active_collection');
     const validIds = COLLECTIONS.map(c => c.id);
     if (saved && validIds.includes(saved)) {
       return saved;
@@ -226,7 +226,7 @@ export default function WatchlistDashboard({
 
   const handleSelectCollection = (id: string) => {
     setActiveCollectionId(id);
-    localStorage.setItem('cinesave_active_collection', id);
+    localStorage.setItem('plot_active_collection', id);
   };
 
   // Compute search results across all unwatched movies when query is present
@@ -262,10 +262,10 @@ export default function WatchlistDashboard({
             Private Archive
           </p>
           <h2 className="text-3xl sm:text-4xl font-display font-light italic text-zinc-100">
-            The Cinema Shelf
+            Your Plot
           </h2>
           <p className="text-xs sm:text-sm text-zinc-500 font-sans max-w-md leading-relaxed">
-            A quiet space for the films you've chosen to keep.
+            A quiet space for the films you've plotted.
           </p>
         </div>
 
@@ -313,7 +313,7 @@ export default function WatchlistDashboard({
               type="text"
               value={searchQuery}
               onChange={(e) => onChangeSearch(e.target.value)}
-              placeholder="Search shelf..."
+              placeholder="Search plot..."
               className="block w-full bg-zinc-900/30 hover:bg-zinc-900/50 focus:bg-zinc-900/80 border border-white/5 focus:border-zinc-700 text-xs rounded-xl pl-8 pr-7 py-2 text-zinc-200 placeholder-zinc-600 outline-none transition-all duration-200"
             />
             {searchQuery && (
@@ -419,8 +419,8 @@ export default function WatchlistDashboard({
                   ))}
                 </div>
               ) : (
-                <div className="py-16 text-center border border-dashed border-zinc-900 rounded-2xl text-zinc-550 text-xs">
-                  No matching films found on your shelves.
+                <div className="py-16 text-center border border-dashed border-zinc-900 rounded-2xl text-zinc-500 text-xs font-sans">
+                  Your plot is quiet—no matching films found.
                 </div>
               )}
             </motion.div>
@@ -494,9 +494,9 @@ export default function WatchlistDashboard({
                       <div className="py-24 text-center max-w-sm mx-auto space-y-4">
                         <div className="text-3xl select-none">📽️</div>
                         <div className="space-y-1">
-                          <p className="font-display font-light italic text-zinc-200 text-lg">This shelf is currently empty</p>
+                          <p className="font-display font-light italic text-zinc-200 text-lg">Your plot is waiting.</p>
                           <p className="text-xs text-zinc-500 leading-relaxed">
-                            No films match this category yet. Capture recommendations to start building this collection!
+                            Paste a Reel or link to start your plot.
                           </p>
                         </div>
                         {onGoToCapture && (
@@ -507,7 +507,7 @@ export default function WatchlistDashboard({
                               whileTap={{ scale: 0.98 }}
                               className="px-6 py-2.5 bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-sans font-medium rounded-xl cursor-pointer"
                             >
-                              Add a Film
+                              Plot a Film
                             </motion.button>
                           </div>
                         )}
@@ -532,7 +532,7 @@ export default function WatchlistDashboard({
                   <span>🏆 Completed Archive</span>
                 </h3>
                 <p className="text-xs text-zinc-500 font-sans">
-                  A classic vault of completed tickets and finished cinematic journeys ({completedMovies.length} total)
+                  A completed record of finished cinematic journeys ({completedMovies.length} total)
                 </p>
               </div>
 
@@ -548,9 +548,9 @@ export default function WatchlistDashboard({
                   ))}
                 </div>
               ) : (
-                <div className="py-20 text-center border border-dashed border-zinc-900 rounded-2xl text-zinc-550 text-xs max-w-sm mx-auto space-y-1.5">
-                  <p className="font-medium text-zinc-400">Empty Archive Vault</p>
-                  <p className="text-zinc-650">When you finish a film on your shelf, mark it as completed to store its digital stub here.</p>
+                <div className="py-20 text-center border border-dashed border-zinc-900 rounded-2xl text-zinc-500 text-xs max-w-sm mx-auto space-y-1.5">
+                  <p className="font-display font-light italic text-zinc-300 text-sm">Your archive is empty—for now.</p>
+                  <p className="text-zinc-600">When you finish a film in your plot, mark it as completed to store its record here.</p>
                 </div>
               )}
             </motion.div>

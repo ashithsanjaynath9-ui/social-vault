@@ -47,10 +47,10 @@ export default function MovieCard({ movie, onClick, isCompleted = false }: Movie
       if (whyLower.includes('podcast')) {
         return { label: 'Podcast', icon: Mic };
       }
-      return { label: 'Saved Rec', icon: Bookmark };
+      return { label: 'Plotted Rec', icon: Bookmark };
     }
 
-    return { label: 'Saved Rec', icon: Bookmark };
+    return { label: 'Plotted Rec', icon: Bookmark };
   };
 
   const source = getSourceDetails();
