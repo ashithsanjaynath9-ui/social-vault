@@ -11,9 +11,7 @@ import {
   Loader2, 
   Sparkles, 
   MoreHorizontal, 
-  Shield, 
-  ChevronLeft, 
-  ChevronRight
+  Shield 
 } from 'lucide-react';
 import { Movie } from '../types';
 
@@ -132,12 +130,8 @@ export default function HeroProductDemo({ onImportSubmit, onSelectMovie }: HeroP
   const [isExtractingReal, setIsExtractingReal] = useState(false);
   const [realError, setRealError] = useState<string | null>(null);
 
-  // Smooth continuous auto-play scrolling state
+  // Smooth continuous ambient background scrolling state
   const [scrollPos, setScrollPos] = useState(0);
-  const [isHovered, setIsHovered] = useState(false);
-
-  const isHoveredRef = useRef(isHovered);
-  isHoveredRef.current = isHovered;
 
   const scrollPosRef = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -159,19 +153,17 @@ export default function HeroProductDemo({ onImportSubmit, onSelectMovie }: HeroP
       const delta = currentTime - lastTime;
       lastTime = currentTime;
 
-      if (!isHoveredRef.current) {
-        // Smooth frame-rate independent speed (~45px per second)
-        const pixelsToMove = (delta / 1000) * 45; 
-        let nextPos = scrollPosRef.current + pixelsToMove;
+      // Smooth frame-rate independent ambient speed (~45px per second)
+      const pixelsToMove = (delta / 1000) * 45; 
+      let nextPos = scrollPosRef.current + pixelsToMove;
 
-        // Reset seamlessly when one full set of 12 items has passed
-        if (nextPos >= SINGLE_SET_WIDTH) {
-          nextPos = nextPos % SINGLE_SET_WIDTH;
-        }
-
-        scrollPosRef.current = nextPos;
-        setScrollPos(nextPos);
+      // Reset seamlessly when one full set of 12 items has passed
+      if (nextPos >= SINGLE_SET_WIDTH) {
+        nextPos = nextPos % SINGLE_SET_WIDTH;
       }
+
+      scrollPosRef.current = nextPos;
+      setScrollPos(nextPos);
 
       animationFrameRef.current = requestAnimationFrame(animate);
     };
@@ -201,24 +193,6 @@ export default function HeroProductDemo({ onImportSubmit, onSelectMovie }: HeroP
         setIsExtractingReal(false);
       }
     }
-  };
-
-  const handleNextCard = () => {
-    let nextPos = scrollPosRef.current + ITEM_FULL_WIDTH;
-    if (nextPos >= SINGLE_SET_WIDTH) {
-      nextPos = nextPos % SINGLE_SET_WIDTH;
-    }
-    scrollPosRef.current = nextPos;
-    setScrollPos(nextPos);
-  };
-
-  const handlePrevCard = () => {
-    let nextPos = scrollPosRef.current - ITEM_FULL_WIDTH;
-    if (nextPos < 0) {
-      nextPos += SINGLE_SET_WIDTH;
-    }
-    scrollPosRef.current = nextPos;
-    setScrollPos(nextPos);
   };
 
   return (
@@ -407,88 +381,55 @@ export default function HeroProductDemo({ onImportSubmit, onSelectMovie }: HeroP
 
       </div>
 
-      {/* 4. SEAMLESSLY BLENDED CONTINUOUS SMOOTH CAROUSEL */}
-      <div 
-        className="relative z-20 w-full mt-8 sm:mt-12 flex flex-col items-center gap-3"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        <div className="relative w-full flex items-center justify-between gap-2 px-1 sm:px-2">
+      {/* 4. AMBIENT BACKGROUND FILM REEL (Purely atmospheric, non-interactive) */}
+      <div className="relative z-10 w-full mt-10 sm:mt-14 pointer-events-none select-none">
+        <div 
+          ref={containerRef}
+          className="relative w-full overflow-hidden py-4 sm:py-6 bg-transparent"
+        >
+          {/* Left Vignette Edge Fade - Blends seamlessly into canvas background */}
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-28 sm:w-48 bg-gradient-to-r from-[#050505] via-[#050505]/85 to-transparent z-30" />
           
-          {/* Left Arrow Navigation Button */}
-          <button
-            onClick={handlePrevCard}
-            className="w-10 h-10 rounded-full bg-[#101018]/90 border border-[#252338] text-zinc-300 hover:text-white flex items-center justify-center cursor-pointer hover:border-[#8E7BFF] hover:bg-[#1A182B] transition-all shrink-0 z-40 shadow-[0_0_20px_rgba(0,0,0,0.8)]"
-            title="Previous Movie"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
+          {/* Right Vignette Edge Fade - Blends seamlessly into canvas background */}
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-28 sm:w-48 bg-gradient-to-l from-[#050505] via-[#050505]/85 to-transparent z-30" />
 
-          {/* SEAMLESSLY BLENDED CONTAINER - NO BOX BORDER / NO SPROCKET HOLES */}
+          {/* Continuous Smooth Infinite Rolling Track (Hardware-Accelerated) */}
           <div 
-            ref={containerRef}
-            className="flex-1 relative overflow-hidden py-4 sm:py-6 bg-transparent"
+            className="flex items-center gap-4 py-2 will-change-transform opacity-35 sm:opacity-45 filter contrast-105"
+            style={{
+              transform: `translate3d(-${scrollPos}px, 0, 0)`
+            }}
           >
-            {/* Left Vignette Edge Fade - Blends seamlessly into canvas */}
-            <div className="pointer-events-none absolute inset-y-0 left-0 w-20 sm:w-36 bg-gradient-to-r from-[#050505] via-[#050505]/80 to-transparent z-30" />
-            
-            {/* Right Vignette Edge Fade - Blends seamlessly into canvas */}
-            <div className="pointer-events-none absolute inset-y-0 right-0 w-20 sm:w-36 bg-gradient-to-l from-[#050505] via-[#050505]/80 to-transparent z-30" />
+            {REEL_MOVIES.map((movie, idx) => (
+              <div
+                key={`${movie.id}-${idx}`}
+                className="relative w-36 sm:w-44 aspect-[2/3] rounded-2xl overflow-hidden flex-shrink-0 border border-white/10 shadow-lg"
+              >
+                {/* Movie Poster Image */}
+                <img 
+                  src={movie.posterUrl} 
+                  alt={movie.title}
+                  referrerPolicy="no-referrer"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    if (target.src !== movie.backupPosterUrl) {
+                      target.src = movie.backupPosterUrl;
+                    }
+                  }}
+                  className="w-full h-full object-cover filter brightness-85 contrast-110"
+                />
 
-            {/* Continuous Smooth Infinite Rolling Track (Hardware-Accelerated translate3d) */}
-            <div 
-              className="flex items-center gap-4 py-2 will-change-transform"
-              style={{
-                transform: `translate3d(-${scrollPos}px, 0, 0)`
-              }}
-            >
-              {REEL_MOVIES.map((movie, idx) => {
-                return (
-                  <div
-                    key={`${movie.id}-${idx}`}
-                    onClick={() => {
-                      if (onSelectMovie) onSelectMovie(movie.id);
-                    }}
-                    className="relative w-36 sm:w-44 aspect-[2/3] rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 flex-shrink-0 select-none border border-[#232136] hover:border-[#8E7BFF]/60 hover:scale-[1.03] hover:shadow-[0_0_25px_rgba(142,123,255,0.3)] z-10 filter brightness-95 hover:brightness-105"
-                  >
-                    {/* Movie Poster Image */}
-                    <img 
-                      src={movie.posterUrl} 
-                      alt={movie.title}
-                      referrerPolicy="no-referrer"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        if (target.src !== movie.backupPosterUrl) {
-                          target.src = movie.backupPosterUrl;
-                        }
-                      }}
-                      className="w-full h-full object-cover filter brightness-90 contrast-110"
-                    />
-
-                    {/* Poster Bottom Title Overlay */}
-                    <div className="absolute inset-x-0 bottom-0 pt-10 pb-3 px-3 bg-gradient-to-t from-black via-black/80 to-transparent flex items-end justify-center text-center">
-                      <span className="font-sans font-bold text-[10px] sm:text-xs text-white tracking-wider uppercase drop-shadow-md">
-                        {movie.displayTitle}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
+                {/* Poster Bottom Title Overlay */}
+                <div className="absolute inset-x-0 bottom-0 pt-10 pb-3 px-3 bg-gradient-to-t from-black/90 via-black/50 to-transparent flex items-end justify-center text-center">
+                  <span className="font-sans font-medium text-[10px] sm:text-xs text-white/80 tracking-wider uppercase drop-shadow-md">
+                    {movie.displayTitle}
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
 
-          {/* Right Arrow Navigation Button */}
-          <button
-            onClick={handleNextCard}
-            className="w-10 h-10 rounded-full bg-[#101018]/90 border border-[#252338] text-zinc-300 hover:text-white flex items-center justify-center cursor-pointer hover:border-[#8E7BFF] hover:bg-[#1A182B] transition-all shrink-0 z-40 shadow-[0_0_20px_rgba(0,0,0,0.8)]"
-            title="Next Movie"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
-
         </div>
-
       </div>
 
     </div>
