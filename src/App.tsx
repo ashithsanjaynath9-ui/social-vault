@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Film, Sparkles, Tv, Check, Flame, Play, Trash, Search, Shuffle, Calendar, RefreshCw, Compass, HelpCircle, X, User } from 'lucide-react';
+import { Film, Sparkles, Tv, Check, Flame, Play, Trash, Search, Shuffle, Calendar, RefreshCw, Compass, HelpCircle, X, User, Bookmark } from 'lucide-react';
 import { Movie, AppStats } from './types';
 import { INITIAL_MOVIES, ReelTemplate } from './data';
 import { parseRuntimeMinutes } from './utils';
@@ -277,31 +277,39 @@ export default function App() {
       <div className="w-full max-w-7xl mx-auto pt-4 sm:pt-6 space-y-8 relative">
         
         {/* Header Branding section */}
-        <header className="flex flex-col md:flex-row items-center justify-between gap-4 pb-6 border-b border-[#111214]">
+        <header className="flex flex-col md:flex-row items-center justify-between gap-4 pb-6 border-b border-[#14151E]">
           
-          {/* Left: Logo */}
+          {/* Left: Logo with Bookmark Icon & Subtitle */}
           <div 
-            className="flex items-center select-none cursor-pointer group" 
+            className="flex items-center gap-3 select-none cursor-pointer group" 
             onClick={() => setViewMode('home')}
           >
-            <span className="font-sans font-semibold text-base sm:text-[17px] text-[#F5F5F3] tracking-[0.04em] lowercase transition-opacity group-hover:opacity-80">
-              plot
-            </span>
+            <div className="w-9 h-9 rounded-xl bg-[#0D0E14] border border-[#232135] flex items-center justify-center text-[#7F72FF] shadow-[0_0_15px_rgba(127,114,255,0.25)] transition-transform group-hover:scale-105">
+              <Bookmark className="w-4 h-4 fill-[#7F72FF]/20 text-[#7F72FF]" />
+            </div>
+            <div className="flex flex-col text-left">
+              <span className="font-sans font-bold text-lg sm:text-xl text-[#F5F5F3] tracking-tight lowercase">
+                plot
+              </span>
+              <span className="text-[11px] text-[#7A798C] font-sans font-normal leading-none mt-0.5">
+                Less deciding. More watching.
+              </span>
+            </div>
           </div>
 
-          {/* Center: Navigation Links with Glowing Active Bar */}
+          {/* Center: Navigation Links (Home, Library, Profile) with Glowing Active Bar */}
           <nav className="flex items-center gap-8 py-1" id="main-tabs-nav">
             <button
               onClick={() => setViewMode('home')}
               className={`relative py-1 text-xs sm:text-sm font-medium transition-all cursor-pointer tracking-wide ${
-                viewMode === 'home' ? 'text-[#F5F5F3]' : 'text-[#A7A7A2] hover:text-[#F5F5F3]'
+                viewMode === 'home' ? 'text-[#F5F5F3]' : 'text-[#7A798C] hover:text-[#F5F5F3]'
               }`}
             >
               <span>Home</span>
               {viewMode === 'home' && (
                 <motion.div
                   layoutId="mainNavIndicator"
-                  className="absolute -bottom-2.5 left-0 right-0 h-[2px] bg-[#7F72FF] shadow-[0_0_12px_#7F72FF]"
+                  className="absolute -bottom-2.5 left-0 right-0 h-[2px] bg-[#8E7BFF] shadow-[0_0_12px_#8E7BFF]"
                   transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                 />
               )}
@@ -310,14 +318,14 @@ export default function App() {
             <button
               onClick={() => setViewMode('library')}
               className={`relative py-1 text-xs sm:text-sm font-medium transition-all cursor-pointer tracking-wide ${
-                viewMode === 'library' ? 'text-[#F5F5F3]' : 'text-[#A7A7A2] hover:text-[#F5F5F3]'
+                viewMode === 'library' ? 'text-[#F5F5F3]' : 'text-[#7A798C] hover:text-[#F5F5F3]'
               }`}
             >
-              <span>Your Plot</span>
+              <span>Library</span>
               {viewMode === 'library' && (
                 <motion.div
                   layoutId="mainNavIndicator"
-                  className="absolute -bottom-2.5 left-0 right-0 h-[2px] bg-[#7F72FF] shadow-[0_0_12px_#7F72FF]"
+                  className="absolute -bottom-2.5 left-0 right-0 h-[2px] bg-[#8E7BFF] shadow-[0_0_12px_#8E7BFF]"
                   transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                 />
               )}
@@ -326,21 +334,21 @@ export default function App() {
             <button
               onClick={() => setViewMode('profile')}
               className={`relative py-1 text-xs sm:text-sm font-medium transition-all cursor-pointer tracking-wide ${
-                viewMode === 'profile' ? 'text-[#F5F5F3]' : 'text-[#A7A7A2] hover:text-[#F5F5F3]'
+                viewMode === 'profile' ? 'text-[#F5F5F3]' : 'text-[#7A798C] hover:text-[#F5F5F3]'
               }`}
             >
               <span>Profile</span>
               {viewMode === 'profile' && (
                 <motion.div
                   layoutId="mainNavIndicator"
-                  className="absolute -bottom-2.5 left-0 right-0 h-[2px] bg-[#7F72FF] shadow-[0_0_12px_#7F72FF]"
+                  className="absolute -bottom-2.5 left-0 right-0 h-[2px] bg-[#8E7BFF] shadow-[0_0_12px_#8E7BFF]"
                   transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                 />
               )}
             </button>
           </nav>
 
-          {/* Right: Search & Decide Tonight Button */}
+          {/* Right: Search & DECIDE TONIGHT Button */}
           <div className="flex items-center gap-3 w-full md:w-auto justify-end">
             <div className="w-full md:w-64">
               <GlobalSearch movies={movies} onAddMovie={handleAddSingleMovie} />
@@ -348,10 +356,10 @@ export default function App() {
 
             <button
               onClick={() => setIsAssistantOpen(true)}
-              className="px-3.5 py-2 rounded-xl bg-[#111214] border border-[#7F72FF]/25 hover:border-[#7F72FF]/50 text-[#F5F5F3] text-[11px] font-mono font-semibold tracking-wider uppercase flex items-center gap-2 cursor-pointer transition-all duration-300 shrink-0 shadow-md hover:shadow-[#7F72FF]/10"
+              className="px-4 sm:px-5 py-2.5 rounded-full bg-gradient-to-r from-[#5035E6] via-[#7F72FF] to-[#8E7BFF] hover:opacity-95 text-white text-xs font-semibold uppercase tracking-wider flex items-center gap-2 cursor-pointer shadow-[0_0_25px_rgba(127,114,255,0.45)] transition-all hover:scale-[1.02] active:scale-[0.98] shrink-0"
             >
-              <Sparkles className="w-3.5 h-3.5 text-[#7F72FF]" />
-              <span className="hidden sm:inline">Decide Tonight</span>
+              <Sparkles className="w-3.5 h-3.5 fill-white text-white" />
+              <span className="hidden sm:inline">DECIDE TONIGHT</span>
             </button>
           </div>
         </header>

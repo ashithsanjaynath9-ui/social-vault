@@ -131,7 +131,7 @@ export default function HomeScreen({
   };
 
   return (
-    <div className="w-full h-[calc(100vh-8.5rem)] min-h-[500px] max-h-[820px] relative flex flex-col justify-between items-center text-center overflow-hidden rounded-3xl bg-[#050505] border border-white/5 select-none p-4 sm:p-6 shadow-2xl">
+    <div className="w-full min-h-[760px] relative flex flex-col justify-between items-center text-center overflow-hidden rounded-3xl bg-[#050505] border border-white/5 select-none p-2 sm:p-6 shadow-2xl">
       
       {/* Multi-layered Cinema Environmental Atmosphere */}
       <CinemaAtmosphere />
