@@ -2,15 +2,26 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { Movie } from '../types';
 import { Film, Instagram, Video, Youtube, MessageCircle, Mic, Bookmark, Check } from 'lucide-react';
+import { getMoviePalette } from '../utils/moviePalette';
 
 interface MovieCardProps {
   key?: React.Key;
   movie: Movie;
   onClick: () => void;
   isCompleted?: boolean;
+  onHoverStart?: (movie: Movie) => void;
+  onHoverEnd?: () => void;
 }
 
-export default function MovieCard({ movie, onClick, isCompleted = false }: MovieCardProps) {
+export default function MovieCard({ 
+  movie, 
+  onClick, 
+  isCompleted = false,
+  onHoverStart,
+  onHoverEnd
+}: MovieCardProps) {
+  const palette = getMoviePalette(movie);
+
   // Source formatting - Appears ONLY on hover
   const getSourceDetails = () => {
     const platform = movie.socialSource?.platform;
@@ -64,20 +75,28 @@ export default function MovieCard({ movie, onClick, isCompleted = false }: Movie
 
   return (
     <motion.div
-      whileHover={{ y: -6, scale: 1.015 }}
-      whileTap={{ scale: 0.98 }}
-      transition={{ type: "spring", stiffness: 300, damping: 28 }}
+      onMouseEnter={() => onHoverStart?.(movie)}
+      onMouseLeave={() => onHoverEnd?.()}
+      whileHover={{ y: -14, scale: 1.18 }}
+      whileTap={{ scale: 0.97 }}
+      transition={{ type: "spring", stiffness: 320, damping: 24 }}
       onClick={onClick}
-      className="group flex flex-col cursor-pointer text-left select-none w-full"
+      className="group relative flex flex-col cursor-pointer text-left select-none w-full hover:z-50 transition-all duration-300"
     >
       {/* Quiet Collectible Poster Container */}
-      <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-zinc-950 border border-white/5 shadow-[0_12px_28px_rgba(0,0,0,0.7)] ring-1 ring-white/5 transition-all duration-300 group-hover:border-[#7F72FF]/40 group-hover:ring-[#7F72FF]/20 group-hover:shadow-[0_20px_42px_rgba(0,0,0,0.85),_0_0_20px_rgba(127,114,255,0.18)]">
+      <div 
+        style={{
+          ['--glow-color' as any]: palette.glowColor,
+          ['--color-1' as any]: palette.color1,
+        }}
+        className="relative aspect-[2/3] rounded-xl overflow-hidden bg-zinc-950 border border-white/10 shadow-[0_12px_28px_rgba(0,0,0,0.7)] ring-1 ring-white/10 transition-all duration-300 group-hover:border-[var(--color-1)]/70 group-hover:ring-[var(--color-1)]/40 group-hover:shadow-[0_25px_50px_rgba(0,0,0,0.95),_0_0_35px_var(--glow-color)]"
+      >
         
         {/* Subtle Spine Edge Highlight */}
-        <div className="absolute inset-y-0 left-0 w-[1px] bg-gradient-to-b from-white/20 via-white/5 to-transparent z-20 pointer-events-none" />
+        <div className="absolute inset-y-0 left-0 w-[1px] bg-gradient-to-b from-white/30 via-white/10 to-transparent z-20 pointer-events-none" />
         
         {/* Glossy Diagonal Reflection Sheen */}
-        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.06] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20" />
+        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.08] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20" />
 
         {/* Subtle Completed/Watched Badge Indicator */}
         {isWatchedOrCompleted && (
@@ -91,8 +110,8 @@ export default function MovieCard({ movie, onClick, isCompleted = false }: Movie
 
         {/* Source Badge (ONLY Appears on Hover) */}
         <div className="absolute top-2 right-2 z-30 opacity-0 -translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 ease-out pointer-events-none">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#0B0D12]/90 border border-[#7F72FF]/30 backdrop-blur-md">
-            <SourceIcon className="w-3 h-3 text-[#7F72FF]" />
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#0B0D12]/90 border border-white/20 backdrop-blur-md">
+            <SourceIcon className="w-3 h-3 text-[var(--color-1)]" />
             <span className="text-[10px] font-sans font-medium text-zinc-200 tracking-tight max-w-[110px] truncate">
               {source.label}
             </span>
@@ -105,11 +124,11 @@ export default function MovieCard({ movie, onClick, isCompleted = false }: Movie
             src={movie.posterUrl}
             alt={movie.title}
             referrerPolicy="no-referrer"
-            className="w-full h-full object-cover transition-transform duration-500 scale-100 group-hover:scale-[1.03] opacity-95 group-hover:opacity-100"
+            className="w-full h-full object-cover transition-transform duration-500 scale-100 group-hover:scale-[1.04] opacity-95 group-hover:opacity-100"
           />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-900 text-zinc-600 p-4 text-center">
-            <Film className="w-7 h-7 mb-2 text-zinc-700 group-hover:text-[#7F72FF] transition-colors" />
+            <Film className="w-7 h-7 mb-2 text-zinc-700 group-hover:text-[var(--color-1)] transition-colors" />
             <span className="text-[10px] text-zinc-500 font-medium truncate w-full">{movie.title}</span>
           </div>
         )}

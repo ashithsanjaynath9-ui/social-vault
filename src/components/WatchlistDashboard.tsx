@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { Movie, AppStats } from '../types';
 import MovieCard from './MovieCard';
+import { getMoviePalette } from '../utils/moviePalette';
 
 interface WatchlistDashboardProps {
   movies: Movie[];
@@ -51,6 +52,10 @@ export default function WatchlistDashboard({
 
   // Local state to toggle between the physical movie shelf and the completed archive
   const [libraryMode, setLibraryMode] = useState<'shelf' | 'completed'>('shelf');
+
+  // Track hovered movie card to dynamically adapt the page's ambient background color palette
+  const [hoveredMovie, setHoveredMovie] = useState<Movie | null>(null);
+  const hoveredPalette = hoveredMovie ? getMoviePalette(hoveredMovie) : null;
 
   // Human-focused emotional collections exactly matching the user requested categories and examples
   const COLLECTIONS: EmotionalCollection[] = useMemo(() => [
@@ -253,9 +258,35 @@ export default function WatchlistDashboard({
   }, [movies]);
 
   return (
-    <div className="space-y-8 animate-fade-in text-zinc-100 font-sans max-w-5xl mx-auto py-2 px-4 sm:px-6" id="personal-movie-shelf">
+    <div className="relative space-y-8 animate-fade-in text-zinc-100 font-sans max-w-5xl mx-auto py-2 px-4 sm:px-6" id="personal-movie-shelf">
       
-      {/* Sleek Header & Search Room */}
+      {/* Dynamic Cinematic Ambient Background Gradient on Movie Card Hover */}
+      <AnimatePresence>
+        {hoveredMovie && hoveredPalette && (
+          <motion.div
+            key={`ambient-bg-${hoveredMovie.id}`}
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.96 }}
+            transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1.0] }}
+            className="pointer-events-none absolute -inset-x-12 -inset-y-12 z-0 overflow-hidden rounded-[2.5rem] transition-all"
+          >
+            {/* Multi-stop radial gradient color splash */}
+            <div 
+              className="absolute inset-0 filter blur-[80px] saturate-150 opacity-45 transition-all duration-500"
+              style={{
+                background: `radial-gradient(circle at 50% 35%, ${hoveredPalette.color1} 0%, ${hoveredPalette.color2} 38%, ${hoveredPalette.color3} 70%, transparent 100%)`
+              }}
+            />
+            {/* Subtle Vignette & Dark Overlay for Crisp Text Contrast */}
+            <div className="absolute inset-0 bg-gradient-to-b from-[#050505]/40 via-transparent to-[#050505]/85 pointer-events-none" />
+            <div className="absolute inset-0 bg-black/20 pointer-events-none" />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="relative z-10 space-y-8">
+        {/* Sleek Header & Search Room */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-2">
         <div className="space-y-1 text-left">
           <p className="text-[10px] tracking-widest uppercase font-medium text-zinc-500 font-mono">
@@ -415,6 +446,8 @@ export default function WatchlistDashboard({
                       key={movie.id}
                       movie={movie}
                       onClick={() => onSelectMovie(movie.id)}
+                      onHoverStart={(m) => setHoveredMovie(m)}
+                      onHoverEnd={() => setHoveredMovie(null)}
                     />
                   ))}
                 </div>
@@ -472,6 +505,8 @@ export default function WatchlistDashboard({
                             key={`${collection.id}-${movie.id}`}
                             movie={movie}
                             onClick={() => onSelectMovie(movie.id)}
+                            onHoverStart={(m) => setHoveredMovie(m)}
+                            onHoverEnd={() => setHoveredMovie(null)}
                           />
                         ))}
 
@@ -543,6 +578,8 @@ export default function WatchlistDashboard({
                       key={movie.id}
                       movie={movie}
                       onClick={() => onSelectMovie(movie.id)}
+                      onHoverStart={(m) => setHoveredMovie(m)}
+                      onHoverEnd={() => setHoveredMovie(null)}
                       isCompleted={true}
                     />
                   ))}
@@ -556,6 +593,7 @@ export default function WatchlistDashboard({
             </motion.div>
           )}
         </AnimatePresence>
+        </div>
       </div>
     </div>
   );
