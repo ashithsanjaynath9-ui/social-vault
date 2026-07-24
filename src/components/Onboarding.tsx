@@ -633,8 +633,7 @@ const STORY_SCREENS: ScreenDefinition[] = [
   {
     isLastScreen: true,
     headline: 'Not sure what to watch?',
-    subheadline1: "We'll always have something worth watching.",
-    ctaText: '',
+    ctaText: 'Start Plotting',
     glowColor: 'radial-gradient(circle at 50% 45%, rgba(142, 123, 255, 0.3) 0%, rgba(0, 240, 255, 0.18) 60%, transparent 85%)',
     visual: <PlotPicksDemoAnimation />,
   },
@@ -653,16 +652,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
     }, 700);
   }, [isExiting, onComplete]);
 
-  // Automatic transition after 3.5 seconds of inactivity on the final screen
-  useEffect(() => {
-    if (currentStep === STORY_SCREENS.length - 1 && !isExiting) {
-      const timer = setTimeout(() => {
-        triggerExit();
-      }, 3500);
-      return () => clearTimeout(timer);
-    }
-  }, [currentStep, isExiting, triggerExit]);
-
+  // Remove auto-timer so user can click Start Plotting button when ready
   // Keyboard accessibility navigation & instant transition triggers
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -815,8 +805,8 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
               </motion.p>
             )}
 
-            {/* Prominent Action Button on First Screen */}
-            {screen.isFirstScreen && (
+            {/* Prominent Action Button on First & Last Screen */}
+            {(screen.isFirstScreen || screen.isLastScreen) && screen.ctaText && (
               <motion.button
                 onClick={(e) => {
                   e.stopPropagation();
