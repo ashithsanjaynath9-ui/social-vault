@@ -239,7 +239,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                   transition={{ type: "spring", stiffness: 250, damping: 20 }}
                   className="px-8 py-3.5 rounded-xl bg-white text-black hover:bg-zinc-200 text-xs font-sans font-medium flex items-center gap-2 cursor-pointer shadow-lg"
                 >
-                  <span>Build My Library</span>
+                  <span>Build Your Plot</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </motion.button>
               </div>
@@ -301,7 +301,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                         className="flex flex-col items-center space-y-1.5 text-center p-2"
                       >
                         <Sparkles className="w-8 h-8 text-[#7C8CFF] animate-bounce" />
-                        <span className="text-xs font-sans text-[#7C8CFF] font-normal">Library ready</span>
+                        <span className="text-xs font-sans text-[#7C8CFF] font-normal">Your Plot ready</span>
                         <span className="text-xs font-sans text-zinc-450 leading-none">12 Movies Curated</span>
                       </motion.div>
                     )}
@@ -551,7 +551,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                   transition={{ type: "spring", stiffness: 250, damping: 20 }}
                   className="px-12 py-4 rounded-xl bg-[#7C8CFF] text-[#0A0F1E] text-xs font-sans font-medium shadow-xl flex items-center gap-2 cursor-pointer"
                 >
-                  <span>Build My Library</span>
+                  <span>Build Your Plot</span>
                   <Bookmark className="w-4 h-4 text-[#0A0F1E]" />
                 </motion.button>
               </div>

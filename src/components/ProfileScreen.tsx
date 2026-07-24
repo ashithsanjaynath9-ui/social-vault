@@ -243,7 +243,7 @@ export default function ProfileScreen({
                 <Lock className="w-4 h-4 text-zinc-400" />
               </div>
               <div className="text-left min-w-0">
-                <p className="text-xs font-medium text-zinc-200">Private Library</p>
+                <p className="text-xs font-medium text-zinc-200">Private Plot</p>
                 <p className="text-[10px] text-zinc-500 mt-0.5 truncate">Only accessible on this client device</p>
               </div>
             </div>
@@ -259,7 +259,7 @@ export default function ProfileScreen({
             </button>
           </div>
 
-          {/* Export Library Setting */}
+          {/* Export Plot Setting */}
           <button
             onClick={handleExportLibrary}
             className="w-full flex items-center justify-between p-4 hover:bg-zinc-900/35 transition-colors text-left border-0 bg-transparent cursor-pointer"
@@ -269,7 +269,7 @@ export default function ProfileScreen({
                 <Download className="w-4 h-4 text-zinc-400" />
               </div>
               <div className="text-left min-w-0">
-                <p className="text-xs font-medium text-zinc-200">Export Library</p>
+                <p className="text-xs font-medium text-zinc-200">Export Plot</p>
                 <p className="text-[10px] text-zinc-500 mt-0.5 truncate">Download your curated watchlist as JSON</p>
               </div>
             </div>

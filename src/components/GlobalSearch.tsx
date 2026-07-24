@@ -92,7 +92,7 @@ export default function GlobalSearch({ movies, onAddMovie }: GlobalSearchProps) 
     });
   }, [worldDatabase, query]);
 
-  // Check if a movie from results is already in the library
+  // Check if a movie from results is already in Your Plot
   const isMovieInLibrary = (title: string) => {
     return movies.some(m => m.title.toLowerCase() === title.toLowerCase());
   };
@@ -103,16 +103,12 @@ export default function GlobalSearch({ movies, onAddMovie }: GlobalSearchProps) 
       <div className="w-full max-w-xs md:max-w-sm relative">
         <div 
           onClick={() => setIsOpen(true)}
-          className="flex items-center justify-between gap-3 px-3 py-2 bg-zinc-900/60 hover:bg-zinc-900 border border-zinc-850/60 hover:border-zinc-800 rounded-xl cursor-pointer select-none transition-all group shadow-sm text-left"
+          className="flex items-center justify-between gap-3 px-3.5 py-2 bg-zinc-900/60 hover:bg-zinc-900 border border-zinc-850/60 hover:border-zinc-800 rounded-xl cursor-pointer select-none transition-all group shadow-sm text-left"
           id="global-spotlight-trigger"
         >
-          <div className="flex items-center gap-2 text-zinc-400 group-hover:text-zinc-200">
+          <div className="flex items-center gap-2.5 text-zinc-400 group-hover:text-zinc-200">
             <Search className="w-4 h-4 text-zinc-500 group-hover:text-zinc-400 shrink-0" />
-            <span className="text-xs font-sans tracking-wide">Search movies globally...</span>
-          </div>
-          <div className="hidden sm:flex items-center gap-1 bg-zinc-950 border border-zinc-850 text-zinc-500 font-mono text-[10px] px-1.5 py-0.5 rounded-md font-bold">
-            <span>⌘</span>
-            <span>K</span>
+            <span className="text-xs font-sans tracking-wide pl-1">Search movies globally...</span>
           </div>
         </div>
       </div>
@@ -159,9 +155,6 @@ export default function GlobalSearch({ movies, onAddMovie }: GlobalSearchProps) 
                     <X className="w-3 h-3" />
                   </button>
                 )}
-                <div className="text-[10px] font-mono text-zinc-500 bg-zinc-900 border border-zinc-850 px-1.5 py-0.5 rounded shrink-0 uppercase tracking-wider">
-                  Esc to close
-                </div>
               </div>
 
               {/* Spotlight Autocomplete Result Output */}
@@ -245,7 +238,7 @@ export default function GlobalSearch({ movies, onAddMovie }: GlobalSearchProps) 
                             </div>
                           </div>
 
-                          {/* Right: Tactile Add to Library Action */}
+                          {/* Right: Tactile Add to Plot Action */}
                           <div className="self-stretch sm:self-auto flex items-center justify-end border-t sm:border-t-0 border-zinc-900/60 pt-2 sm:pt-0 shrink-0">
                             {saved ? (
                               <div className="flex items-center gap-1 bg-emerald-500/10 text-emerald-400 text-xs px-3 py-1.5 rounded-lg border border-emerald-500/20 font-medium">
@@ -274,12 +267,9 @@ export default function GlobalSearch({ movies, onAddMovie }: GlobalSearchProps) 
               </div>
 
               {/* Bottom Quick Help Info Strip */}
-              <div className="bg-zinc-950/60 px-4 py-2 border-t border-zinc-900 flex justify-between items-center text-[10px] text-zinc-500 font-sans shrink-0">
+              <div className="bg-zinc-950/60 px-4 py-2 border-t border-zinc-900 flex items-center text-[10px] text-zinc-500 font-sans shrink-0">
                 <span className="flex items-center gap-1">
                   <Film className="w-3.5 h-3.5 text-zinc-600" /> Matches movies from global datasets.
-                </span>
-                <span className="hidden sm:inline font-mono">
-                  Press <kbd className="text-zinc-400 bg-zinc-900 px-1 py-0.5 rounded border border-zinc-850 font-semibold">esc</kbd> to close
                 </span>
               </div>
             </motion.div>

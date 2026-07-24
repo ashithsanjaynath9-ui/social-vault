@@ -11,7 +11,8 @@ import {
   Loader2, 
   Sparkles, 
   MoreHorizontal, 
-  Shield 
+  Shield,
+  Bookmark 
 } from 'lucide-react';
 import { Movie } from '../types';
 
@@ -130,8 +131,9 @@ export default function HeroProductDemo({ onImportSubmit, onSelectMovie }: HeroP
   const [isExtractingReal, setIsExtractingReal] = useState(false);
   const [realError, setRealError] = useState<string | null>(null);
 
-  // Smooth continuous ambient background scrolling state
+  // Smooth continuous rolling film reel state
   const [scrollPos, setScrollPos] = useState(0);
+  const [containerCenter, setContainerCenter] = useState(600);
 
   const scrollPosRef = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -139,22 +141,35 @@ export default function HeroProductDemo({ onImportSubmit, onSelectMovie }: HeroP
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Precise sizing parameters
+  // Sizing parameters
   const CARD_WIDTH = 180; // px
   const CARD_GAP = 16; // px
-  const ITEM_FULL_WIDTH = CARD_WIDTH + CARD_GAP;
+  const ITEM_FULL_WIDTH = CARD_WIDTH + CARD_GAP; // 196px
   const SINGLE_SET_WIDTH = CAROUSEL_MOVIES.length * ITEM_FULL_WIDTH; // 12 * 196 = 2352px
+
+  // Track container width for precise center detection
+  useEffect(() => {
+    const updateCenter = () => {
+      if (containerRef.current) {
+        setContainerCenter(containerRef.current.offsetWidth / 2);
+      }
+    };
+    updateCenter();
+    window.addEventListener('resize', updateCenter);
+    return () => window.removeEventListener('resize', updateCenter);
+  }, []);
 
   // Silky smooth RequestAnimationFrame hardware-accelerated movement loop
   useEffect(() => {
     let lastTime = performance.now();
+    // 35-45 seconds per complete visible set cycle (~40s)
+    const SPEED_PX_PER_SEC = SINGLE_SET_WIDTH / 40; 
 
     const animate = (currentTime: number) => {
       const delta = currentTime - lastTime;
       lastTime = currentTime;
 
-      // Smooth frame-rate independent ambient speed (~45px per second)
-      const pixelsToMove = (delta / 1000) * 45; 
+      const pixelsToMove = (delta / 1000) * SPEED_PX_PER_SEC; 
       let nextPos = scrollPosRef.current + pixelsToMove;
 
       // Reset seamlessly when one full set of 12 items has passed
@@ -381,52 +396,93 @@ export default function HeroProductDemo({ onImportSubmit, onSelectMovie }: HeroP
 
       </div>
 
-      {/* 4. AMBIENT BACKGROUND FILM REEL (Purely atmospheric, non-interactive) */}
-      <div className="relative z-10 w-full mt-10 sm:mt-14 pointer-events-none select-none">
+      {/* 4. CINEMATIC ROLLING FILM REEL (Continuous Curved 35mm Projector Strip) */}
+      <div 
+        className="relative z-20 w-full mt-10 sm:mt-14 select-none pointer-events-none"
+      >
+        {/* Perspective Wrapper for Curved 3D Film Strip */}
         <div 
           ref={containerRef}
-          className="relative w-full overflow-hidden py-4 sm:py-6 bg-transparent"
+          className="relative w-full overflow-hidden py-8 sm:py-12 bg-transparent"
+          style={{ perspective: '1200px' }}
         >
           {/* Left Vignette Edge Fade - Blends seamlessly into canvas background */}
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-28 sm:w-48 bg-gradient-to-r from-[#050505] via-[#050505]/85 to-transparent z-30" />
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-28 sm:w-48 bg-gradient-to-r from-[#050505] via-[#050505]/90 to-transparent z-40" />
           
           {/* Right Vignette Edge Fade - Blends seamlessly into canvas background */}
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-28 sm:w-48 bg-gradient-to-l from-[#050505] via-[#050505]/85 to-transparent z-30" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-28 sm:w-48 bg-gradient-to-l from-[#050505] via-[#050505]/90 to-transparent z-40" />
 
-          {/* Continuous Smooth Infinite Rolling Track (Hardware-Accelerated) */}
+          {/* Atmospheric Ambient Backlight behind Center of Reel */}
+          <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-48 bg-[#8E7BFF]/10 blur-3xl rounded-full z-0" />
+
+          {/* Continuous Infinite Rolling Motion Track */}
           <div 
-            className="flex items-center gap-4 py-2 will-change-transform opacity-35 sm:opacity-45 filter contrast-105"
+            className="flex items-center gap-4 py-4 will-change-transform"
             style={{
-              transform: `translate3d(-${scrollPos}px, 0, 0)`
+              transform: `translate3d(-${scrollPos}px, 0, 0)`,
+              transformStyle: 'preserve-3d'
             }}
           >
-            {REEL_MOVIES.map((movie, idx) => (
-              <div
-                key={`${movie.id}-${idx}`}
-                className="relative w-36 sm:w-44 aspect-[2/3] rounded-2xl overflow-hidden flex-shrink-0 border border-white/10 shadow-lg"
-              >
-                {/* Movie Poster Image */}
-                <img 
-                  src={movie.posterUrl} 
-                  alt={movie.title}
-                  referrerPolicy="no-referrer"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    if (target.src !== movie.backupPosterUrl) {
-                      target.src = movie.backupPosterUrl;
-                    }
-                  }}
-                  className="w-full h-full object-cover filter brightness-85 contrast-110"
-                />
+            {REEL_MOVIES.map((movie, idx) => {
+              // Calculate card position relative to visible container center
+              const cardLeftX = idx * ITEM_FULL_WIDTH - scrollPos;
+              const cardCenterX = cardLeftX + CARD_WIDTH / 2;
+              const distToCenter = Math.abs(cardCenterX - containerCenter);
+              
+              // Organic curved arc calculation
+              const normDist = Math.min(1, distToCenter / Math.max(containerCenter, 400));
+              const arcY = Math.pow(normDist, 2) * 14;
 
-                {/* Poster Bottom Title Overlay */}
-                <div className="absolute inset-x-0 bottom-0 pt-10 pb-3 px-3 bg-gradient-to-t from-black/90 via-black/50 to-transparent flex items-end justify-center text-center">
-                  <span className="font-sans font-medium text-[10px] sm:text-xs text-white/80 tracking-wider uppercase drop-shadow-md">
-                    {movie.displayTitle}
-                  </span>
+              return (
+                <div
+                  key={`${movie.id}-${idx}`}
+                  style={{
+                    transform: `translateY(${arcY}px)`,
+                    transformStyle: 'preserve-3d',
+                  }}
+                  className="relative w-36 sm:w-44 flex-shrink-0 rounded-2xl overflow-hidden bg-[#0D0E17] border border-white/10 shadow-xl z-10 opacity-80"
+                >
+                  {/* 35mm Sprocket Perforations Top Header Bar */}
+                  <div className="w-full bg-[#07080E] py-1 px-2 border-b border-white/10 flex justify-between items-center z-20">
+                    <div className="w-2.5 h-1.5 rounded-[1px] bg-[#161826] border border-white/10 shadow-inner" />
+                    <div className="w-2.5 h-1.5 rounded-[1px] bg-[#161826] border border-white/10 shadow-inner" />
+                    <div className="w-2.5 h-1.5 rounded-[1px] bg-[#161826] border border-white/10 shadow-inner" />
+                    <div className="w-2.5 h-1.5 rounded-[1px] bg-[#161826] border border-white/10 shadow-inner" />
+                  </div>
+
+                  {/* Poster Image Area */}
+                  <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/40">
+                    <img 
+                      src={movie.posterUrl} 
+                      alt={movie.title}
+                      referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        if (target.src !== movie.backupPosterUrl) {
+                          target.src = movie.backupPosterUrl;
+                        }
+                      }}
+                      className="w-full h-full object-cover filter brightness-95 contrast-105"
+                    />
+
+                    {/* Poster Bottom Title Overlay */}
+                    <div className="absolute inset-x-0 bottom-0 pt-10 pb-2.5 px-2.5 bg-gradient-to-t from-black via-black/70 to-transparent flex items-end justify-center text-center">
+                      <span className="font-sans font-semibold text-[10px] sm:text-xs tracking-wider uppercase drop-shadow-md text-zinc-300">
+                        {movie.displayTitle}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* 35mm Sprocket Perforations Bottom Footer Bar */}
+                  <div className="w-full bg-[#07080E] py-1 px-2 border-t border-white/10 flex justify-between items-center z-20">
+                    <div className="w-2.5 h-1.5 rounded-[1px] bg-[#161826] border border-white/10 shadow-inner" />
+                    <div className="w-2.5 h-1.5 rounded-[1px] bg-[#161826] border border-white/10 shadow-inner" />
+                    <div className="w-2.5 h-1.5 rounded-[1px] bg-[#161826] border border-white/10 shadow-inner" />
+                    <div className="w-2.5 h-1.5 rounded-[1px] bg-[#161826] border border-white/10 shadow-inner" />
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
         </div>

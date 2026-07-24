@@ -85,7 +85,7 @@ export default function MovieDetailModal({
                 “Marking a chapter of your story.”
               </h5>
               <p className="text-xs text-[#5C574F] leading-relaxed">
-                Plotted under your personal library ribbon on <span className="font-medium text-[#1A1917]">{dateStr}</span>. This film is held safe for you until a quiet, reflective evening. No ads, no commercial rush.
+                Plotted under your personal plot ribbon on <span className="font-medium text-[#1A1917]">{dateStr}</span>. This film is held safe for you until a quiet, reflective evening. No ads, no commercial rush.
               </p>
             </div>
             <div className="flex justify-between items-center text-[10px] text-[#8B867A] pt-1.5 border-t border-dashed border-[#EBE7DF]">
@@ -152,7 +152,7 @@ export default function MovieDetailModal({
                   The Curator's Stamp
                 </h5>
                 <p className="text-xs text-zinc-400 leading-relaxed">
-                  Certified as a permanent entry of <span className="text-zinc-300">{emailPrefix}</span>'s personal film library. Registered on <span className="text-zinc-400">{dateStr}</span>.
+                  Certified as a permanent entry of <span className="text-zinc-300">{emailPrefix}</span>'s personal film plot. Registered on <span className="text-zinc-400">{dateStr}</span>.
                 </p>
               </div>
             </div>
@@ -238,7 +238,7 @@ export default function MovieDetailModal({
           {/* Main Title, Director, and Year */}
           <div className="space-y-1.5">
             <div className="flex items-baseline gap-2 flex-wrap">
-              <h2 className={`text-3xl font-display font-light italic text-white tracking-tight ${movie.watched ? 'line-through text-zinc-500' : ''}`}>
+              <h2 className="text-3xl font-display font-light italic text-white tracking-tight">
                 {movie.title}
               </h2>
               <span className="text-sm font-sans text-zinc-500 font-normal">({movie.year})</span>

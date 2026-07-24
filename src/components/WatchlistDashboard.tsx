@@ -519,7 +519,7 @@ export default function WatchlistDashboard({
             </motion.div>
           ) : (
             
-            /* COMPLETED ARCHIVE VAULT (Faded grid of completed movie tickets) */
+            /* COMPLETED ARCHIVE VAULT (Grid of completed movie collection) */
             <motion.div
               key="completed-archive-container"
               initial={{ opacity: 0 }}

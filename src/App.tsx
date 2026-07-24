@@ -281,23 +281,23 @@ export default function App() {
           
           {/* Left: Logo with Bookmark Icon & Subtitle */}
           <div 
-            className="flex items-center gap-3 select-none cursor-pointer group" 
+            className="flex items-center gap-3.5 select-none cursor-pointer group" 
             onClick={() => setViewMode('home')}
           >
-            <div className="w-9 h-9 rounded-xl bg-[#0D0E14] border border-[#232135] flex items-center justify-center text-[#7F72FF] shadow-[0_0_15px_rgba(127,114,255,0.25)] transition-transform group-hover:scale-105">
-              <Bookmark className="w-4 h-4 fill-[#7F72FF]/20 text-[#7F72FF]" />
+            <div className="w-[42px] h-[42px] rounded-xl bg-[#0E0F18] border border-[#2D2A4A] flex items-center justify-center text-[#8E7BFF] shadow-[0_0_20px_rgba(142,123,255,0.35)] transition-all duration-300 group-hover:scale-105 group-hover:border-[#8E7BFF]/60 group-hover:shadow-[0_0_28px_rgba(142,123,255,0.5)]">
+              <Bookmark className="w-[20px] h-[20px] fill-[#8E7BFF]/30 text-[#9E8FFF] stroke-[1.75]" />
             </div>
-            <div className="flex flex-col text-left">
-              <span className="font-sans font-bold text-lg sm:text-xl text-[#F5F5F3] tracking-tight lowercase">
+            <div className="flex flex-col text-left justify-center">
+              <span className="font-sans font-semibold text-[22px] sm:text-[25px] text-[#F7F7F8] tracking-[-0.03em] leading-none lowercase antialiased">
                 plot
               </span>
-              <span className="text-[11px] text-[#7A798C] font-sans font-normal leading-none mt-0.5">
+              <span className="text-[11px] sm:text-xs text-[#7A798C] font-sans font-normal leading-none mt-1.5 tracking-normal">
                 Less deciding. More watching.
               </span>
             </div>
           </div>
 
-          {/* Center: Navigation Links (Home, Library, Profile) with Glowing Active Bar */}
+          {/* Center: Navigation Links (Home, Your Plot, Profile) with Glowing Active Bar */}
           <nav className="flex items-center gap-8 py-1" id="main-tabs-nav">
             <button
               onClick={() => setViewMode('home')}
@@ -321,7 +321,7 @@ export default function App() {
                 viewMode === 'library' ? 'text-[#F5F5F3]' : 'text-[#7A798C] hover:text-[#F5F5F3]'
               }`}
             >
-              <span>Library</span>
+              <span>Your Plot</span>
               {viewMode === 'library' && (
                 <motion.div
                   layoutId="mainNavIndicator"
@@ -359,7 +359,7 @@ export default function App() {
               className="px-4 sm:px-5 py-2.5 rounded-full bg-gradient-to-r from-[#5035E6] via-[#7F72FF] to-[#8E7BFF] hover:opacity-95 text-white text-xs font-semibold uppercase tracking-wider flex items-center gap-2 cursor-pointer shadow-[0_0_25px_rgba(127,114,255,0.45)] transition-all hover:scale-[1.02] active:scale-[0.98] shrink-0"
             >
               <Sparkles className="w-3.5 h-3.5 fill-white text-white" />
-              <span className="hidden sm:inline">DECIDE TONIGHT</span>
+              <span className="hidden sm:inline">Ask plot</span>
             </button>
           </div>
         </header>

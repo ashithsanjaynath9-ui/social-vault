@@ -138,7 +138,7 @@ select:not([class*="bg-transparent"]),
   transition: all 0.2s ease-in-out !important;
 }
 
-/* Filter select container divs in the Library refine panel */
+/* Filter select container divs in the Your Plot refine panel */
 div.flex.items-center.bg-zinc-900\/50 {
   background-color: #12192B !important;
   border: 1px solid rgba(255, 255, 255, 0.06) !important;

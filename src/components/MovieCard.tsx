@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Movie } from '../types';
-import { Film, Instagram, Video, Youtube, MessageCircle, Mic, Bookmark } from 'lucide-react';
+import { Film, Instagram, Video, Youtube, MessageCircle, Mic, Bookmark, Check } from 'lucide-react';
 
 interface MovieCardProps {
   key?: React.Key;
@@ -60,15 +60,15 @@ export default function MovieCard({ movie, onClick, isCompleted = false }: Movie
     ? movie.streamingServices.slice(0, 2).join(' • ')
     : null;
 
+  const isWatchedOrCompleted = isCompleted || movie.watched;
+
   return (
     <motion.div
       whileHover={{ y: -6, scale: 1.015 }}
       whileTap={{ scale: 0.98 }}
       transition={{ type: "spring", stiffness: 300, damping: 28 }}
       onClick={onClick}
-      className={`group flex flex-col cursor-pointer text-left select-none w-full ${
-        isCompleted ? 'opacity-65 hover:opacity-100 transition-opacity duration-300' : ''
-      }`}
+      className="group flex flex-col cursor-pointer text-left select-none w-full"
     >
       {/* Quiet Collectible Poster Container */}
       <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-zinc-950 border border-white/5 shadow-[0_12px_28px_rgba(0,0,0,0.7)] ring-1 ring-white/5 transition-all duration-300 group-hover:border-[#7F72FF]/40 group-hover:ring-[#7F72FF]/20 group-hover:shadow-[0_20px_42px_rgba(0,0,0,0.85),_0_0_20px_rgba(127,114,255,0.18)]">
@@ -78,6 +78,16 @@ export default function MovieCard({ movie, onClick, isCompleted = false }: Movie
         
         {/* Glossy Diagonal Reflection Sheen */}
         <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.06] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20" />
+
+        {/* Subtle Completed/Watched Badge Indicator */}
+        {isWatchedOrCompleted && (
+          <div className="absolute top-2 left-2 z-30 pointer-events-none">
+            <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#0B0D12]/90 border border-emerald-500/40 backdrop-blur-md text-emerald-400 text-[10px] font-sans font-medium shadow-sm">
+              <Check className="w-3 h-3 text-emerald-400 stroke-[2.5]" />
+              <span>Watched</span>
+            </div>
+          </div>
+        )}
 
         {/* Source Badge (ONLY Appears on Hover) */}
         <div className="absolute top-2 right-2 z-30 opacity-0 -translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 ease-out pointer-events-none">
@@ -89,15 +99,13 @@ export default function MovieCard({ movie, onClick, isCompleted = false }: Movie
           </div>
         </div>
 
-        {/* Poster Image */}
+        {/* Poster Image - Always vibrant, colorful and un-faded */}
         {movie.posterUrl ? (
           <img
             src={movie.posterUrl}
             alt={movie.title}
             referrerPolicy="no-referrer"
-            className={`w-full h-full object-cover transition-transform duration-500 scale-100 group-hover:scale-[1.03] ${
-              isCompleted ? 'grayscale opacity-75 group-hover:grayscale-0 group-hover:opacity-100' : 'opacity-95 group-hover:opacity-100'
-            }`}
+            className="w-full h-full object-cover transition-transform duration-500 scale-100 group-hover:scale-[1.03] opacity-95 group-hover:opacity-100"
           />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-900 text-zinc-600 p-4 text-center">

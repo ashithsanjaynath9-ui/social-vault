@@ -68,8 +68,8 @@ export const IDENTITY_DIRECTIONS: IdentityDirection[] = [
     id: 'monogram',
     name: 'plot',
     conceptTitle: 'The Curator’s Monogram',
-    metaphor: 'A personal library seal of ownership.',
-    description: 'An intertwined geometric seal of ownership. Taking inspiration from classical ex-libris bookplates and personal stamps, this direction communicates pride of ownership. It is an enduring stamp that declares: “This is part of my personal library.”',
+    metaphor: 'A personal plot seal of ownership.',
+    description: 'An intertwined geometric seal of ownership. Taking inspiration from classical ex-libris bookplates and personal stamps, this direction communicates pride of ownership. It is an enduring stamp that declares: “This is part of my personal plot.”',
     typography: 'Aesthetic Serifs + Fine Letterspacing',
     vibeText: 'Classic • Artisanal • Personal • Permanent',
     logoSvg: (className = "w-12 h-12") => (

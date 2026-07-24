@@ -181,7 +181,7 @@ export default function CineSaveAssistant({
     const totalMatches = matchingMovies.length;
     const startIndex = (shuffleIndex * 3) % totalMatches;
     
-    // Circulate list to ensure we always get 3 movies if library has enough
+    // Circulate list to ensure we always get 3 movies if plot has enough
     const results: Movie[] = [];
     for (let i = 0; i < 3; i++) {
       const idx = (startIndex + i) % totalMatches;
@@ -191,7 +191,7 @@ export default function CineSaveAssistant({
       }
     }
 
-    // Backup duplicates just in case library is very small (< 3)
+    // Backup duplicates just in case plot is very small (< 3)
     if (results.length < 3 && totalMatches > 0) {
       for (let i = 0; i < totalMatches; i++) {
         const candidate = matchingMovies[i];
@@ -299,11 +299,11 @@ export default function CineSaveAssistant({
                         {brandConfig.logoSvg("w-3.5 h-3.5")}
                       </div>
                       <span className="text-[10px] tracking-widest uppercase font-semibold text-[#97A5FF] font-mono">
-                        {brandConfig.name} AI Assistant
+                        Plot Picks
                       </span>
                     </div>
                     <h3 className="text-2xl sm:text-3xl font-display font-light italic text-zinc-100 leading-none">
-                      {currentStep === 'results' ? 'Your Personal Curated Picks' : 'Decide in Under 30 Seconds'}
+                      {currentStep === 'results' ? 'Your Personal Curated Picks' : 'Ask plot'}
                     </h3>
                   </div>
                   <button 
@@ -457,7 +457,7 @@ export default function CineSaveAssistant({
                             onClick={handleReset}
                             className="text-xs text-[#97A5FF] hover:text-white flex items-center gap-1 font-mono hover:underline cursor-pointer"
                           >
-                            <ArrowLeft className="w-3 h-3" /> Reset Quiz
+                            <ArrowLeft className="w-3 h-3" /> Reset Choices
                           </button>
                         </div>
 
@@ -503,7 +503,7 @@ export default function CineSaveAssistant({
                                             src={movie.posterUrl} 
                                             alt={movie.title}
                                             referrerPolicy="no-referrer"
-                                            className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-300"
+                                            className="w-full h-full object-cover transition-all duration-300"
                                           />
                                         ) : (
                                           <div className="w-full h-full flex items-center justify-center bg-zinc-900 text-zinc-600 text-xl font-mono">
@@ -598,7 +598,7 @@ export default function CineSaveAssistant({
                 {/* Footer disclaimer stamp */}
                 <div className="py-2 text-center shrink-0">
                   <p className="text-[10px] text-zinc-600 font-sans max-w-md mx-auto">
-                    plot Assistant filters your own saved films. There are no social feeds, no sponsored bias, and no artificial loops. Just the films you trusted yourself to remember.
+                    plot Concierge filters your own saved films. There are no social feeds, no sponsored bias, and no artificial loops. Just the films you trusted yourself to remember.
                   </p>
                 </div>
 
