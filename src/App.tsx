@@ -5,10 +5,9 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Film, Sparkles, Tv, Check, Flame, Play, Trash, Search, Shuffle, Calendar, RefreshCw, Compass, HelpCircle, X, User, Bookmark } from 'lucide-react';
+import { Check, Sparkles, HelpCircle, Bookmark } from 'lucide-react';
 import { Movie, AppStats } from './types';
-import { INITIAL_MOVIES, ReelTemplate } from './data';
-import { parseRuntimeMinutes } from './utils';
+import { INITIAL_MOVIES } from './data';
 import WatchlistDashboard from './components/WatchlistDashboard';
 import CineSaveAssistant from './components/CineSaveAssistant';
 import Onboarding from './components/Onboarding';
@@ -48,8 +47,9 @@ export default function App() {
   // User Account & Onboarding State
   const [userEmail, setUserEmail] = useState<string>('batman@gotham.com');
   const [onboardingComplete, setOnboardingComplete] = useState<boolean>(false);
+  const [justFinishedOnboarding, setJustFinishedOnboarding] = useState<boolean>(false);
 
-  // Premium Toast Notification State & Auto-dismiss (Delight Moment 3)
+  // Premium Toast Notification State & Auto-dismiss
   const [toast, setToast] = useState<{ message: string; sub: string; visible: boolean } | null>(null);
 
   useEffect(() => {
@@ -99,16 +99,17 @@ export default function App() {
     }
   }, [activeIdentity, isLoaded]);
 
-  // Keyboard shortcut listener for global search modal (Cmd+K / Ctrl+K)
   // Save onboarding state
   const handleCompleteOnboarding = () => {
     setOnboardingComplete(true);
+    setJustFinishedOnboarding(true);
     localStorage.setItem('plot_onboarding_complete', 'true');
     setViewMode('home');
   };
 
   const handleResetOnboarding = () => {
     setOnboardingComplete(false);
+    setJustFinishedOnboarding(false);
     localStorage.removeItem('plot_onboarding_complete');
     localStorage.removeItem('cine_save_onboarding_complete');
   };
@@ -121,7 +122,6 @@ export default function App() {
     const watchedCount = watched.length;
     const savedHours = Math.round(totalSaved * 2);
 
-    // Calculate statistical Mode (highest frequency) Vibe Tag
     const vibeCounts = unwatched.reduce((acc, curr) => {
       if (curr.vibe) {
         acc[curr.vibe] = (acc[curr.vibe] || 0) + 1;
@@ -150,7 +150,6 @@ export default function App() {
     }));
     
     setMovies(prev => [...decorated, ...prev]);
-    // Switch to active unwatched tab and View Mode to see the newly extracted items
     setCurrentTab('unwatched');
     setViewMode('library');
 
@@ -169,7 +168,6 @@ export default function App() {
       if (m.id === id) {
         movieTitle = m.title;
         isMarkedWatched = !m.watched;
-        // If finishing watch, remove progress tracker value to clear Continue Watching state
         const nextProgress = isMarkedWatched ? undefined : m.progress;
         return {
           ...m,
@@ -240,7 +238,6 @@ export default function App() {
   if (!isLoaded) {
     return (
       <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center font-sans relative overflow-hidden">
-        {/* Soft background reflections */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-[#7C8CFF]/5 rounded-full blur-[120px] pointer-events-none" />
         
         <div className="flex flex-col items-center gap-6 relative z-10">
@@ -251,7 +248,6 @@ export default function App() {
               transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
               className="absolute inset-0 rounded-full border-t-2 border-[#7C8CFF]/40"
             />
-            {/* Handcrafted active logo mark instead of generic icon */}
             <div className="text-[#7C8CFF]">
               {selectedIdentity.logoSvg("w-7 h-7")}
             </div>
@@ -265,14 +261,14 @@ export default function App() {
     );
   }
 
-  // If onboarding is not completed, enforce the walkthrough experience
-  if (!onboardingComplete) {
-    return <Onboarding onComplete={handleCompleteOnboarding} />;
-  }
-
   return (
     <div className="min-h-screen bg-[#050505] text-[#F5F5F3] pb-6 relative px-4 sm:px-6 lg:px-8 font-sans">
       
+      {/* Onboarding Overlay when user hasn't completed onboarding */}
+      {!onboardingComplete && (
+        <Onboarding onComplete={handleCompleteOnboarding} />
+      )}
+
       {/* Main Container */}
       <div className="w-full max-w-7xl mx-auto pt-4 sm:pt-6 space-y-8 relative">
         
@@ -297,7 +293,7 @@ export default function App() {
             </div>
           </div>
 
-          {/* Center: Navigation Links (Home, Your Plot, Profile) with Glowing Active Bar */}
+          {/* Center: Navigation Links */}
           <nav className="flex items-center gap-8 py-1" id="main-tabs-nav">
             <button
               onClick={() => setViewMode('home')}
@@ -383,6 +379,7 @@ export default function App() {
                 onAddMovie={handleAddSingleMovie}
                 onMoviesAdded={handleAddMovies}
                 onOpenAssistant={() => setIsAssistantOpen(true)}
+                autoFocusInput={justFinishedOnboarding}
               />
             </motion.div>
           )}
@@ -410,8 +407,6 @@ export default function App() {
               />
             </motion.div>
           )}
-
-
 
           {viewMode === 'profile' && (
             <motion.div
@@ -448,7 +443,7 @@ export default function App() {
           )}
         </AnimatePresence>
 
-        {/* Subtle, ultra-clean Footer */}
+        {/* Footer */}
         <footer className="pt-16 border-t border-zinc-950 flex flex-col sm:flex-row items-center justify-between text-xs text-zinc-500 font-sans gap-4">
           <div className="flex flex-wrap items-center gap-3">
             <p>© {new Date().getFullYear()} plot.</p>
@@ -468,7 +463,7 @@ export default function App() {
           </p>
         </footer>
 
-        {/* Custom Premium Notification Toast (Delight Moment 3) */}
+        {/* Toast Notification */}
         <AnimatePresence>
           {toast && toast.visible && (
             <motion.div
@@ -492,7 +487,7 @@ export default function App() {
           )}
         </AnimatePresence>
 
-        {/* Global Floating AI Decider Assistant Drawer */}
+        {/* Global Floating AI Assistant */}
         <CineSaveAssistant
           movies={movies}
           onMarkWatched={handleToggleWatched}

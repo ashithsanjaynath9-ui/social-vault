@@ -9,8 +9,6 @@ import {
   ArrowRight, 
   Check, 
   AlertCircle,
-  Link as LinkIcon,
-  FileText,
   Film,
   X
 } from 'lucide-react';
@@ -28,21 +26,18 @@ interface HomeScreenProps {
   onAddMovie?: (movie: Omit<Movie, 'id' | 'addedAt' | 'watched'>) => void;
   onMoviesAdded?: (newMovies: Omit<Movie, 'id' | 'addedAt' | 'watched'>[]) => void;
   onOpenAssistant?: () => void;
+  autoFocusInput?: boolean;
 }
 
 export default function HomeScreen({
-  onMoviesAdded
+  onMoviesAdded,
+  autoFocusInput
 }: HomeScreenProps) {
-  const [inputText, setInputText] = useState('');
-  const [isTextMode, setIsTextMode] = useState(false); // Default flow is link-first
   const [isExtracting, setIsExtracting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [previewMovies, setPreviewMovies] = useState<Omit<Movie, 'id' | 'addedAt' | 'watched'>[] | null>(null);
   const [selectedIndices, setSelectedIndices] = useState<Record<number, boolean>>({});
-
-  const inputRef = useRef<HTMLInputElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleImportWithText = async (textToExtract: string) => {
     if (!textToExtract.trim()) return;
@@ -87,7 +82,7 @@ export default function HomeScreen({
       }));
 
       const initialSelected: Record<number, boolean> = {};
-      decorated.forEach((_, idx) => {
+      decorated.forEach((_: any, idx: number) => {
         initialSelected[idx] = true;
       });
       setSelectedIndices(initialSelected);
@@ -121,7 +116,6 @@ export default function HomeScreen({
       onMoviesAdded(selected);
     }
 
-    setInputText('');
     setPreviewMovies(null);
     setSelectedIndices({});
     setSuccessMessage('Added to plot.');
@@ -139,7 +133,8 @@ export default function HomeScreen({
       {/* Center Main Product Demonstration Hero Area */}
       <HeroProductDemo 
         onMoviesAdded={onMoviesAdded} 
-        onImportSubmit={handleImportWithText} 
+        onImportSubmit={handleImportWithText}
+        autoFocusInput={autoFocusInput}
       />
 
       {/* Global Error Feedback */}

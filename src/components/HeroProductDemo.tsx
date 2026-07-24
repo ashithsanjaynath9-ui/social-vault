@@ -4,15 +4,14 @@
  */
 
 import React, { useState, useRef, useEffect } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   ArrowRight, 
   Link as LinkIcon, 
   Loader2, 
   Sparkles, 
   MoreHorizontal, 
-  Shield,
-  Bookmark 
+  Shield 
 } from 'lucide-react';
 import { Movie } from '../types';
 
@@ -20,6 +19,7 @@ interface HeroProductDemoProps {
   onMoviesAdded?: (newMovies: Omit<Movie, 'id' | 'addedAt' | 'watched'>[]) => void;
   onImportSubmit?: (text: string) => Promise<void>;
   onSelectMovie?: (id: string) => void;
+  autoFocusInput?: boolean;
 }
 
 interface DemoMovieCard {
@@ -126,10 +126,13 @@ const REEL_MOVIES = [
   ...CAROUSEL_MOVIES
 ];
 
-export default function HeroProductDemo({ onImportSubmit, onSelectMovie }: HeroProductDemoProps) {
+export default function HeroProductDemo({ onImportSubmit, autoFocusInput }: HeroProductDemoProps) {
   const [inputText, setInputText] = useState('');
   const [isExtractingReal, setIsExtractingReal] = useState(false);
   const [realError, setRealError] = useState<string | null>(null);
+
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
 
   // Smooth continuous rolling film reel state
   const [scrollPos, setScrollPos] = useState(0);
@@ -147,6 +150,23 @@ export default function HeroProductDemo({ onImportSubmit, onSelectMovie }: HeroP
   const ITEM_FULL_WIDTH = CARD_WIDTH + CARD_GAP; // 196px
   const SINGLE_SET_WIDTH = CAROUSEL_MOVIES.length * ITEM_FULL_WIDTH; // 12 * 196 = 2352px
 
+  useEffect(() => {
+    if (autoFocusInput) {
+      setShowTooltip(true);
+      const timer = setTimeout(() => {
+        inputRef.current?.focus();
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [autoFocusInput]);
+
+  const handleInteraction = () => {
+    if (!hasInteracted) {
+      setHasInteracted(true);
+      setShowTooltip(false);
+    }
+  };
+
   // Track container width for precise center detection
   useEffect(() => {
     const updateCenter = () => {
@@ -162,7 +182,6 @@ export default function HeroProductDemo({ onImportSubmit, onSelectMovie }: HeroP
   // Silky smooth RequestAnimationFrame hardware-accelerated movement loop
   useEffect(() => {
     let lastTime = performance.now();
-    // 35-45 seconds per complete visible set cycle (~40s)
     const SPEED_PX_PER_SEC = SINGLE_SET_WIDTH / 40; 
 
     const animate = (currentTime: number) => {
@@ -172,7 +191,6 @@ export default function HeroProductDemo({ onImportSubmit, onSelectMovie }: HeroP
       const pixelsToMove = (delta / 1000) * SPEED_PX_PER_SEC; 
       let nextPos = scrollPosRef.current + pixelsToMove;
 
-      // Reset seamlessly when one full set of 12 items has passed
       if (nextPos >= SINGLE_SET_WIDTH) {
         nextPos = nextPos % SINGLE_SET_WIDTH;
       }
@@ -194,6 +212,7 @@ export default function HeroProductDemo({ onImportSubmit, onSelectMovie }: HeroP
 
   const handleManualSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    handleInteraction();
     if (!inputText.trim() || isExtractingReal) return;
 
     if (onImportSubmit) {
@@ -213,12 +232,20 @@ export default function HeroProductDemo({ onImportSubmit, onSelectMovie }: HeroP
   return (
     <div className="relative z-20 w-full max-w-7xl mx-auto px-2 sm:px-4 pt-4 sm:pt-8 pb-10 flex flex-col items-center select-none overflow-hidden">
       
-      {/* 1. FLOATING 3D TILTED BACKGROUND MOVIE POSTERS (Left & Right Depth) */}
+      {/* 1. FLOATING 3D TILTED BACKGROUND MOVIE POSTERS (Left & Right Depth with Subtle Parallax Float) */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
         {/* Left Tilted Poster 1: Interstellar */}
-        <div 
+        <motion.div 
+          animate={{
+            y: [-10, 8, -10],
+            rotate: [-16, -14, -16],
+          }}
+          transition={{
+            duration: 12,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
           className="absolute top-[8%] -left-[20px] sm:-left-[30px] w-48 sm:w-60 md:w-72 aspect-[2/3] rounded-2xl overflow-hidden border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.8)] opacity-35 blur-[0.5px]"
-          style={{ transform: 'rotate(-16deg) scale(0.85) translateY(-10px)' }}
         >
           <img 
             src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80" 
@@ -228,24 +255,40 @@ export default function HeroProductDemo({ onImportSubmit, onSelectMovie }: HeroP
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-4">
             <span className="font-serif italic text-sm text-white/90 tracking-widest uppercase">INTERSTELLAR</span>
           </div>
-        </div>
+        </motion.div>
 
         {/* Left Tilted Poster 2: Blade Runner 2049 */}
-        <div 
+        <motion.div 
+          animate={{
+            y: [6, -12, 6],
+            rotate: [-10, -8, -10],
+          }}
+          transition={{
+            duration: 15,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
           className="absolute top-[42%] -left-[30px] sm:-left-[45px] w-44 sm:w-56 md:w-64 aspect-[2/3] rounded-2xl overflow-hidden border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.8)] opacity-30 blur-[0.5px]"
-          style={{ transform: 'rotate(-10deg) scale(0.88)' }}
         >
           <img 
             src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80" 
             alt="Blade Runner 2049"
             className="w-full h-full object-cover filter brightness-75 contrast-110"
           />
-        </div>
+        </motion.div>
 
         {/* Right Tilted Poster 1: The Godfather */}
-        <div 
+        <motion.div 
+          animate={{
+            y: [-8, 10, -8],
+            rotate: [14, 16, 14],
+          }}
+          transition={{
+            duration: 14,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
           className="absolute top-[8%] -right-[20px] sm:-right-[30px] w-48 sm:w-60 md:w-72 aspect-[2/3] rounded-2xl overflow-hidden border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.8)] opacity-35 blur-[0.5px]"
-          style={{ transform: 'rotate(14deg) scale(0.85) translateY(-10px)' }}
         >
           <img 
             src="https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=600&q=80" 
@@ -255,12 +298,20 @@ export default function HeroProductDemo({ onImportSubmit, onSelectMovie }: HeroP
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-4">
             <span className="font-serif italic text-sm text-white/90 tracking-widest uppercase">THE GODFATHER</span>
           </div>
-        </div>
+        </motion.div>
 
         {/* Right Tilted Poster 2: Spirited Away */}
-        <div 
+        <motion.div 
+          animate={{
+            y: [10, -8, 10],
+            rotate: [16, 13, 16],
+          }}
+          transition={{
+            duration: 16,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
           className="absolute top-[32%] -right-[30px] sm:-right-[45px] w-48 sm:w-60 md:w-72 aspect-[2/3] rounded-2xl overflow-hidden border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.8)] opacity-40 blur-[0.5px]"
-          style={{ transform: 'rotate(16deg) scale(0.9)' }}
         >
           <img 
             src="https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80" 
@@ -270,7 +321,7 @@ export default function HeroProductDemo({ onImportSubmit, onSelectMovie }: HeroP
           <div className="absolute inset-x-0 top-3 px-4">
             <span className="font-serif italic text-sm text-white/90 tracking-widest uppercase">SPIRITED AWAY</span>
           </div>
-        </div>
+        </motion.div>
       </div>
 
       {/* 2. FAINT PROJECTOR PURPLE BLOOM GLOW */}
@@ -300,8 +351,32 @@ export default function HeroProductDemo({ onImportSubmit, onSelectMovie }: HeroP
         </p>
 
         {/* Extraction Capture Bar */}
-        <form onSubmit={handleManualSubmit} className="w-full max-w-xl mt-7">
-          <div className="relative flex items-center gap-2 sm:gap-3 bg-[#0B0C11]/90 border border-[#252338] focus-within:border-[#8E7BFF] rounded-2xl p-2 sm:p-2.5 transition-all duration-300 shadow-[0_20px_60px_rgba(0,0,0,0.95)] backdrop-blur-xl">
+        <form onSubmit={handleManualSubmit} className="w-full max-w-xl mt-7 relative">
+          
+          {/* Floating Tooltip: Paste your first Reel */}
+          <AnimatePresence>
+            {showTooltip && !hasInteracted && (
+              <motion.div
+                initial={{ opacity: 0, y: 8, scale: 0.94 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -6, scale: 0.94 }}
+                transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                className="absolute -top-12 left-1/2 -translate-x-1/2 z-40 flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-[#0E0F18] border border-[#8E7BFF]/70 text-indigo-100 text-xs font-sans font-medium shadow-[0_10px_30px_rgba(142,123,255,0.4)] backdrop-blur-xl pointer-events-none"
+              >
+                <span className="w-2 h-2 rounded-full bg-[#8E7BFF] animate-ping" />
+                <span>Paste your first Reel.</span>
+                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rotate-45 bg-[#0E0F18] border-r border-b border-[#8E7BFF]/70" />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <div
+            className={`relative flex items-center gap-2 sm:gap-3 bg-[#0B0C11]/90 border rounded-2xl p-2 sm:p-2.5 transition-all duration-500 shadow-[0_20px_60px_rgba(0,0,0,0.95)] backdrop-blur-xl ${
+              showTooltip && !hasInteracted
+                ? 'border-[#8E7BFF] shadow-[0_0_30px_rgba(142,123,255,0.6),0_0_60px_rgba(142,123,255,0.3)] animate-pulse'
+                : 'border-[#252338] focus-within:border-[#8E7BFF]'
+            }`}
+          >
             <div className="pl-3 text-[#8E7BFF] shrink-0">
               <LinkIcon className="w-4 h-4" />
             </div>
@@ -310,7 +385,12 @@ export default function HeroProductDemo({ onImportSubmit, onSelectMovie }: HeroP
               ref={inputRef}
               type="text"
               value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
+              onChange={(e) => {
+                handleInteraction();
+                setInputText(e.target.value);
+              }}
+              onFocus={handleInteraction}
+              onClick={handleInteraction}
               placeholder="Paste an Instagram Reel, TikTok, YouTube or Letterboxd link"
               disabled={isExtractingReal}
               className="w-full bg-transparent px-1 py-1.5 text-xs sm:text-sm text-[#F5F5F7] placeholder-[#5C5B6E] focus:outline-none border-0 font-sans tracking-wide"
@@ -319,6 +399,7 @@ export default function HeroProductDemo({ onImportSubmit, onSelectMovie }: HeroP
             <button
               type="submit"
               disabled={isExtractingReal}
+              onClick={handleInteraction}
               className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 shrink-0 transition-all duration-300 ${
                 inputText.trim() && !isExtractingReal
                   ? 'bg-[#6E54FF] hover:bg-[#7D64FF] text-white shadow-[0_0_24px_rgba(110,84,255,0.5)] cursor-pointer hover:scale-[1.02] active:scale-[0.98]'
@@ -424,12 +505,10 @@ export default function HeroProductDemo({ onImportSubmit, onSelectMovie }: HeroP
             }}
           >
             {REEL_MOVIES.map((movie, idx) => {
-              // Calculate card position relative to visible container center
               const cardLeftX = idx * ITEM_FULL_WIDTH - scrollPos;
               const cardCenterX = cardLeftX + CARD_WIDTH / 2;
               const distToCenter = Math.abs(cardCenterX - containerCenter);
               
-              // Organic curved arc calculation
               const normDist = Math.min(1, distToCenter / Math.max(containerCenter, 400));
               const arcY = Math.pow(normDist, 2) * 10;
 

@@ -303,8 +303,8 @@ export default function ProfileScreen({
                 <HelpCircle className="w-4 h-4 text-zinc-400" />
               </div>
               <div className="text-left min-w-0">
-                <p className="text-xs font-medium text-zinc-200">Replay User Guide</p>
-                <p className="text-[10px] text-zinc-500 mt-0.5 truncate">Launch the initial screen tutorial</p>
+                <p className="text-xs font-medium text-zinc-200">Replay Introduction</p>
+                <p className="text-[10px] text-zinc-500 mt-0.5 truncate">Replay the cinematic onboarding</p>
               </div>
             </div>
             <ChevronRight className="w-4 h-4 text-zinc-600 shrink-0" />
