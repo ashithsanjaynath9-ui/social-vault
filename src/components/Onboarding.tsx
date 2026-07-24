@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Instagram, Sparkles, Film, Bookmark, CheckCircle2 } from 'lucide-react';
 
@@ -634,7 +634,7 @@ const STORY_SCREENS: ScreenDefinition[] = [
     isLastScreen: true,
     headline: 'Not sure what to watch?',
     subheadline1: "We'll always have something worth watching.",
-    ctaText: 'Start Plotting',
+    ctaText: '',
     glowColor: 'radial-gradient(circle at 50% 45%, rgba(142, 123, 255, 0.3) 0%, rgba(0, 240, 255, 0.18) 60%, transparent 85%)',
     visual: <PlotPicksDemoAnimation />,
   },
@@ -645,15 +645,25 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
   const [isExiting, setIsExiting] = useState(false);
 
   // Trigger smooth exit animation before invoking parent onComplete callback
-  const triggerExit = () => {
+  const triggerExit = useCallback(() => {
     if (isExiting) return;
     setIsExiting(true);
     setTimeout(() => {
       onComplete();
-    }, 600);
-  };
+    }, 700);
+  }, [isExiting, onComplete]);
 
-  // Keyboard accessibility navigation
+  // Automatic transition after 3.5 seconds of inactivity on the final screen
+  useEffect(() => {
+    if (currentStep === STORY_SCREENS.length - 1 && !isExiting) {
+      const timer = setTimeout(() => {
+        triggerExit();
+      }, 3500);
+      return () => clearTimeout(timer);
+    }
+  }, [currentStep, isExiting, triggerExit]);
+
+  // Keyboard accessibility navigation & instant transition triggers
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (isExiting) return;
@@ -677,7 +687,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentStep, isExiting]);
+  }, [currentStep, isExiting, triggerExit]);
 
   const screen = STORY_SCREENS[currentStep];
 
@@ -690,16 +700,26 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
     }
   };
 
+  const handleContainerClick = () => {
+    if (isExiting) return;
+    if (currentStep === STORY_SCREENS.length - 1) {
+      triggerExit();
+    } else {
+      handleNext();
+    }
+  };
+
   return (
     <motion.div
+      onClick={handleContainerClick}
       initial={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
       animate={
         isExiting
-          ? { opacity: 0, scale: 0.95, filter: 'blur(10px)' }
+          ? { opacity: 0, scale: 0.98, filter: 'blur(12px)' }
           : { opacity: 1, scale: 1, filter: 'blur(0px)' }
       }
-      transition={{ duration: 0.6, ease: EXPENSIVE_EASE }}
-      className="fixed inset-0 z-50 bg-[#030305]/95 text-zinc-100 flex flex-col justify-between p-6 sm:p-12 md:p-16 overflow-hidden select-none backdrop-blur-2xl"
+      transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
+      className="fixed inset-0 z-50 bg-[#030305]/95 text-zinc-100 flex flex-col justify-between p-6 sm:p-12 md:p-16 overflow-hidden select-none backdrop-blur-2xl cursor-pointer"
     >
       {/* Canvas Dust Particles */}
       <DustParticles />
@@ -728,7 +748,10 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
         </div>
 
         <button
-          onClick={triggerExit}
+          onClick={(e) => {
+            e.stopPropagation();
+            triggerExit();
+          }}
           disabled={isExiting}
           className="text-[11px] font-sans tracking-[0.2em] uppercase text-zinc-400 hover:text-white transition-colors duration-300 px-3 py-1.5 rounded-full hover:bg-white/5 cursor-pointer"
         >
@@ -792,10 +815,13 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
               </motion.p>
             )}
 
-            {/* Prominent Action Button softly illuminating */}
-            {(screen.isFirstScreen || screen.isLastScreen) && (
+            {/* Prominent Action Button on First Screen */}
+            {screen.isFirstScreen && (
               <motion.button
-                onClick={handleNext}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleNext();
+                }}
                 disabled={isExiting}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -820,7 +846,10 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
         <div className="w-28 text-left">
           {currentStep > 0 ? (
             <button
-              onClick={() => setCurrentStep((prev) => prev - 1)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setCurrentStep((prev) => prev - 1);
+              }}
               disabled={isExiting}
               className="text-[11px] font-sans tracking-[0.2em] uppercase text-zinc-400 hover:text-white transition-colors duration-300 px-3 py-1.5 rounded-full hover:bg-white/5 cursor-pointer"
             >
@@ -836,7 +865,10 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
           {STORY_SCREENS.map((_, idx) => (
             <button
               key={`dot-${idx}`}
-              onClick={() => setCurrentStep(idx)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setCurrentStep(idx);
+              }}
               disabled={isExiting}
               aria-label={`Go to screen ${idx + 1}`}
               className="group p-1.5 focus:outline-none cursor-pointer"
@@ -873,11 +905,14 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
           ))}
         </div>
 
-        {/* Continue / Start Plotting Action softly illuminating */}
+        {/* Continue Action softly illuminating (hidden on screen 0 and screen 3) */}
         <div className="w-28 text-right flex justify-end">
-          {!screen.isFirstScreen && (
+          {!screen.isFirstScreen && !screen.isLastScreen && (
             <motion.button
-              onClick={handleNext}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleNext();
+              }}
               disabled={isExiting}
               whileHover={{
                 scale: 1.02,

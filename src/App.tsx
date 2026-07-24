@@ -365,10 +365,18 @@ export default function App() {
           {viewMode === 'home' && (
             <motion.div
               key="homescreen-view"
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={
+                justFinishedOnboarding
+                  ? { opacity: 0, scale: 0.96, filter: 'blur(8px)', y: 0 }
+                  : { opacity: 0, y: 12 }
+              }
+              animate={{ opacity: 1, scale: 1, filter: 'blur(0px)', y: 0 }}
               exit={{ opacity: 0, y: -12 }}
-              transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+              transition={
+                justFinishedOnboarding
+                  ? { duration: 0.9, ease: [0.16, 1, 0.3, 1] }
+                  : { type: 'spring', stiffness: 350, damping: 30 }
+              }
             >
               <HomeScreen
                 movies={movies}
