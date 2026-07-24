@@ -389,35 +389,35 @@ export default function HeroProductDemo({ onImportSubmit, onSelectMovie }: HeroP
         </div>
 
         {/* Works across all your favorite apps */}
-        <div className="flex items-center justify-center gap-1.5 mt-3 text-xs text-[#7A798C] font-sans italic">
+        <div className="flex items-center justify-center gap-1.5 mt-3 text-xs text-[#7A798C] font-sans italic relative z-30">
           <Shield className="w-3.5 h-3.5 text-[#8E7BFF]" />
           <span>Works across all your favorite apps</span>
         </div>
 
       </div>
 
-      {/* 4. CINEMATIC ROLLING FILM REEL (Continuous Curved 35mm Projector Strip) */}
+      {/* 4. CINEMATIC ROLLING FILM REEL (Translucent Continuous Curved 35mm Projector Strip Ambient Background) */}
       <div 
-        className="relative z-20 w-full mt-10 sm:mt-14 select-none pointer-events-none"
+        className="relative z-10 w-full -mt-14 sm:-mt-18 select-none pointer-events-none opacity-35 mix-blend-screen"
       >
         {/* Perspective Wrapper for Curved 3D Film Strip */}
         <div 
           ref={containerRef}
-          className="relative w-full overflow-hidden py-8 sm:py-12 bg-transparent"
+          className="relative w-full overflow-hidden py-3 sm:py-4 bg-transparent"
           style={{ perspective: '1200px' }}
         >
-          {/* Left Vignette Edge Fade - Blends seamlessly into canvas background */}
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-28 sm:w-48 bg-gradient-to-r from-[#050505] via-[#050505]/90 to-transparent z-40" />
+          {/* Left Vignette Edge Fade */}
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-24 sm:w-40 bg-gradient-to-r from-[#050505] via-[#050505]/90 to-transparent z-40" />
           
-          {/* Right Vignette Edge Fade - Blends seamlessly into canvas background */}
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-28 sm:w-48 bg-gradient-to-l from-[#050505] via-[#050505]/90 to-transparent z-40" />
+          {/* Right Vignette Edge Fade */}
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-24 sm:w-40 bg-gradient-to-l from-[#050505] via-[#050505]/90 to-transparent z-40" />
 
           {/* Atmospheric Ambient Backlight behind Center of Reel */}
-          <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-48 bg-[#8E7BFF]/10 blur-3xl rounded-full z-0" />
+          <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-28 bg-[#8E7BFF]/10 blur-2xl rounded-full z-0" />
 
           {/* Continuous Infinite Rolling Motion Track */}
           <div 
-            className="flex items-center gap-4 py-4 will-change-transform"
+            className="flex items-center gap-3 py-2 will-change-transform"
             style={{
               transform: `translate3d(-${scrollPos}px, 0, 0)`,
               transformStyle: 'preserve-3d'
@@ -431,7 +431,7 @@ export default function HeroProductDemo({ onImportSubmit, onSelectMovie }: HeroP
               
               // Organic curved arc calculation
               const normDist = Math.min(1, distToCenter / Math.max(containerCenter, 400));
-              const arcY = Math.pow(normDist, 2) * 14;
+              const arcY = Math.pow(normDist, 2) * 10;
 
               return (
                 <div
@@ -440,14 +440,14 @@ export default function HeroProductDemo({ onImportSubmit, onSelectMovie }: HeroP
                     transform: `translateY(${arcY}px)`,
                     transformStyle: 'preserve-3d',
                   }}
-                  className="relative w-36 sm:w-44 flex-shrink-0 rounded-2xl overflow-hidden bg-[#0D0E17] border border-white/10 shadow-xl z-10 opacity-80"
+                  className="relative w-28 sm:w-36 flex-shrink-0 rounded-xl overflow-hidden bg-[#0D0E17]/60 border border-white/10 shadow-md z-10 opacity-70"
                 >
                   {/* 35mm Sprocket Perforations Top Header Bar */}
-                  <div className="w-full bg-[#07080E] py-1 px-2 border-b border-white/10 flex justify-between items-center z-20">
-                    <div className="w-2.5 h-1.5 rounded-[1px] bg-[#161826] border border-white/10 shadow-inner" />
-                    <div className="w-2.5 h-1.5 rounded-[1px] bg-[#161826] border border-white/10 shadow-inner" />
-                    <div className="w-2.5 h-1.5 rounded-[1px] bg-[#161826] border border-white/10 shadow-inner" />
-                    <div className="w-2.5 h-1.5 rounded-[1px] bg-[#161826] border border-white/10 shadow-inner" />
+                  <div className="w-full bg-[#07080E]/80 py-0.5 px-1.5 border-b border-white/10 flex justify-between items-center z-20">
+                    <div className="w-2 h-1 rounded-[1px] bg-[#161826] border border-white/10" />
+                    <div className="w-2 h-1 rounded-[1px] bg-[#161826] border border-white/10" />
+                    <div className="w-2 h-1 rounded-[1px] bg-[#161826] border border-white/10" />
+                    <div className="w-2 h-1 rounded-[1px] bg-[#161826] border border-white/10" />
                   </div>
 
                   {/* Poster Image Area */}
@@ -462,29 +462,28 @@ export default function HeroProductDemo({ onImportSubmit, onSelectMovie }: HeroP
                           target.src = movie.backupPosterUrl;
                         }
                       }}
-                      className="w-full h-full object-cover filter brightness-95 contrast-105"
+                      className="w-full h-full object-cover filter brightness-90 contrast-105 opacity-80"
                     />
 
                     {/* Poster Bottom Title Overlay */}
-                    <div className="absolute inset-x-0 bottom-0 pt-10 pb-2.5 px-2.5 bg-gradient-to-t from-black via-black/70 to-transparent flex items-end justify-center text-center">
-                      <span className="font-sans font-semibold text-[10px] sm:text-xs tracking-wider uppercase drop-shadow-md text-zinc-300">
+                    <div className="absolute inset-x-0 bottom-0 pt-6 pb-1.5 px-2 bg-gradient-to-t from-black via-black/70 to-transparent flex items-end justify-center text-center">
+                      <span className="font-sans font-semibold text-[9px] sm:text-[10px] tracking-wider uppercase drop-shadow-md text-zinc-300 truncate">
                         {movie.displayTitle}
                       </span>
                     </div>
                   </div>
 
                   {/* 35mm Sprocket Perforations Bottom Footer Bar */}
-                  <div className="w-full bg-[#07080E] py-1 px-2 border-t border-white/10 flex justify-between items-center z-20">
-                    <div className="w-2.5 h-1.5 rounded-[1px] bg-[#161826] border border-white/10 shadow-inner" />
-                    <div className="w-2.5 h-1.5 rounded-[1px] bg-[#161826] border border-white/10 shadow-inner" />
-                    <div className="w-2.5 h-1.5 rounded-[1px] bg-[#161826] border border-white/10 shadow-inner" />
-                    <div className="w-2.5 h-1.5 rounded-[1px] bg-[#161826] border border-white/10 shadow-inner" />
+                  <div className="w-full bg-[#07080E]/80 py-0.5 px-1.5 border-t border-white/10 flex justify-between items-center z-20">
+                    <div className="w-2 h-1 rounded-[1px] bg-[#161826] border border-white/10" />
+                    <div className="w-2 h-1 rounded-[1px] bg-[#161826] border border-white/10" />
+                    <div className="w-2 h-1 rounded-[1px] bg-[#161826] border border-white/10" />
+                    <div className="w-2 h-1 rounded-[1px] bg-[#161826] border border-white/10" />
                   </div>
                 </div>
               );
             })}
           </div>
-
         </div>
       </div>
 
