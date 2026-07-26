@@ -16,9 +16,27 @@ import MovieDetailModal from './components/MovieDetailModal';
 import ProfileScreen from './components/ProfileScreen';
 import { IdentityId, IDENTITY_DIRECTIONS } from './components/BrandIdentity';
 import GlobalSearch from './components/GlobalSearch';
+import AuthModal from './components/AuthModal';
 
 export default function App() {
   const [movies, setMovies] = useState<Movie[]>([]);
+  const [hasPlottedFirstFilm, setHasPlottedFirstFilm] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('plot_first_film_plotted') === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const [isSeatReserved, setIsSeatReserved] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('plot_seat_reserved') === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalReason, setAuthModalReason] = useState<'second_movie' | 'sync_device' | 'save_permanent' | 'general'>('general');
+  const [pendingAddMovies, setPendingAddMovies] = useState<Omit<Movie, 'id' | 'addedAt' | 'watched'>[] | null>(null);
   const [activeIdentity, setActiveIdentity] = useState<IdentityId>(() => {
     try {
       const saved = localStorage.getItem('plot_identity');
@@ -46,7 +64,7 @@ export default function App() {
 
   // User Account & Onboarding State
   const [userEmail, setUserEmail] = useState<string>('batman@gotham.com');
-  const [onboardingComplete, setOnboardingComplete] = useState<boolean>(false);
+  const [onboardingComplete, setOnboardingComplete] = useState<boolean>(true);
   const [justFinishedOnboarding, setJustFinishedOnboarding] = useState<boolean>(false);
 
   // Premium Toast Notification State & Auto-dismiss
@@ -76,7 +94,9 @@ export default function App() {
 
       // Load onboarding progress state
       const onboardingStored = localStorage.getItem('plot_onboarding_complete') || localStorage.getItem('cine_save_onboarding_complete');
-      if (onboardingStored === 'true') {
+      if (onboardingStored === 'false') {
+        setOnboardingComplete(false);
+      } else {
         setOnboardingComplete(true);
       }
     } catch (e) {
@@ -110,8 +130,7 @@ export default function App() {
   const handleResetOnboarding = () => {
     setOnboardingComplete(false);
     setJustFinishedOnboarding(false);
-    localStorage.removeItem('plot_onboarding_complete');
-    localStorage.removeItem('cine_save_onboarding_complete');
+    localStorage.setItem('plot_onboarding_complete', 'false');
   };
 
   // 2. High-level dashboard statistics calculation
@@ -141,7 +160,41 @@ export default function App() {
   }, [movies]);
 
   // 3. User operations handlers
+  const handleSeatReserved = (email: string, name?: string) => {
+    setIsSeatReserved(true);
+    localStorage.setItem('plot_seat_reserved', 'true');
+    setUserEmail(email);
+
+    if (pendingAddMovies && pendingAddMovies.length > 0) {
+      const decorated: Movie[] = pendingAddMovies.map((m, idx) => ({
+        ...m,
+        id: `movie-${Date.now()}-${idx}-${Math.floor(Math.random() * 10000)}`,
+        addedAt: new Date().toISOString(),
+        watched: false,
+      }));
+      setMovies(prev => [...decorated, ...prev]);
+      setPendingAddMovies(null);
+      setCurrentTab('unwatched');
+      setViewMode('library');
+    }
+
+    setToast({
+      message: "Seat Reserved!",
+      sub: `Welcome to plot early access, ${name || email.split('@')[0]}.`,
+      visible: true
+    });
+  };
+
   const handleAddMovies = (newMovies: Omit<Movie, 'id' | 'addedAt' | 'watched'>[]) => {
+    // If the user hasn't reserved early access seat and ALREADY plotted their 1st film, trigger early access modal for 2nd+ addition
+    if (!isSeatReserved && hasPlottedFirstFilm) {
+      setPendingAddMovies(newMovies);
+      setAuthModalReason('second_movie');
+      setIsAuthModalOpen(true);
+      return;
+    }
+
+    // First extraction OR seat already reserved
     const decorated: Movie[] = newMovies.map((m, idx) => ({
       ...m,
       id: `movie-${Date.now()}-${idx}-${Math.floor(Math.random() * 10000)}`,
@@ -153,9 +206,51 @@ export default function App() {
     setCurrentTab('unwatched');
     setViewMode('library');
 
+    if (!hasPlottedFirstFilm) {
+      setHasPlottedFirstFilm(true);
+      localStorage.setItem('plot_first_film_plotted', 'true');
+    }
+
     setToast({
       message: "Added to plot.",
-      sub: `Successfully plotted ${newMovies.length} recommendations.`,
+      sub: `Successfully plotted ${newMovies.length} recommendations to your sanctuary.`,
+      visible: true
+    });
+  };
+
+  const handleAddSingleMovie = (newMovie: Omit<Movie, 'id' | 'addedAt' | 'watched'>) => {
+    if (movies.some(m => m.title.toLowerCase() === newMovie.title.toLowerCase())) {
+      setToast({
+        message: "Already Plotted",
+        sub: `"${newMovie.title}" is already in your plot.`,
+        visible: true
+      });
+      return;
+    }
+
+    if (!isSeatReserved && hasPlottedFirstFilm) {
+      setPendingAddMovies([newMovie]);
+      setAuthModalReason('second_movie');
+      setIsAuthModalOpen(true);
+      return;
+    }
+
+    const decorated: Movie = {
+      ...newMovie,
+      id: `movie-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+      addedAt: new Date().toISOString(),
+      watched: false,
+    };
+    setMovies(prev => [decorated, ...prev]);
+
+    if (!hasPlottedFirstFilm) {
+      setHasPlottedFirstFilm(true);
+      localStorage.setItem('plot_first_film_plotted', 'true');
+    }
+
+    setToast({
+      message: "Added to plot.",
+      sub: `"${newMovie.title}" added to plot.`,
       visible: true
     });
   };
@@ -198,29 +293,6 @@ export default function App() {
 
   const handleDeleteMovie = (id: string) => {
     setMovies(prev => prev.filter(m => m.id !== id));
-  };
-
-  const handleAddSingleMovie = (newMovie: Omit<Movie, 'id' | 'addedAt' | 'watched'>) => {
-    if (movies.some(m => m.title.toLowerCase() === newMovie.title.toLowerCase())) {
-      setToast({
-        message: "Already Plotted",
-        sub: `"${newMovie.title}" is already in your plot.`,
-        visible: true
-      });
-      return;
-    }
-    const decorated: Movie = {
-      ...newMovie,
-      id: `movie-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
-      addedAt: new Date().toISOString(),
-      watched: false,
-    };
-    setMovies(prev => [decorated, ...prev]);
-    setToast({
-      message: "Added to plot.",
-      sub: `"${newMovie.title}" added to plot.`,
-      visible: true
-    });
   };
 
   const handleToggleFavorite = (id: string) => {
@@ -412,6 +484,11 @@ export default function App() {
                 onDelete={handleDeleteMovie}
                 onSelectMovie={(id) => setSelectedMovieId(id)}
                 onGoToCapture={() => setViewMode('home')}
+                isSeatReserved={isSeatReserved}
+                onOpenReserveModal={(reason) => {
+                  setAuthModalReason(reason);
+                  setIsAuthModalOpen(true);
+                }}
               />
             </motion.div>
           )}
@@ -503,6 +580,15 @@ export default function App() {
           activeIdentity={activeIdentity}
           isOpenControlled={isAssistantOpen}
           onToggleControlled={setIsAssistantOpen}
+        />
+
+        {/* Early Access / Reserve Your Seat Modal */}
+        <AuthModal
+          isOpen={isAuthModalOpen}
+          onClose={() => setIsAuthModalOpen(false)}
+          reason={authModalReason}
+          plottedCount={movies.length}
+          onAuthenticate={handleSeatReserved}
         />
 
       </div>

@@ -111,7 +111,7 @@ export default function ProfileScreen({
             }}
             className="w-full py-2.5 bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 text-xs font-medium rounded-xl text-zinc-300 hover:text-white transition-all cursor-pointer"
           >
-            Create your plot
+            Reserve Your Seat
           </button>
         </div>
 
