@@ -16,6 +16,7 @@ import { Movie } from '../types';
 import { detectPlatform } from '../utils';
 import CinemaAtmosphere from './CinemaAtmosphere';
 import HeroProductDemo from './HeroProductDemo';
+import CinematicEasterEggs from './CinematicEasterEggs';
 
 interface HomeScreenProps {
   movies?: Movie[];
@@ -129,6 +130,9 @@ export default function HomeScreen({
       
       {/* Multi-layered Cinema Environmental Atmosphere */}
       <CinemaAtmosphere />
+
+      {/* Hidden Cinematic Easter Eggs Interaction Layer */}
+      <CinematicEasterEggs />
 
       {/* Center Main Product Demonstration Hero Area */}
       <HeroProductDemo 
