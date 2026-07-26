@@ -30,11 +30,36 @@ interface HomeScreenProps {
   autoFocusInput?: boolean;
 }
 
+// Curated collection of famous movie quotes for extraction loading state
+interface ExtractionQuote {
+  emoji: string;
+  quote: string;
+  movie?: string;
+}
+
+const EXTRACTION_QUOTES: ExtractionQuote[] = [
+  { emoji: '🎬', quote: '"Roads? Where we\'re going, we don\'t need roads."', movie: 'Back to the Future' },
+  { emoji: '🍿', quote: '"Just keep watching..."', movie: 'Cinema Paradiso' },
+  { emoji: '🎞️', quote: '"The show must go on."', movie: 'Bohemian Rhapsody' },
+  { emoji: '🎥', quote: '"Every great story begins somewhere."', movie: 'The Prestige' },
+  { emoji: '⚡', quote: '"May the Force be with you."', movie: 'Star Wars' },
+  { emoji: '🤡', quote: '"Why so serious?"', movie: 'The Dark Knight' },
+  { emoji: '🌹', quote: '"Here\'s looking at you, kid."', movie: 'Casablanca' },
+  { emoji: '🥁', quote: '"Not quite my tempo."', movie: 'Whiplash' },
+  { emoji: '🚀', quote: '"Love is the one thing that transcends time and space."', movie: 'Interstellar' },
+  { emoji: '🕶️', quote: '"I\'ll be back."', movie: 'The Terminator' },
+  { emoji: '💫', quote: '"Carpe diem. Seize the day, boys."', movie: 'Dead Poets Society' },
+  { emoji: '🪄', quote: '"Are you watching closely?"', movie: 'The Prestige' },
+  { emoji: '🏎️', quote: '"Life moves pretty fast. If you don\'t stop and look around once in a while, you could miss it."', movie: 'Ferris Bueller\'s Day Off' },
+  { emoji: '🎩', quote: '"I\'m gonna make him an offer he can\'t refuse."', movie: 'The Godfather' },
+];
+
 export default function HomeScreen({
   onMoviesAdded,
   autoFocusInput
 }: HomeScreenProps) {
   const [isExtracting, setIsExtracting] = useState(false);
+  const [currentQuote, setCurrentQuote] = useState<ExtractionQuote>(EXTRACTION_QUOTES[0]);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [previewMovies, setPreviewMovies] = useState<Omit<Movie, 'id' | 'addedAt' | 'watched'>[] | null>(null);
@@ -42,6 +67,10 @@ export default function HomeScreen({
 
   const handleImportWithText = async (textToExtract: string) => {
     if (!textToExtract.trim()) return;
+
+    // Pick a random quote each time extraction begins
+    const randomQuote = EXTRACTION_QUOTES[Math.floor(Math.random() * EXTRACTION_QUOTES.length)];
+    setCurrentQuote(randomQuote);
 
     setIsExtracting(true);
     setError(null);
@@ -186,28 +215,50 @@ export default function HomeScreen({
          ========================================================= */}
       
       {/* Loading Overlay */}
-      {isExtracting && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md p-4">
-          <div className="bg-[#111214] border border-[#1A1C20] rounded-3xl p-8 max-w-sm w-full flex flex-col items-center justify-center space-y-6 shadow-2xl text-center">
-            <div className="relative w-16 h-24 rounded-2xl bg-[#1A1C20] border border-[#7F72FF]/30 overflow-hidden flex items-center justify-center shadow-2xl">
-              <motion.div
-                animate={{ y: [-48, 48, -48] }}
-                transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute inset-x-0 h-1 bg-[#7F72FF] blur-[2px]"
-              />
-              <Film className="w-6 h-6 text-[#7F72FF]" />
-            </div>
-            <div className="space-y-1.5">
-              <p className="text-sm text-[#F5F5F3] font-display font-light italic tracking-wide animate-pulse">
-                Unspooling plot recommendations...
-              </p>
-              <p className="text-xs text-[#A7A7A2] font-sans">
-                Unfolding titles, directors, and posters.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {isExtracting && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.35, ease: 'easeInOut' }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4"
+          >
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: -10 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+              className="bg-[#111214] border border-[#1A1C20] rounded-3xl p-8 max-w-sm w-full flex flex-col items-center justify-center space-y-5 shadow-2xl text-center"
+            >
+              {/* Scanner animation keeping the film reel scanner */}
+              <div className="relative w-16 h-24 rounded-2xl bg-[#1A1C20] border border-[#7F72FF]/30 overflow-hidden flex items-center justify-center shadow-2xl">
+                <motion.div
+                  animate={{ y: [-48, 48, -48] }}
+                  transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute inset-x-0 h-1 bg-[#7F72FF] blur-[2px]"
+                />
+                <Film className="w-6 h-6 text-[#7F72FF]" />
+              </div>
+
+              {/* Random Famous Movie Dialogue & Emoji */}
+              <div className="space-y-2 pt-1">
+                <div className="text-3xl animate-bounce leading-none select-none">
+                  {currentQuote.emoji}
+                </div>
+                <p className="text-sm font-serif italic text-[#F5F5F3] leading-relaxed px-2">
+                  {currentQuote.quote}
+                </p>
+                {currentQuote.movie && (
+                  <p className="text-[10px] font-sans font-semibold uppercase tracking-widest text-[#a594fd]">
+                    — {currentQuote.movie}
+                  </p>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Extracted Movies Result Modal */}
       {previewMovies && (
