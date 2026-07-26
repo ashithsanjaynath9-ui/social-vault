@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Check, Sparkles, HelpCircle, Bookmark } from 'lucide-react';
+import { Check, Sparkles, HelpCircle, Bookmark, Ticket } from 'lucide-react';
 import { Movie, AppStats } from './types';
 import { INITIAL_MOVIES } from './data';
 import WatchlistDashboard from './components/WatchlistDashboard';
@@ -17,6 +17,7 @@ import ProfileScreen from './components/ProfileScreen';
 import { IdentityId, IDENTITY_DIRECTIONS } from './components/BrandIdentity';
 import GlobalSearch from './components/GlobalSearch';
 import AuthModal from './components/AuthModal';
+import ReservePage from './components/ReservePage';
 
 export default function App() {
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -45,7 +46,39 @@ export default function App() {
       return 'bookmark';
     }
   });
-  const [viewMode, setViewMode] = useState<'home' | 'library' | 'profile'>('home');
+  const [viewMode, setViewMode] = useState<'home' | 'library' | 'profile' | 'reserve'>(() => {
+    if (typeof window !== 'undefined') {
+      const path = window.location.pathname.toLowerCase();
+      const hash = window.location.hash.toLowerCase();
+      if (
+        path.includes('/reserve') || path.includes('/invite') || path.includes('/premiere') ||
+        hash.includes('reserve') || hash.includes('invite') || hash.includes('premiere')
+      ) {
+        return 'reserve';
+      }
+    }
+    return 'home';
+  });
+
+  // Listen for URL changes
+  useEffect(() => {
+    const handleRouteChange = () => {
+      const path = window.location.pathname.toLowerCase();
+      const hash = window.location.hash.toLowerCase();
+      if (
+        path.includes('/reserve') || path.includes('/invite') || path.includes('/premiere') ||
+        hash.includes('reserve') || hash.includes('invite') || hash.includes('premiere')
+      ) {
+        setViewMode('reserve');
+      }
+    };
+    window.addEventListener('popstate', handleRouteChange);
+    window.addEventListener('hashchange', handleRouteChange);
+    return () => {
+      window.removeEventListener('popstate', handleRouteChange);
+      window.removeEventListener('hashchange', handleRouteChange);
+    };
+  }, []);
   const [currentTab, setCurrentTab] = useState<'unwatched' | 'watched' | 'all'>('unwatched');
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoaded, setIsLoaded] = useState(false);
@@ -333,6 +366,15 @@ export default function App() {
     );
   }
 
+  if (viewMode === 'reserve') {
+    return (
+      <ReservePage
+        onReserveComplete={handleSeatReserved}
+        onNavigateToApp={() => setViewMode('home')}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#050505] text-[#F5F5F3] pb-6 relative px-4 sm:px-6 lg:px-8 font-sans">
       
@@ -416,15 +458,28 @@ export default function App() {
             </button>
           </nav>
 
-          {/* Right: Search & DECIDE TONIGHT Button */}
-          <div className="flex items-center gap-3 w-full md:w-auto justify-end">
-            <div className="w-full md:w-64">
+          {/* Right: Search, Reserve Seat & Ask plot Button */}
+          <div className="flex items-center gap-2.5 sm:gap-3 w-full md:w-auto justify-end">
+            <div className="w-full md:w-52 lg:w-60">
               <GlobalSearch movies={movies} onAddMovie={handleAddSingleMovie} />
             </div>
 
+            {/* Reserve Your Seat CTA */}
+            <motion.button
+              whileHover={{ y: -2, scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setViewMode('reserve')}
+              className="px-3 sm:px-4 py-2 rounded-full bg-[#12131C] hover:bg-[#1C1D2A] border border-[#7F72FF]/35 hover:border-[#7F72FF]/70 text-[#E0DCFF] hover:text-white text-xs font-medium tracking-wide flex items-center gap-2 cursor-pointer shadow-[0_2px_10px_rgba(0,0,0,0.2)] hover:shadow-[0_0_20px_rgba(127,114,255,0.3)] transition-all duration-[250ms] ease-out shrink-0"
+              title="Reserve Your Seat for Early Access"
+            >
+              <Ticket className="w-3.5 h-3.5 text-[#7F72FF]" />
+              <span className="hidden sm:inline">Reserve Your Seat</span>
+              <span className="sm:hidden">Reserve</span>
+            </motion.button>
+
             <button
               onClick={() => setIsAssistantOpen(true)}
-              className="px-4 sm:px-5 py-2.5 rounded-full bg-gradient-to-r from-[#5035E6] via-[#7F72FF] to-[#8E7BFF] hover:opacity-95 text-white text-xs font-semibold uppercase tracking-wider flex items-center gap-2 cursor-pointer shadow-[0_0_25px_rgba(127,114,255,0.45)] transition-all hover:scale-[1.02] active:scale-[0.98] shrink-0"
+              className="px-3.5 sm:px-5 py-2 rounded-full bg-gradient-to-r from-[#5035E6] via-[#7F72FF] to-[#8E7BFF] hover:opacity-95 text-white text-xs font-semibold uppercase tracking-wider flex items-center gap-2 cursor-pointer shadow-[0_0_25px_rgba(127,114,255,0.45)] transition-all hover:scale-[1.02] active:scale-[0.98] shrink-0"
             >
               <Sparkles className="w-3.5 h-3.5 fill-white text-white" />
               <span className="hidden sm:inline">Ask plot</span>
@@ -542,6 +597,12 @@ export default function App() {
               <HelpCircle className="w-3.5 h-3.5" />
               Replay Guide
             </motion.button>
+            <button
+              onClick={() => setViewMode('reserve')}
+              className="text-zinc-500 hover:text-[#7F72FF] transition-colors cursor-pointer underline bg-transparent border-0"
+            >
+              Early Access Premiere
+            </button>
           </div>
           <p className="italic text-zinc-500">
             Your quiet cinematic archive. Made with care.
