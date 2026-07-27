@@ -20,6 +20,7 @@ import { detectPlatform } from '../utils';
 import CinemaAtmosphere from './CinemaAtmosphere';
 import HeroProductDemo from './HeroProductDemo';
 import CinematicEasterEggs from './CinematicEasterEggs';
+import { PlotIcon } from './PlotLogo';
 
 interface HomeScreenProps {
   movies?: Movie[];
@@ -254,14 +255,9 @@ export default function HomeScreen({
               transition={{ duration: 0.3, ease: 'easeOut' }}
               className="bg-[#111214] border border-[#1A1C20] rounded-3xl p-8 max-w-sm w-full flex flex-col items-center justify-center space-y-5 shadow-2xl text-center"
             >
-              {/* Scanner animation keeping the film reel scanner */}
-              <div className="relative w-16 h-24 rounded-2xl bg-[#1A1C20] border border-[#7F72FF]/30 overflow-hidden flex items-center justify-center shadow-2xl">
-                <motion.div
-                  animate={{ y: [-48, 48, -48] }}
-                  transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute inset-x-0 h-1 bg-[#7F72FF] blur-[2px]"
-                />
-                <Film className="w-6 h-6 text-[#7F72FF]" />
+              {/* Official Plot Icon breathing loading indicator */}
+              <div className="relative w-20 h-20 rounded-2xl bg-[#14151C] border border-[#7F72FF]/20 flex items-center justify-center shadow-xl">
+                <PlotIcon className="w-10 h-10" showBg={false} animate="breathe" />
               </div>
 
               {/* Random Famous Movie Dialogue & Emoji */}

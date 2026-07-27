@@ -14,6 +14,7 @@ import {
   Shield 
 } from 'lucide-react';
 import { Movie } from '../types';
+import { PlotIcon } from './PlotLogo';
 
 interface HeroProductDemoProps {
   onMoviesAdded?: (newMovies: Omit<Movie, 'id' | 'addedAt' | 'watched'>[]) => void;
@@ -330,10 +331,10 @@ export default function HeroProductDemo({ onImportSubmit, autoFocusInput }: Hero
       {/* 3. HERO CENTER CONTENT BLOCK */}
       <div className="relative z-20 text-center flex flex-col items-center max-w-3xl mx-auto pt-2 sm:pt-4">
         
-        {/* Top Badge Pill */}
+        {/* Small Premium Eyebrow Label */}
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#0E0F17]/90 border border-[#2B2748] text-[#A89CFF] text-[11px] font-sans font-medium uppercase tracking-widest shadow-inner mb-6 backdrop-blur-md">
           <Sparkles className="w-3.5 h-3.5 text-[#A89CFF]" />
-          <span>YOUR MOVIES, YOUR SPACE</span>
+          <span>✨ AI-Powered Movie Extraction</span>
         </div>
 
         {/* Main Serif Headline */}
@@ -408,7 +409,7 @@ export default function HeroProductDemo({ onImportSubmit, autoFocusInput }: Hero
             >
               {isExtractingReal ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin text-white" />
+                  <PlotIcon className="w-4 h-4" showBg={false} animate="breathe" />
                   <span>Extracting...</span>
                 </>
               ) : (

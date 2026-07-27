@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Mail, User, ArrowRight, Sparkles, Heart, CheckCircle2, Ticket } from 'lucide-react';
+import { PlotLogo, PlotIcon } from './PlotLogo';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -80,10 +81,8 @@ export default function AuthModal({
               </button>
 
               {/* Early Access Pill */}
-              <div className="mb-4 flex items-center gap-2">
-                <span className="font-sans font-medium text-lg text-[#F5F5F3] tracking-wide lowercase">
-                  plot
-                </span>
+              <div className="mb-4 flex items-center gap-2.5">
+                <PlotLogo variant="full" size="sm" />
                 <span className="text-[10px] uppercase font-mono tracking-widest text-[#7F72FF] bg-[#7F72FF]/15 px-2.5 py-0.5 rounded-full border border-[#7F72FF]/30 flex items-center gap-1">
                   <Sparkles className="w-3 h-3 text-[#7F72FF]" />
                   Early Access
@@ -162,7 +161,10 @@ export default function AuthModal({
                     className="w-full sm:flex-1 py-3 bg-[#7F72FF] hover:bg-[#6E60FF] text-white text-xs font-semibold rounded-xl transition-all shadow-lg shadow-[#7F72FF]/25 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-80"
                   >
                     {isSubmitted ? (
-                      <span>Securing your seat...</span>
+                      <span className="flex items-center gap-2">
+                        <PlotIcon className="w-4 h-4" showBg={false} animate="breathe" />
+                        <span>Securing your seat...</span>
+                      </span>
                     ) : (
                       <>
                         <span>{mode === 'login' ? 'Welcome Back' : 'Reserve My Seat'}</span>

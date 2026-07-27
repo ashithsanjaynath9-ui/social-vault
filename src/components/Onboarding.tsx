@@ -6,6 +6,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Instagram, Sparkles, Film, Bookmark, CheckCircle2 } from 'lucide-react';
+import { PlotLogo } from './PlotLogo';
 
 interface OnboardingProps {
   onComplete: () => void;
@@ -733,8 +734,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
       {/* TOP HEADER: Minimal Brand & Skip Button */}
       <header className="relative z-10 flex items-center justify-between w-full max-w-5xl mx-auto">
         <div className="flex items-center space-x-2">
-          <span className="font-serif italic text-xl text-white/90 tracking-wide">plot</span>
-          <span className="w-1 h-1 rounded-full bg-[#8E7BFF] shadow-[0_0_8px_#8E7BFF]" />
+          <PlotLogo variant="full" size="sm" />
         </div>
 
         <button

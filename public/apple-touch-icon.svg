@@ -1,0 +1,39 @@
+<svg width="180" height="180" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="plotPGradientApple" x1="30" y1="85" x2="80" y2="15" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stopColor="#4129E3" />
+      <stop offset="50%" stopColor="#6448FF" />
+      <stop offset="100%" stopColor="#8A7BFF" />
+    </linearGradient>
+    <linearGradient id="plotPFoldGradientApple" x1="46" y1="34" x2="70" y2="65" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stopColor="#1B1052" />
+      <stop offset="100%" stopColor="#321D96" />
+    </linearGradient>
+    <linearGradient id="plotSquircleBgApple" x1="10" y1="10" x2="90" y2="90" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stopColor="#12111E" />
+      <stop offset="100%" stopColor="#07060D" />
+    </linearGradient>
+    <linearGradient id="plotBorderGlowApple" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stopColor="rgba(138, 123, 255, 0.45)" />
+      <stop offset="50%" stopColor="rgba(80, 53, 230, 0.2)" />
+      <stop offset="100%" stopColor="rgba(255, 255, 255, 0.08)" />
+    </linearGradient>
+  </defs>
+
+  <rect x="2" y="2" width="96" height="96" rx="26" fill="url(#plotSquircleBgApple)" />
+  <rect x="2.5" y="2.5" width="95" height="95" rx="25.5" stroke="url(#plotBorderGlowApple)" strokeWidth="1.2" />
+
+  <path
+    d="M 33 76 L 33 28 C 33 21 38 16 48 16 C 67 16 80 25.5 80 43 C 80 60 67 69.5 48 69.5 L 43 69.5 C 41.5 69.5 41 68.5 41 67 L 41 49 C 41 46.5 43 44.5 45.5 44.5 L 48 44.5 C 57 44.5 63 39.5 63 32 C 63 24.5 57 20 48 20 L 41.5 20 L 41.5 76 C 41.5 78.5 39.5 80 37.25 80 L 37.25 80 C 34.9 80 33 78.5 33 76 Z"
+    fill="url(#plotPGradientApple)"
+  />
+
+  <path
+    d="M 42 47.5 L 42 66 C 42 68.5 43.5 69.5 46.5 69.5 C 58 69.5 67 60 67 47.5 C 67 38 58 35 48.5 35 C 44 35 42 38 42 42 Z"
+    fill="url(#plotPFoldGradientApple)"
+  />
+
+  <rect x="44.5" y="38" width="3.2" height="4.5" rx="0.8" fill="#07060D" />
+  <rect x="44.5" y="45.5" width="3.2" height="4.5" rx="0.8" fill="#07060D" />
+  <rect x="44.5" y="53" width="3.2" height="4.5" rx="0.8" fill="#07060D" />
+</svg>

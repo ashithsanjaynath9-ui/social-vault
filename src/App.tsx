@@ -18,6 +18,7 @@ import { IdentityId, IDENTITY_DIRECTIONS } from './components/BrandIdentity';
 import GlobalSearch from './components/GlobalSearch';
 import AuthModal from './components/AuthModal';
 import ReservePage from './components/ReservePage';
+import PlotLogo from './components/PlotLogo';
 
 export default function App() {
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -342,25 +343,12 @@ export default function App() {
 
   if (!isLoaded) {
     return (
-      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center font-sans relative overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-[#7C8CFF]/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="min-h-screen bg-[#07060D] flex flex-col items-center justify-center font-sans relative overflow-hidden select-none">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#7C8CFF]/10 rounded-full blur-[140px] pointer-events-none" />
         
         <div className="flex flex-col items-center gap-6 relative z-10">
-          <div className="relative w-16 h-16 flex items-center justify-center">
-            <div className="absolute inset-0 rounded-full border-2 border-[#7C8CFF]/5" />
-            <motion.div 
-              animate={{ rotate: 360 }}
-              transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
-              className="absolute inset-0 rounded-full border-t-2 border-[#7C8CFF]/40"
-            />
-            <div className="text-[#7C8CFF]">
-              {selectedIdentity.logoSvg("w-7 h-7")}
-            </div>
-          </div>
-          <div className="text-center space-y-1.5">
-            {selectedIdentity.wordmark("text-xl")}
-            <p className="text-xs text-zinc-500 font-sans">Loading your plot...</p>
-          </div>
+          <PlotLogo variant="full" size="xl" animate="breathe" hoverGlow={false} />
+          <p className="text-xs text-[#7A798C] font-sans font-light tracking-wide">Loading your plot sanctuary...</p>
         </div>
       </div>
     );
@@ -387,21 +375,20 @@ export default function App() {
       <div className="w-full max-w-7xl mx-auto pt-4 sm:pt-6 space-y-8 relative">
         
         {/* Header Branding section */}
-        <header className="flex flex-col md:flex-row items-center justify-between gap-4 pb-6 border-b border-[#14151E]">
+        <header className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6 pb-6 border-b border-[#14151E]">
           
-          {/* Left: Logo with Bookmark Icon & Subtitle */}
+          {/* Left: Official Brand Logo & Subtitle */}
           <div 
-            className="flex items-center gap-3.5 select-none cursor-pointer group" 
+            className="flex items-center gap-3 select-none cursor-pointer group py-1.5 px-3 -ml-3 rounded-xl hover:bg-white/[0.04] transition-all" 
             onClick={() => setViewMode('home')}
           >
-            <div className="w-[42px] h-[42px] rounded-xl bg-[#0E0F18] border border-[#2D2A4A] flex items-center justify-center text-[#8E7BFF] shadow-[0_0_20px_rgba(142,123,255,0.35)] transition-all duration-300 group-hover:scale-105 group-hover:border-[#8E7BFF]/60 group-hover:shadow-[0_0_28px_rgba(142,123,255,0.5)]">
-              <Bookmark className="w-[20px] h-[20px] fill-[#8E7BFF]/30 text-[#9E8FFF] stroke-[1.75]" />
-            </div>
-            <div className="flex flex-col text-left justify-center">
-              <span className="font-sans font-semibold text-[22px] sm:text-[25px] text-[#F7F7F8] tracking-[-0.03em] leading-none lowercase antialiased">
-                plot
-              </span>
-              <span className="text-[11px] sm:text-xs text-[#7A798C] font-sans font-normal leading-none mt-1.5 tracking-normal">
+            <PlotLogo 
+              variant="full" 
+              size="sm" 
+              hoverGlow={true}
+            />
+            <div className="hidden sm:flex flex-col text-left justify-center border-l border-[#1F2030] pl-3 my-0.5">
+              <span className="text-[11px] text-[#7A798C] group-hover:text-[#A09EB8] font-sans font-normal leading-none tracking-tight transition-colors">
                 Less deciding. More watching.
               </span>
             </div>
@@ -583,28 +570,31 @@ export default function App() {
           )}
         </AnimatePresence>
 
-        {/* Footer */}
-        <footer className="pt-16 border-t border-zinc-950 flex flex-col sm:flex-row items-center justify-between text-xs text-zinc-500 font-sans gap-4">
-          <div className="flex flex-wrap items-center gap-3">
-            <p>© {new Date().getFullYear()} plot.</p>
-            <motion.button
-              onClick={handleResetOnboarding}
-              whileHover={{ scale: 1.02, color: "#7C8CFF" }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ type: "spring", stiffness: 250, damping: 20 }}
-              className="text-zinc-500 hover:text-blue-400 transition-colors flex items-center gap-1 cursor-pointer underline bg-transparent border-0"
-            >
-              <HelpCircle className="w-3.5 h-3.5" />
-              Replay Guide
-            </motion.button>
-            <button
-              onClick={() => setViewMode('reserve')}
-              className="text-zinc-500 hover:text-[#7F72FF] transition-colors cursor-pointer underline bg-transparent border-0"
-            >
-              Early Access Premiere
-            </button>
+        {/* Footer (FULL Logo for Premium Brand Moment) */}
+        <footer className="pt-16 border-t border-zinc-950 flex flex-col sm:flex-row items-center justify-between text-xs text-zinc-500 font-sans gap-6">
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+            <PlotLogo variant="full" size="sm" />
+            <div className="flex flex-wrap items-center gap-3 border-t sm:border-t-0 sm:border-l border-zinc-900 pt-3 sm:pt-0 sm:pl-6">
+              <p>© {new Date().getFullYear()} plot.</p>
+              <motion.button
+                onClick={handleResetOnboarding}
+                whileHover={{ scale: 1.02, color: "#7C8CFF" }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ type: "spring", stiffness: 250, damping: 20 }}
+                className="text-zinc-500 hover:text-blue-400 transition-colors flex items-center gap-1 cursor-pointer underline bg-transparent border-0"
+              >
+                <HelpCircle className="w-3.5 h-3.5" />
+                Replay Guide
+              </motion.button>
+              <button
+                onClick={() => setViewMode('reserve')}
+                className="text-zinc-500 hover:text-[#7F72FF] transition-colors cursor-pointer underline bg-transparent border-0"
+              >
+                Early Access Premiere
+              </button>
+            </div>
           </div>
-          <p className="italic text-zinc-500">
+          <p className="italic text-zinc-500 text-center sm:text-right">
             Your quiet cinematic archive. Made with care.
           </p>
         </footer>

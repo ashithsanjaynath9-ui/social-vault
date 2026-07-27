@@ -1,6 +1,6 @@
 {
   "name": "plot",
-  "description": "Every recommendation deserves a place.",
+  "description": "Your personal movie sanctuary with AI-powered movie extraction and recommendation.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

@@ -22,6 +22,7 @@ import {
 import { Movie, AppStats } from '../types';
 
 import AuthModal from './AuthModal';
+import { PlotLogo, PlotIcon } from './PlotLogo';
 
 interface ProfileScreenProps {
   movies: Movie[];
@@ -146,8 +147,8 @@ export default function ProfileScreen({
       {/* 1. Spotify-style Minimal Avatar Header */}
       <div className="flex items-center justify-between gap-4 py-2">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="relative w-12 h-12 rounded-full bg-gradient-to-tr from-zinc-900 to-zinc-950 border border-zinc-800 flex items-center justify-center text-xl shadow-md overflow-hidden shrink-0">
-            <User className="w-5 h-5 text-zinc-500" />
+          <div className="relative w-12 h-12 rounded-full bg-gradient-to-tr from-zinc-900 to-zinc-950 border border-zinc-800 flex items-center justify-center shadow-md overflow-hidden shrink-0">
+            <PlotIcon className="w-7 h-7" />
           </div>
           <div className="min-w-0 text-left">
             <h3 className="text-sm font-medium text-zinc-200 truncate">
@@ -346,8 +347,8 @@ export default function ProfileScreen({
                 <X className="w-4 h-4" />
               </button>
               
-              <div className="space-y-1 select-none">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-indigo-400 font-semibold">plot</span>
+              <div className="space-y-1.5 select-none">
+                <PlotLogo variant="full" size="sm" />
                 <h3 className="text-base font-display italic text-zinc-100">Quiet Sanctuary</h3>
               </div>
 

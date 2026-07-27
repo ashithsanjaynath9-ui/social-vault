@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { Movie } from '../types';
 import { IDENTITY_DIRECTIONS } from './BrandIdentity';
+import { PlotIcon } from './PlotLogo';
 
 interface WatchTonightModalProps {
   movies: Movie[];
@@ -375,8 +376,8 @@ export default function WatchTonightModal({
                 <div className="relative min-h-[220px]">
                   {isRemixing ? (
                     <div className="absolute inset-0 flex items-center justify-center py-20">
-                      <div className="flex items-center gap-2.5 text-zinc-500 text-xs font-mono">
-                        <RotateCw className="w-4 h-4 animate-spin text-zinc-400" />
+                      <div className="flex items-center gap-2.5 text-zinc-400 text-xs font-mono">
+                        <PlotIcon className="w-5 h-5" showBg={false} animate="breathe" />
                         <span>Drawing from your plot...</span>
                       </div>
                     </div>

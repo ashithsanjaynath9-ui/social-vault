@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { Bookmark, Clipboard, Tag, Award, Heart, Check, Compass, Eye } from 'lucide-react';
+import { PlotIcon, PlotWordmark, PlotLogoDesignSystem } from './PlotLogo';
 
 export type IdentityId = 'bookmark' | 'stub' | 'monogram' | 'shelf';
 
@@ -24,90 +25,61 @@ export const IDENTITY_DIRECTIONS: IdentityDirection[] = [
   {
     id: 'bookmark',
     name: 'plot',
-    conceptTitle: 'The Bookmarked Slip',
-    metaphor: 'Marking a precious page to return to later.',
-    description: 'A poetic, timeless concept inspired by physical ribbon bookmarks. It treats cinema not as ephemeral streams, but as chapters of a life well-lived. Saving is a quiet pause, a bookmark placed until you are ready.',
-    typography: 'Newsreader Elegant Serif + Instrument Sans',
-    vibeText: 'Quiet • Editorial • Warm • Introspective',
+    conceptTitle: 'Official Plot Identity',
+    metaphor: 'The single source of truth for plot.',
+    description: 'The official brand identity combining a stylized film-strip P mark with clean lowercase tracking. Crafted for quiet cinematic curation.',
+    typography: 'System Modern Sans + Spaced Tracked Lowercase',
+    vibeText: 'Official • Cinematic • Modern • Curated',
     logoSvg: (className = "w-12 h-12") => (
-      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-        <path d="M6 10C12 10 18 12 24 15C30 12 36 10 42 10V38C36 38 30 40 24 43C18 40 12 38 6 38V10Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-30" />
-        <path d="M20 12V34L24 31L28 34V12H20Z" fill="#8B80F9" stroke="#8B80F9" strokeWidth="1.5" strokeLinejoin="round" />
-        <path d="M24 6V12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="opacity-40" />
-      </svg>
+      <PlotIcon className={className} />
     ),
     wordmark: (className = "text-xl") => (
-      <div className={`flex items-baseline select-none ${className}`}>
-        <span className="font-display font-medium text-[#F2ECE3] tracking-tight lowercase">plot</span>
-      </div>
+      <PlotWordmark className={className} size="md" />
     )
   },
   {
     id: 'stub',
     name: 'plot',
-    conceptTitle: 'The Archive Ticket Stub',
-    metaphor: 'A physical token of a screening tonight.',
-    description: 'An elegant vintage movie ticket, stripped of any flashy neon or commercial noise. Beautifully proportioned with perforated edges and a punched star. It elevates movie recommendations into actual personal invites and physical, collected milestones.',
-    typography: 'Instrument Sans Semibold + Spaced Monospace',
-    vibeText: 'Nostalgic • Tactile • Human • Curated',
+    conceptTitle: 'Official Plot Identity',
+    metaphor: 'The single source of truth for plot.',
+    description: 'The official brand identity combining a stylized film-strip P mark with clean lowercase tracking. Crafted for quiet cinematic curation.',
+    typography: 'System Modern Sans + Spaced Tracked Lowercase',
+    vibeText: 'Official • Cinematic • Modern • Curated',
     logoSvg: (className = "w-12 h-12") => (
-      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-        <path d="M8 12H40C40 12 40 16 38 18C36 20 36 24 38 26C40 28 40 32 40 32H8C8 32 8 28 10 26C12 24 12 20 10 18C8 16 8 12 8 12Z" stroke="#8B80F9" strokeWidth="2" strokeLinejoin="round" />
-        <path d="M24 17L25.8 21.2L30.2 21.5L26.8 24.4L27.9 28.8L24 26.4L20.1 28.8L21.2 24.4L17.8 21.5L22.2 21.2L24 17Z" fill="currentColor" className="text-zinc-400" />
-        <line x1="14" y1="12" x2="14" y2="32" stroke="currentColor" strokeWidth="1" strokeDasharray="3 3" className="opacity-40" />
-        <line x1="34" y1="12" x2="34" y2="32" stroke="currentColor" strokeWidth="1" strokeDasharray="3 3" className="opacity-40" />
-      </svg>
+      <PlotIcon className={className} />
     ),
     wordmark: (className = "text-xl") => (
-      <div className={`flex items-baseline select-none font-sans ${className}`}>
-        <span className="font-semibold text-[#8B80F9] tracking-tight lowercase">plot</span>
-      </div>
+      <PlotWordmark className={className} size="md" />
     )
   },
   {
     id: 'monogram',
     name: 'plot',
-    conceptTitle: 'The Curator’s Monogram',
-    metaphor: 'A personal plot seal of ownership.',
-    description: 'An intertwined geometric seal of ownership. Taking inspiration from classical ex-libris bookplates and personal stamps, this direction communicates pride of ownership. It is an enduring stamp that declares: “This is part of my personal plot.”',
-    typography: 'Aesthetic Serifs + Fine Letterspacing',
-    vibeText: 'Classic • Artisanal • Personal • Permanent',
+    conceptTitle: 'Official Plot Identity',
+    metaphor: 'The single source of truth for plot.',
+    description: 'The official brand identity combining a stylized film-strip P mark with clean lowercase tracking. Crafted for quiet cinematic curation.',
+    typography: 'System Modern Sans + Spaced Tracked Lowercase',
+    vibeText: 'Official • Cinematic • Modern • Curated',
     logoSvg: (className = "w-12 h-12") => (
-      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-        <circle cx="24" cy="24" r="19" stroke="currentColor" strokeWidth="1.5" className="opacity-30" />
-        <circle cx="24" cy="24" r="16" stroke="#8B80F9" strokeWidth="1" className="opacity-20" />
-        <path d="M28 17C26 15.5 21 15.5 19.5 18C18 20.5 18 27.5 19.5 30C21 32.5 26 32.5 28 31" stroke="#8B80F9" strokeWidth="2.5" strokeLinecap="round" />
-        <path d="M21 19.5C23.5 18 26.5 19.5 25.5 22.5C24.5 25.5 19.5 24.5 21 28C22.5 31.5 26.5 30 27 28.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-      </svg>
+      <PlotIcon className={className} />
     ),
     wordmark: (className = "text-xl") => (
-      <div className={`flex items-baseline select-none ${className}`}>
-        <span className="font-display tracking-[0.15em] font-light text-[#8B80F9] lowercase">plot</span>
-      </div>
+      <PlotWordmark className={className} size="md" />
     )
   },
   {
     id: 'shelf',
     name: 'plot',
-    conceptTitle: 'The Physical Book Shelf',
-    metaphor: 'Books standing together, lived-in and real.',
-    description: 'A quiet, cozy visual motif of physical movie boxes or volumes resting on a warm, personal shelf. It evokes the feeling of scanning your personal collection on a lazy rainy afternoon, finding comfort in physical presence and tactile arrangements.',
-    typography: 'Soft Humanist Sans + Warm Understatement',
-    vibeText: 'Grounded • Cozy • Organized • Structured',
+    conceptTitle: 'Official Plot Identity',
+    metaphor: 'The single source of truth for plot.',
+    description: 'The official brand identity combining a stylized film-strip P mark with clean lowercase tracking. Crafted for quiet cinematic curation.',
+    typography: 'System Modern Sans + Spaced Tracked Lowercase',
+    vibeText: 'Official • Cinematic • Modern • Curated',
     logoSvg: (className = "w-12 h-12") => (
-      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-        <line x1="8" y1="36" x2="40" y2="36" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="opacity-60" />
-        <rect x="12" y="16" width="6" height="18" rx="1" fill="#8B80F9" stroke="#8B80F9" strokeWidth="1" />
-        <rect x="20" y="12" width="5.5" height="22" rx="1" fill="currentColor" stroke="currentColor" strokeWidth="1" className="text-zinc-450" />
-        <g transform="translate(26,13) rotate(14)">
-          <rect x="0" y="0" width="5.5" height="21" rx="1" fill="currentColor" stroke="currentColor" strokeWidth="1" className="text-zinc-600" />
-        </g>
-      </svg>
+      <PlotIcon className={className} />
     ),
     wordmark: (className = "text-xl") => (
-      <div className={`flex items-baseline select-none font-sans ${className}`}>
-        <span className="font-normal text-[#F2ECE3] tracking-tight lowercase">plot</span>
-      </div>
+      <PlotWordmark className={className} size="md" />
     )
   }
 ];
@@ -189,6 +161,11 @@ export function IdentityShowcase({ activeId, onChangeIdentity }: IdentityShowcas
             </div>
           );
         })}
+      </div>
+
+      {/* Brand Design System Showcase */}
+      <div className="mt-10">
+        <PlotLogoDesignSystem />
       </div>
 
       {/* Complete visual type scale for plot */}

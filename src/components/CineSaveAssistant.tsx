@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { Movie } from '../types';
 import { IDENTITY_DIRECTIONS } from './BrandIdentity';
+import { PlotLogo, PlotIcon } from './PlotLogo';
 
 interface CineSaveAssistantProps {
   movies: Movie[];
@@ -295,9 +296,7 @@ export default function CineSaveAssistant({
                 <div className="flex items-start justify-between">
                   <div className="space-y-1.5 text-left">
                     <div className="flex items-center gap-2">
-                      <div className="w-5 h-5 rounded bg-[#1B2540] border border-[#2D3D6B] text-[#97A5FF] flex items-center justify-center">
-                        {brandConfig.logoSvg("w-3.5 h-3.5")}
-                      </div>
+                      <PlotIcon className="w-5 h-5" />
                       <span className="text-[10px] tracking-widest uppercase font-semibold text-[#97A5FF] font-mono">
                         Plot Picks
                       </span>

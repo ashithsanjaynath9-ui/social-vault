@@ -292,35 +292,6 @@ export default function WatchlistDashboard({
 
       <div className="relative z-10 space-y-8">
         
-        {/* Early Access Sanctuary Preservation Banner */}
-        {!isSeatReserved && movies.length > 0 && (
-          <motion.div 
-            initial={{ opacity: 0, y: -6 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-[#0E0F18]/90 border border-[#2D2A4A]/80 rounded-2xl p-3.5 sm:p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-left shadow-lg backdrop-blur-sm"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl bg-[#7F72FF]/15 border border-[#7F72FF]/30 flex items-center justify-center text-[#7F72FF] shrink-0">
-                <Sparkles className="w-4 h-4" />
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-[#F5F5F3]">
-                  You&apos;ve started building your sanctuary ({movies.length} {movies.length === 1 ? 'film' : 'films'} plotted)
-                </p>
-                <p className="text-[11px] text-[#A7A7A2] mt-0.5">
-                  Reserve your seat for early access to keep your personal plot permanently synced.
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={() => onOpenReserveModal?.('save_permanent')}
-              className="px-4 py-2 bg-[#7F72FF] hover:bg-[#6E60FF] text-white text-xs font-semibold rounded-xl transition-all shrink-0 cursor-pointer shadow-md"
-            >
-              Reserve Your Seat
-            </button>
-          </motion.div>
-        )}
-
         {/* Sleek Header & Search Room */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-2">
         <div className="space-y-1 text-left">

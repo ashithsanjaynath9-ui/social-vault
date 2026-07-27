@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Sparkles, ArrowRight, User, Mail, Heart, Ticket, CheckCircle2, Film, Layers, Compass, Clapperboard, ShieldCheck, Zap } from 'lucide-react';
+import { PlotLogo, PlotIcon } from './PlotLogo';
 
 interface ReservePageProps {
   onReserveComplete?: (email: string, name?: string, firstMovie?: string) => void;
@@ -47,22 +48,20 @@ export default function ReservePage({ onReserveComplete, onNavigateToApp }: Rese
         style={{ backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`, backgroundSize: '32px 32px' }} 
       />
 
-      {/* Minimal Header */}
-      <header className="relative z-10 max-w-6xl mx-auto w-full px-6 pt-5 pb-3 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-2.5">
-          <span className="font-sans font-extrabold text-2xl tracking-tighter text-[#F5F5F3] lowercase">
-            plot
-          </span>
-          <span className="text-[10px] uppercase font-mono tracking-widest text-[#7F72FF] bg-[#7F72FF]/15 px-2.5 py-0.5 rounded-full border border-[#7F72FF]/30 flex items-center gap-1">
-            <Sparkles className="w-3 h-3 text-[#7F72FF]" />
-            Premiere Access
+      {/* Minimal Exclusive Header */}
+      <header className="relative z-10 max-w-6xl mx-auto w-full px-6 pt-6 pb-4 flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0">
+        <div className="flex items-center gap-3">
+          <PlotLogo variant="full" size="sm" hoverGlow={true} />
+          <span className="hidden sm:inline-flex text-[10px] uppercase font-mono tracking-widest text-[#8A7BFF] bg-[#4129E3]/20 px-3 py-1 rounded-full border border-[#6448FF]/30 items-center gap-1.5 shadow-sm">
+            <Sparkles className="w-3 h-3 text-[#8A7BFF]" />
+            Exclusive Premiere Invitation
           </span>
         </div>
 
         {onNavigateToApp && (
           <button
             onClick={onNavigateToApp}
-            className="text-xs text-zinc-400 hover:text-white transition-colors flex items-center gap-1.5 cursor-pointer py-1.5 px-3 rounded-xl hover:bg-white/5 border border-transparent hover:border-white/10"
+            className="text-xs text-zinc-400 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer py-2 px-4 rounded-xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 shadow-sm"
           >
             <span>Explore App Preview</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -81,7 +80,7 @@ export default function ReservePage({ onReserveComplete, onNavigateToApp }: Rese
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: -15 }}
-              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.5, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
               className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center"
             >
               {/* Left Column: What plot is & Why early access matters */}
@@ -224,7 +223,10 @@ export default function ReservePage({ onReserveComplete, onNavigateToApp }: Rese
                         className="w-full py-3.5 bg-[#7F72FF] hover:bg-[#6E60FF] text-white text-xs font-semibold rounded-xl transition-all shadow-xl shadow-[#7F72FF]/25 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-80"
                       >
                         {isSubmitted ? (
-                          <span>Securing your seat...</span>
+                          <span className="flex items-center gap-2">
+                            <PlotIcon className="w-4 h-4" showBg={false} animate="breathe" />
+                            <span>Securing your seat...</span>
+                          </span>
                         ) : (
                           <>
                             <span>Reserve My Seat</span>
@@ -245,72 +247,90 @@ export default function ReservePage({ onReserveComplete, onNavigateToApp }: Rese
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 40 }}
               transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-              className="w-full max-w-md mx-auto relative select-none my-auto"
+              className="w-full max-w-lg mx-auto relative select-none my-auto"
             >
-              <div className="bg-[#0E0F16]/95 border border-white/15 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-2xl overflow-hidden text-left space-y-6">
+              <div className="bg-[#0B0C12]/95 border border-[#8A7BFF]/25 rounded-3xl p-6 sm:p-8 shadow-[0_0_50px_rgba(65,41,227,0.25)] backdrop-blur-2xl overflow-hidden text-left space-y-6 relative">
                 
-                {/* Spotlights */}
-                <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-72 h-32 bg-[#7F72FF]/25 rounded-full blur-3xl pointer-events-none" />
-                <div className="absolute -bottom-16 left-1/2 -translate-x-1/2 w-72 h-32 bg-amber-500/15 rounded-full blur-3xl pointer-events-none" />
+                {/* Premiere Glow Spotlights */}
+                <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-80 h-40 bg-gradient-to-b from-[#6448FF]/30 to-transparent rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute -bottom-24 left-1/2 -translate-x-1/2 w-80 h-40 bg-[#4129E3]/20 rounded-full blur-3xl pointer-events-none" />
 
-                {/* Header Stub */}
-                <div className="flex items-center justify-between pb-4 border-b border-white/10">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-xl bg-[#7F72FF]/15 border border-[#7F72FF]/30 flex items-center justify-center text-[#7F72FF]">
-                      <Ticket className="w-4 h-4" />
-                    </div>
-                    <span className="font-sans font-bold text-xl text-[#F5F5F3] lowercase tracking-wider">
-                      plot
-                    </span>
+                {/* HERO ELEMENT: Official plot Logo Header */}
+                <div className="flex flex-col items-center justify-center text-center pt-2 pb-4 border-b border-white/10 relative">
+                  <span className="text-[9px] uppercase font-mono font-bold tracking-[0.25em] text-[#8A7BFF] bg-[#4129E3]/20 px-3 py-0.5 rounded-full border border-[#6448FF]/30 mb-3 shadow-sm">
+                    EARLY ACCESS PASS • PREMIERE EDITION
+                  </span>
+                  
+                  {/* Hero Logo as centerpiece of ticket */}
+                  <div className="py-2 transform transition-transform hover:scale-105 duration-300">
+                    <PlotLogo variant="full" size="xl" hoverGlow={true} />
                   </div>
 
-                  <span className="text-[10px] uppercase font-mono font-bold tracking-widest text-[#a594fd] bg-[#7F72FF]/20 px-3 py-1 rounded-full border border-[#7F72FF]/30">
-                    EARLY ACCESS PASS
-                  </span>
+                  <p className="text-[11px] text-zinc-400 font-sans tracking-tight mt-1">
+                    Your personal movie sanctuary reservation
+                  </p>
                 </div>
 
-                {/* Main Pass Content */}
-                <div className="space-y-4 pt-1">
-                  <div>
-                    <span className="text-[10px] uppercase font-mono tracking-widest text-zinc-400">
-                      RESERVATION CONFIRMED
+                {/* Main Pass Content Grid */}
+                <div className="grid grid-cols-2 gap-3 pt-1">
+                  
+                  {/* Seat Number Box */}
+                  <div className="bg-[#12131D] border border-white/10 rounded-2xl p-3.5 space-y-1">
+                    <span className="text-[9px] uppercase font-mono tracking-wider text-zinc-400 block">
+                      Seat Number
                     </span>
-                    <h3 className="text-3xl font-display font-light italic text-[#F5F5F3] mt-0.5">
-                      Seat Reserved
-                    </h3>
+                    <p className="text-base font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-purple-100 to-[#8A7BFF]">
+                      ROW A • SEAT 042
+                    </p>
                   </div>
 
-                  {/* Status Block */}
-                  <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center justify-between gap-4">
-                    <div>
-                      <p className="text-[10px] uppercase font-mono text-zinc-400 tracking-wider">Pass Holder</p>
-                      <p className="text-xs font-semibold text-[#F5F5F3] truncate max-w-[180px]">
+                  {/* Reservation Status Box */}
+                  <div className="bg-[#12131D] border border-emerald-500/20 rounded-2xl p-3.5 space-y-1">
+                    <span className="text-[9px] uppercase font-mono tracking-wider text-emerald-400/80 block">
+                      Reservation Status
+                    </span>
+                    <div className="flex items-center gap-1.5 text-emerald-400 font-bold text-xs">
+                      <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                      <span className="tracking-wide">CONFIRMED</span>
+                    </div>
+                  </div>
+
+                  {/* Pass Holder Details */}
+                  <div className="col-span-2 bg-[#12131D] border border-white/10 rounded-2xl p-3.5 flex items-center justify-between gap-4">
+                    <div className="min-w-0 flex-1">
+                      <span className="text-[9px] uppercase font-mono tracking-wider text-zinc-400 block">
+                        Pass Holder
+                      </span>
+                      <p className="text-xs font-semibold text-white truncate">
                         {name || 'Film Enthusiast'}
                       </p>
-                      <p className="text-[10px] text-zinc-400 font-mono truncate max-w-[180px]">
+                      <p className="text-[10px] text-zinc-400 font-mono truncate">
                         {email || 'cinema@plot.app'}
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1.5 rounded-xl text-emerald-400 shrink-0">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                      <div className="text-left">
-                        <span className="block text-[9px] font-mono uppercase tracking-wider text-emerald-500/80 leading-none">Status</span>
-                        <span className="text-xs font-bold tracking-wide">Confirmed</span>
-                      </div>
+                    {/* Issue Date Box */}
+                    <div className="text-right border-l border-white/10 pl-4 shrink-0">
+                      <span className="text-[9px] uppercase font-mono tracking-wider text-zinc-400 block">
+                        Issue Date
+                      </span>
+                      <p className="text-xs font-mono font-medium text-[#8A7BFF]">
+                        {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()}
+                      </p>
                     </div>
                   </div>
 
-                  <p className="text-xs text-[#A7A7A2] font-serif italic leading-relaxed text-center px-2 py-1">
-                    &ldquo;We&apos;ll send your invitation before the next screening begins.&rdquo;
-                  </p>
                 </div>
 
-                {/* Ticket Stub Line */}
+                <p className="text-xs text-zinc-400 font-serif italic leading-relaxed text-center px-2 py-1">
+                  &ldquo;You will be notified as soon as doors open for the next premiere screening.&rdquo;
+                </p>
+
+                {/* Ticket Stub Notch Line */}
                 <div className="relative pt-2">
                   <div className="border-t-2 border-dashed border-white/15 w-full my-2" />
-                  <div className="absolute -left-10 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-black border-r border-white/10" />
-                  <div className="absolute -right-10 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-black border-l border-white/10" />
+                  <div className="absolute -left-12 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-[#07080C] border-r border-white/10" />
+                  <div className="absolute -right-12 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-[#07080C] border-l border-white/10" />
                 </div>
 
                 {/* Enter App CTA */}
@@ -319,10 +339,10 @@ export default function ReservePage({ onReserveComplete, onNavigateToApp }: Rese
                     onClick={() => {
                       if (onNavigateToApp) onNavigateToApp();
                     }}
-                    className="w-full py-3.5 bg-[#7F72FF] hover:bg-[#6E60FF] text-white text-xs font-semibold rounded-xl transition-all shadow-xl shadow-[#7F72FF]/25 flex items-center justify-center gap-2 cursor-pointer"
+                    className="w-full py-4 bg-gradient-to-r from-[#4129E3] via-[#6448FF] to-[#8A7BFF] hover:brightness-110 text-white text-xs font-semibold rounded-2xl transition-all shadow-xl shadow-[#4129E3]/30 flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
                   >
                     <span>Enter Your Sanctuary</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
 
