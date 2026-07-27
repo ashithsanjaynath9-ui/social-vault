@@ -17,6 +17,7 @@ import {
   LogOut, 
   ChevronRight,
   HelpCircle,
+  Smartphone,
   X
 } from 'lucide-react';
 import { Movie, AppStats } from '../types';
@@ -32,6 +33,7 @@ interface ProfileScreenProps {
   activeIdentity?: string;
   onChangeIdentity?: (id: any) => void;
   onUpdateEmail?: (email: string) => void;
+  onOpenPWAInstall?: () => void;
 }
 
 export default function ProfileScreen({
@@ -41,7 +43,8 @@ export default function ProfileScreen({
   userEmail = 'cinephile@plot.com',
   activeIdentity,
   onChangeIdentity,
-  onUpdateEmail
+  onUpdateEmail,
+  onOpenPWAInstall
 }: ProfileScreenProps) {
   
   // Calculate Favorite Genres from actual live movie list data
@@ -259,6 +262,28 @@ export default function ProfileScreen({
               }`} />
             </button>
           </div>
+
+          {/* PWA App Installation Row */}
+          {onOpenPWAInstall && (
+            <button
+              onClick={onOpenPWAInstall}
+              className="w-full flex items-center justify-between p-4 hover:bg-zinc-900/35 transition-colors text-left border-0 bg-transparent cursor-pointer group"
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-8 h-8 rounded-lg bg-[#7C8CFF]/15 border border-[#7C8CFF]/30 flex items-center justify-center text-[#7C8CFF] shrink-0 group-hover:scale-105 transition-transform">
+                  <Smartphone className="w-4 h-4 text-[#7C8CFF]" />
+                </div>
+                <div className="text-left min-w-0">
+                  <p className="text-xs font-semibold text-white flex items-center gap-1.5">
+                    <span>Install plot App</span>
+                    <span className="px-1.5 py-0.2 rounded-full bg-[#7C8CFF]/20 text-[#7C8CFF] text-[9px] font-mono">PWA</span>
+                  </p>
+                  <p className="text-[10px] text-zinc-400 mt-0.5 truncate">Add to Home Screen for standalone offline access</p>
+                </div>
+              </div>
+              <ChevronRight className="w-4 h-4 text-[#7C8CFF] shrink-0" />
+            </button>
+          )}
 
           {/* Export Plot Setting */}
           <button

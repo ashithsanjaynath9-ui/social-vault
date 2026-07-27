@@ -77,11 +77,11 @@ export default function MovieCard({
     <motion.div
       onMouseEnter={() => onHoverStart?.(movie)}
       onMouseLeave={() => onHoverEnd?.()}
-      whileHover={{ y: -14, scale: 1.18 }}
-      whileTap={{ scale: 0.97 }}
-      transition={{ type: "spring", stiffness: 320, damping: 24 }}
+      whileHover={{ y: -6, scale: 1.04 }}
+      whileTap={{ scale: 0.94 }}
+      transition={{ type: "spring", stiffness: 380, damping: 26 }}
       onClick={onClick}
-      className="group relative flex flex-col cursor-pointer text-left select-none w-full hover:z-50 transition-all duration-300"
+      className="group relative flex flex-col cursor-pointer text-left select-none w-full hover:z-50 transition-all duration-300 active:scale-95"
     >
       {/* Quiet Collectible Poster Container */}
       <div 
@@ -108,8 +108,8 @@ export default function MovieCard({
           </div>
         )}
 
-        {/* Source Badge (ONLY Appears on Hover) */}
-        <div className="absolute top-2 right-2 z-30 opacity-0 -translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 ease-out pointer-events-none">
+        {/* Source Badge */}
+        <div className="absolute top-2 right-2 z-30 opacity-80 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-200 ease-out pointer-events-none">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#0B0D12]/90 border border-white/20 backdrop-blur-md">
             <SourceIcon className="w-3 h-3 text-[var(--color-1)]" />
             <span className="text-[10px] font-sans font-medium text-zinc-200 tracking-tight max-w-[110px] truncate">
@@ -123,6 +123,8 @@ export default function MovieCard({
           <img
             src={movie.posterUrl}
             alt={movie.title}
+            loading="lazy"
+            decoding="async"
             referrerPolicy="no-referrer"
             className="w-full h-full object-cover transition-transform duration-500 scale-100 group-hover:scale-[1.04] opacity-95 group-hover:opacity-100"
           />

@@ -295,6 +295,8 @@ export default function WatchTonightModal({
                             <img
                               src={movie.posterUrl}
                               alt={movie.title}
+                              loading="lazy"
+                              decoding="async"
                               referrerPolicy="no-referrer"
                               className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-all duration-500 scale-100 group-hover:scale-[1.03]"
                             />

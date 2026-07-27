@@ -375,14 +375,15 @@ export default function CineSaveAssistant({
 
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                           {TIME_AVAILABILITY.map((opt) => (
-                            <button
+                            <motion.button
                               key={opt.id}
+                              whileTap={{ scale: 0.95 }}
                               onClick={() => handleSelectOption(opt.id)}
-                              className="px-4 py-4 rounded-2xl bg-zinc-900/40 hover:bg-zinc-900/80 border border-zinc-850/50 hover:border-zinc-800 text-left transition-all hover:scale-[1.02] cursor-pointer group flex flex-col justify-between h-24"
+                              className="px-4 py-4 rounded-2xl bg-zinc-900/40 hover:bg-zinc-900/80 border border-zinc-850/50 hover:border-zinc-800 text-left transition-all hover:scale-[1.02] cursor-pointer group flex flex-col justify-between h-24 active:scale-95"
                             >
                               <span className="text-2xl select-none group-hover:scale-110 transition-transform duration-200">{opt.emoji}</span>
                               <span className="text-sm font-medium text-zinc-300 group-hover:text-white">{opt.label}</span>
-                            </button>
+                            </motion.button>
                           ))}
                         </div>
                       </motion.div>
@@ -415,14 +416,15 @@ export default function CineSaveAssistant({
 
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                           {WATCH_COMPANIONS.map((opt) => (
-                            <button
+                            <motion.button
                               key={opt.id}
+                              whileTap={{ scale: 0.95 }}
                               onClick={() => handleSelectOption(opt.id)}
-                              className="px-4 py-4 rounded-2xl bg-zinc-900/40 hover:bg-zinc-900/80 border border-zinc-850/50 hover:border-zinc-800 text-left transition-all hover:scale-[1.02] cursor-pointer group flex flex-col justify-between h-24"
+                              className="px-4 py-4 rounded-2xl bg-zinc-900/40 hover:bg-zinc-900/80 border border-zinc-850/50 hover:border-zinc-800 text-left transition-all hover:scale-[1.02] cursor-pointer group flex flex-col justify-between h-24 active:scale-95"
                             >
                               <span className="text-2xl select-none group-hover:scale-110 transition-transform duration-200">{opt.emoji}</span>
                               <span className="text-sm font-medium text-zinc-300 group-hover:text-white">{opt.label}</span>
-                            </button>
+                            </motion.button>
                           ))}
                         </div>
                       </motion.div>

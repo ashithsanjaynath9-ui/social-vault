@@ -11,7 +11,8 @@ import {
   Loader2, 
   Sparkles, 
   MoreHorizontal, 
-  Shield 
+  Shield,
+  Clipboard
 } from 'lucide-react';
 import { Movie } from '../types';
 import { PlotIcon } from './PlotLogo';
@@ -211,6 +212,22 @@ export default function HeroProductDemo({ onImportSubmit, autoFocusInput }: Hero
     };
   }, [SINGLE_SET_WIDTH]);
 
+  const handlePasteClipboard = async () => {
+    handleInteraction();
+    try {
+      if (navigator.clipboard && navigator.clipboard.readText) {
+        const text = await navigator.clipboard.readText();
+        if (text) {
+          setInputText(text);
+        }
+      } else {
+        inputRef.current?.focus();
+      }
+    } catch {
+      inputRef.current?.focus();
+    }
+  };
+
   const handleManualSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     handleInteraction();
@@ -329,16 +346,16 @@ export default function HeroProductDemo({ onImportSubmit, autoFocusInput }: Hero
       <div className="absolute top-[22%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] sm:w-[680px] h-[300px] bg-radial from-[#8E7BFF]/15 via-[#8E7BFF]/03 to-transparent blur-3xl pointer-events-none rounded-full z-0" />
 
       {/* 3. HERO CENTER CONTENT BLOCK */}
-      <div className="relative z-20 text-center flex flex-col items-center max-w-3xl mx-auto pt-2 sm:pt-4">
+      <div className="relative z-20 text-center flex flex-col items-center max-w-3xl mx-auto pt-1 sm:pt-4">
         
         {/* Small Premium Eyebrow Label */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#0E0F17]/90 border border-[#2B2748] text-[#A89CFF] text-[11px] font-sans font-medium uppercase tracking-widest shadow-inner mb-6 backdrop-blur-md">
-          <Sparkles className="w-3.5 h-3.5 text-[#A89CFF]" />
+        <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-[#0E0F17]/90 border border-[#2B2748] text-[#A89CFF] text-[10px] sm:text-[11px] font-sans font-medium uppercase tracking-widest shadow-inner mb-3 sm:mb-5 backdrop-blur-md">
+          <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#A89CFF]" />
           <span>✨ AI-Powered Movie Extraction</span>
         </div>
 
         {/* Main Serif Headline */}
-        <h1 className="text-4xl sm:text-5xl md:text-[4.25rem] font-serif italic font-normal tracking-tight text-[#F5F5F7] leading-[1.08] drop-shadow-[0_12px_40px_rgba(0,0,0,0.9)]">
+        <h1 className="text-[2.2rem] sm:text-5xl md:text-[4.25rem] font-serif italic font-normal tracking-tight text-[#F5F5F7] leading-[1.08] drop-shadow-[0_12px_40px_rgba(0,0,0,0.9)]">
           Every recommendation<br />
           <span className="text-[#8E7BFF] drop-shadow-[0_0_35px_rgba(142,123,255,0.45)]">
             deserves a place.
@@ -346,40 +363,41 @@ export default function HeroProductDemo({ onImportSubmit, autoFocusInput }: Hero
         </h1>
 
         {/* Subtitle */}
-        <p className="mt-4 text-[#9D9DA8] text-sm sm:text-base md:text-lg max-w-lg mx-auto font-sans font-normal leading-relaxed">
+        <p className="mt-2.5 sm:mt-4 text-xs sm:text-base md:text-lg text-[#9D9DA8] max-w-md sm:max-w-lg mx-auto font-sans font-normal leading-relaxed px-2">
           Save movies from Instagram Reels, TikToks, YouTube,<br className="hidden sm:inline" />
           and friends—so they&apos;re waiting when you&apos;re ready to watch.
         </p>
 
-        {/* Extraction Capture Bar */}
-        <form onSubmit={handleManualSubmit} className="w-full max-w-xl mt-7 relative">
+        {/* Extraction Capture Bar - One-Handed Hero Target */}
+        <form onSubmit={handleManualSubmit} className="w-full max-w-xl mt-4 sm:mt-6 relative px-1 sm:px-0">
           
           {/* Floating Tooltip: Paste your first Reel */}
           <AnimatePresence>
             {showTooltip && !hasInteracted && (
               <motion.div
-                initial={{ opacity: 0, y: 8, scale: 0.94 }}
+                initial={{ opacity: 0, y: 6, scale: 0.94 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -6, scale: 0.94 }}
                 transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                className="absolute -top-12 left-1/2 -translate-x-1/2 z-40 flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-[#0E0F18] border border-[#8E7BFF]/70 text-indigo-100 text-xs font-sans font-medium shadow-[0_10px_30px_rgba(142,123,255,0.4)] backdrop-blur-xl pointer-events-none"
+                className="absolute -top-10 sm:-top-12 left-1/2 -translate-x-1/2 z-40 flex items-center space-x-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-[#0E0F18] border border-[#8E7BFF]/70 text-indigo-100 text-[11px] sm:text-xs font-sans font-medium shadow-[0_10px_30px_rgba(142,123,255,0.4)] backdrop-blur-xl pointer-events-none whitespace-nowrap"
               >
-                <span className="w-2 h-2 rounded-full bg-[#8E7BFF] animate-ping" />
+                <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#8E7BFF] animate-ping" />
                 <span>Paste your first Reel.</span>
-                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rotate-45 bg-[#0E0F18] border-r border-b border-[#8E7BFF]/70" />
+                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 bg-[#0E0F18] border-r border-b border-[#8E7BFF]/70" />
               </motion.div>
             )}
           </AnimatePresence>
 
+          {/* Hero Input Box with 54px+ height and generous touch targets */}
           <div
-            className={`relative flex items-center gap-2 sm:gap-3 bg-[#0B0C11]/90 border rounded-2xl p-2 sm:p-2.5 transition-all duration-500 shadow-[0_20px_60px_rgba(0,0,0,0.95)] backdrop-blur-xl ${
+            className={`relative flex items-center gap-2 sm:gap-3 bg-[#0B0C11]/95 border rounded-2xl sm:rounded-3xl p-1.5 sm:p-2 min-h-[54px] sm:min-h-[58px] transition-all duration-500 shadow-[0_20px_60px_rgba(0,0,0,0.95)] backdrop-blur-xl ${
               showTooltip && !hasInteracted
-                ? 'border-[#8E7BFF] shadow-[0_0_30px_rgba(142,123,255,0.6),0_0_60px_rgba(142,123,255,0.3)] animate-pulse'
-                : 'border-[#252338] focus-within:border-[#8E7BFF]'
+                ? 'border-[#8E7BFF] shadow-[0_0_35px_rgba(142,123,255,0.6)] animate-pulse'
+                : 'border-[#2D2A4A] focus-within:border-[#8E7BFF] focus-within:shadow-[0_0_25px_rgba(142,123,255,0.35)]'
             }`}
           >
-            <div className="pl-3 text-[#8E7BFF] shrink-0">
-              <LinkIcon className="w-4 h-4" />
+            <div className="pl-2.5 sm:pl-3 text-[#8E7BFF] shrink-0">
+              <LinkIcon className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
 
             <input
@@ -392,33 +410,86 @@ export default function HeroProductDemo({ onImportSubmit, autoFocusInput }: Hero
               }}
               onFocus={handleInteraction}
               onClick={handleInteraction}
-              placeholder="Paste an Instagram Reel, TikTok, YouTube or Letterboxd link"
+              placeholder="Paste Reel, TikTok, or YouTube link"
               disabled={isExtractingReal}
-              className="w-full bg-transparent px-1 py-1.5 text-xs sm:text-sm text-[#F5F5F7] placeholder-[#5C5B6E] focus:outline-none border-0 font-sans tracking-wide"
+              className="w-full bg-transparent px-1 py-2 text-xs sm:text-base text-[#F5F5F7] placeholder-[#605F73] focus:outline-none border-0 font-sans tracking-wide min-h-[44px]"
             />
 
-            <button
+            {/* Quick One-Tap Clipboard Paste Button */}
+            <motion.button
+              type="button"
+              whileTap={{ scale: 0.92 }}
+              onClick={handlePasteClipboard}
+              disabled={isExtractingReal}
+              className="px-2.5 py-2 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] border border-white/10 text-xs font-medium text-[#C8C5EA] hover:text-white flex items-center gap-1.5 shrink-0 transition-all cursor-pointer min-h-[40px] sm:min-h-[44px]"
+              title="Paste from Clipboard"
+            >
+              <Clipboard className="w-3.5 h-3.5 text-[#8E7BFF]" />
+              <span className="text-[11px] sm:text-xs font-semibold">Paste</span>
+            </motion.button>
+
+            {/* Main Hero Extract Button */}
+            <motion.button
               type="submit"
+              whileTap={{ scale: 0.94 }}
               disabled={isExtractingReal}
               onClick={handleInteraction}
-              className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 shrink-0 transition-all duration-300 ${
+              className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 sm:gap-2 shrink-0 transition-all duration-300 min-h-[40px] sm:min-h-[44px] cursor-pointer ${
                 inputText.trim() && !isExtractingReal
-                  ? 'bg-[#6E54FF] hover:bg-[#7D64FF] text-white shadow-[0_0_24px_rgba(110,84,255,0.5)] cursor-pointer hover:scale-[1.02] active:scale-[0.98]'
-                  : 'bg-[#6E54FF] hover:bg-[#7D64FF] text-white shadow-[0_0_20px_rgba(110,84,255,0.4)] cursor-pointer'
+                  ? 'bg-gradient-to-r from-[#5035E6] via-[#6E54FF] to-[#8E7BFF] text-white shadow-[0_0_28px_rgba(110,84,255,0.6)] hover:scale-[1.02] active:scale-[0.98]'
+                  : 'bg-gradient-to-r from-[#5035E6] to-[#7F72FF] text-white shadow-[0_0_20px_rgba(110,84,255,0.4)]'
               }`}
             >
               {isExtractingReal ? (
                 <>
-                  <PlotIcon className="w-4 h-4" showBg={false} animate="breathe" />
-                  <span>Extracting...</span>
+                  <PlotIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" showBg={false} animate="breathe" />
+                  <span className="font-semibold">Extracting...</span>
                 </>
               ) : (
                 <>
-                  <span>Extract</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <span className="font-bold">Extract</span>
+                  <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </>
               )}
-            </button>
+            </motion.button>
+          </div>
+
+          {/* Quick 1-Tap Sample Link Chips */}
+          <div className="flex items-center justify-center gap-1.5 sm:gap-2 mt-3 flex-wrap">
+            <span className="text-[10px] uppercase font-mono tracking-wider text-[#605F73]">Quick sample:</span>
+            <motion.button
+              type="button"
+              whileTap={{ scale: 0.93 }}
+              onClick={() => {
+                setInputText('https://www.instagram.com/reel/C3x9pL4M_9x/');
+                handleInteraction();
+              }}
+              className="text-[11px] font-sans px-3 py-1.5 rounded-full bg-[#12131F] border border-[#2B2945] text-[#A59DF5] hover:text-white hover:border-[#8E7BFF] transition-all cursor-pointer active:scale-95 min-h-[36px]"
+            >
+              🎬 Instagram Reel
+            </motion.button>
+            <motion.button
+              type="button"
+              whileTap={{ scale: 0.93 }}
+              onClick={() => {
+                setInputText('https://www.tiktok.com/@movies/video/7234567890123456');
+                handleInteraction();
+              }}
+              className="text-[11px] font-sans px-3 py-1.5 rounded-full bg-[#12131F] border border-[#2B2945] text-[#A59DF5] hover:text-white hover:border-[#8E7BFF] transition-all cursor-pointer active:scale-95 min-h-[36px]"
+            >
+              🎵 TikTok
+            </motion.button>
+            <motion.button
+              type="button"
+              whileTap={{ scale: 0.93 }}
+              onClick={() => {
+                setInputText('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+                handleInteraction();
+              }}
+              className="text-[11px] font-sans px-3 py-1.5 rounded-full bg-[#12131F] border border-[#2B2945] text-[#A59DF5] hover:text-white hover:border-[#8E7BFF] transition-all cursor-pointer active:scale-95 min-h-[36px]"
+            >
+              📺 YouTube
+            </motion.button>
           </div>
         </form>
 
@@ -438,36 +509,64 @@ export default function HeroProductDemo({ onImportSubmit, autoFocusInput }: Hero
         {/* Social Share Platform Circle Buttons */}
         <div className="flex items-center justify-center gap-3 sm:gap-4 my-1">
           {/* Instagram Circle */}
-          <div className="w-10 h-10 rounded-full bg-[#111019] border border-[#252338] flex items-center justify-center text-white hover:border-[#8E7BFF]/50 transition-all cursor-pointer shadow-md">
+          <motion.div
+            whileTap={{ scale: 0.88 }}
+            onClick={() => {
+              setInputText('https://www.instagram.com/reel/C3x9pL4M_9x/');
+              handleInteraction();
+            }}
+            className="w-10 h-10 rounded-full bg-[#111019] border border-[#252338] flex items-center justify-center text-white hover:border-[#8E7BFF]/50 transition-all cursor-pointer shadow-md active:scale-90"
+          >
             <svg className="w-4 h-4 text-pink-500 fill-current" viewBox="0 0 24 24">
               <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
             </svg>
-          </div>
+          </motion.div>
 
           <span className="w-1 h-1 rounded-full bg-[#3B3852]" />
 
           {/* TikTok Circle */}
-          <div className="w-10 h-10 rounded-full bg-[#111019] border border-[#252338] flex items-center justify-center text-white hover:border-[#8E7BFF]/50 transition-all cursor-pointer shadow-md">
+          <motion.div
+            whileTap={{ scale: 0.88 }}
+            onClick={() => {
+              setInputText('https://www.tiktok.com/@movies/video/7234567890123456');
+              handleInteraction();
+            }}
+            className="w-10 h-10 rounded-full bg-[#111019] border border-[#252338] flex items-center justify-center text-white hover:border-[#8E7BFF]/50 transition-all cursor-pointer shadow-md active:scale-90"
+          >
             <svg className="w-4 h-4 text-white fill-current" viewBox="0 0 24 24">
               <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 1 1-5.2-1.74 2.89 2.89 0 0 1 2.31-2.22V8.2a6.34 6.34 0 0 0-5.11 6.2 6.34 6.34 0 0 0 10.82 4.48c1.65-1.65 2.63-3.9 2.63-6.42V8.92a8.28 8.28 0 0 0 4.77 1.52V7a4.84 4.84 0 0 1-3-.31z"/>
             </svg>
-          </div>
+          </motion.div>
 
           <span className="w-1 h-1 rounded-full bg-[#3B3852]" />
 
           {/* YouTube Circle */}
-          <div className="w-10 h-10 rounded-full bg-[#111019] border border-[#252338] flex items-center justify-center text-white hover:border-[#8E7BFF]/50 transition-all cursor-pointer shadow-md">
+          <motion.div
+            whileTap={{ scale: 0.88 }}
+            onClick={() => {
+              setInputText('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+              handleInteraction();
+            }}
+            className="w-10 h-10 rounded-full bg-[#111019] border border-[#252338] flex items-center justify-center text-white hover:border-[#8E7BFF]/50 transition-all cursor-pointer shadow-md active:scale-90"
+          >
             <svg className="w-4 h-4 text-red-500 fill-current" viewBox="0 0 24 24">
               <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
             </svg>
-          </div>
+          </motion.div>
 
           <span className="w-1 h-1 rounded-full bg-[#3B3852]" />
 
           {/* More Circle */}
-          <div className="w-10 h-10 rounded-full bg-[#111019] border border-[#252338] flex items-center justify-center text-[#7A798C] hover:text-white hover:border-[#8E7BFF]/50 transition-all cursor-pointer shadow-md">
+          <motion.div
+            whileTap={{ scale: 0.88 }}
+            onClick={() => {
+              setInputText('https://www.instagram.com/reel/C3x9pL4M_9x/');
+              handleInteraction();
+            }}
+            className="w-10 h-10 rounded-full bg-[#111019] border border-[#252338] flex items-center justify-center text-[#7A798C] hover:text-white hover:border-[#8E7BFF]/50 transition-all cursor-pointer shadow-md active:scale-90"
+          >
             <MoreHorizontal className="w-4 h-4" />
-          </div>
+          </motion.div>
         </div>
 
         {/* Works across all your favorite apps */}

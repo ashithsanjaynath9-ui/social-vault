@@ -312,6 +312,8 @@ function MoviePosterFrame({
       <img
         src={customPoster || imgSrc}
         alt=""
+        loading="lazy"
+        decoding="async"
         referrerPolicy="no-referrer"
         onError={handleImageError}
         className="w-full h-full object-cover rounded-[4px]"

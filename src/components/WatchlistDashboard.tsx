@@ -311,12 +311,13 @@ export default function WatchlistDashboard({
           
           {/* Elegant Slate Pill Switcher */}
           <div className="flex items-center bg-zinc-900/30 p-1 rounded-xl border border-white/5 self-start sm:self-auto">
-            <button
+            <motion.button
+              whileTap={{ scale: 0.94 }}
               onClick={() => {
                 setLibraryMode('shelf');
                 onChangeTab('unwatched');
               }}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-sans font-medium transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-sans font-medium transition-all duration-200 cursor-pointer flex items-center gap-1.5 active:scale-95 ${
                 libraryMode === 'shelf'
                   ? 'bg-zinc-800/90 text-zinc-100 shadow-sm'
                   : 'text-zinc-500 hover:text-zinc-300'
@@ -324,13 +325,14 @@ export default function WatchlistDashboard({
             >
               <Compass className="w-3.5 h-3.5" />
               <span>My Shelves</span>
-            </button>
-            <button
+            </motion.button>
+            <motion.button
+              whileTap={{ scale: 0.94 }}
               onClick={() => {
                 setLibraryMode('completed');
                 onChangeTab('watched');
               }}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-sans font-medium transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-sans font-medium transition-all duration-200 cursor-pointer flex items-center gap-1.5 active:scale-95 ${
                 libraryMode === 'completed'
                   ? 'bg-zinc-800/90 text-zinc-100 shadow-sm'
                   : 'text-zinc-500 hover:text-zinc-300'
@@ -338,7 +340,7 @@ export default function WatchlistDashboard({
             >
               <Archive className="w-3.5 h-3.5" />
               <span>Completed</span>
-            </button>
+            </motion.button>
           </div>
 
           {/* Minimal Search Input */}
@@ -373,10 +375,11 @@ export default function WatchlistDashboard({
               const isActive = activeCollectionId === collection.id;
               const count = movies.filter(collection.filterFn).length;
               return (
-                <button
+                <motion.button
                   key={collection.id}
+                  whileTap={{ scale: 0.94 }}
                   onClick={() => handleSelectCollection(collection.id)}
-                  className={`relative group flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-medium tracking-wide transition-all duration-200 select-none cursor-pointer whitespace-nowrap shrink-0 ${
+                  className={`relative group flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-medium tracking-wide transition-all duration-200 select-none cursor-pointer whitespace-nowrap shrink-0 active:scale-95 ${
                     isActive
                       ? 'text-[#F5F5F3]'
                       : 'text-zinc-400 hover:text-zinc-200 opacity-60 hover:opacity-100'
@@ -416,7 +419,7 @@ export default function WatchlistDashboard({
                   >
                     {count}
                   </span>
-                </button>
+                </motion.button>
               );
             })}
           </div>

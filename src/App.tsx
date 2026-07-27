@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Check, Sparkles, HelpCircle, Bookmark, Ticket } from 'lucide-react';
+import { Check, Sparkles, HelpCircle, Bookmark, Ticket, Compass, User, Film, Search, Menu, X, Smartphone } from 'lucide-react';
 import { Movie, AppStats } from './types';
 import { INITIAL_MOVIES } from './data';
 import WatchlistDashboard from './components/WatchlistDashboard';
@@ -19,6 +19,9 @@ import GlobalSearch from './components/GlobalSearch';
 import AuthModal from './components/AuthModal';
 import ReservePage from './components/ReservePage';
 import PlotLogo from './components/PlotLogo';
+import { PWASplashScreen } from './components/PWASplashScreen';
+import { OfflineBanner } from './components/OfflineBanner';
+import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 
 export default function App() {
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -37,6 +40,8 @@ export default function App() {
     }
   });
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isPWAInstallOpen, setIsPWAInstallOpen] = useState(false);
   const [authModalReason, setAuthModalReason] = useState<'second_movie' | 'sync_device' | 'save_permanent' | 'general'>('general');
   const [pendingAddMovies, setPendingAddMovies] = useState<Omit<Movie, 'id' | 'addedAt' | 'watched'>[] | null>(null);
   const [activeIdentity, setActiveIdentity] = useState<IdentityId>(() => {
@@ -364,115 +369,189 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#050505] text-[#F5F5F3] pb-6 relative px-4 sm:px-6 lg:px-8 font-sans">
+    <div className="min-h-screen bg-[#050505] text-[#F5F5F3] pb-28 md:pb-12 relative px-4 sm:px-6 lg:px-8 font-sans">
       
+      {/* PWA Native Features */}
+      <PWASplashScreen />
+      <OfflineBanner />
+      <PWAInstallPrompt forceOpen={isPWAInstallOpen} onClose={() => setIsPWAInstallOpen(false)} />
+
       {/* Onboarding Overlay when user hasn't completed onboarding */}
       {!onboardingComplete && (
         <Onboarding onComplete={handleCompleteOnboarding} />
       )}
 
       {/* Main Container */}
-      <div className="w-full max-w-7xl mx-auto pt-4 sm:pt-6 space-y-8 relative">
+      <div className="w-full max-w-7xl mx-auto pt-2 sm:pt-6 space-y-6 sm:space-y-8 relative">
         
-        {/* Header Branding section */}
-        <header className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6 pb-6 border-b border-[#14151E]">
-          
-          {/* Left: Official Brand Logo & Subtitle */}
+        {/* TOP BAR - Clean, mobile-first top navigation with plot icon, Reserve Your Seat, and Menu */}
+        <header className="sticky top-0 z-40 bg-[#050505]/90 backdrop-blur-xl border-b border-white/[0.08] -mx-4 px-4 sm:px-6 py-2.5 pt-safe flex items-center justify-between gap-3 shadow-md">
+          {/* Left: plot icon */}
           <div 
-            className="flex items-center gap-3 select-none cursor-pointer group py-1.5 px-3 -ml-3 rounded-xl hover:bg-white/[0.04] transition-all" 
+            className="flex items-center gap-2 select-none cursor-pointer group active:scale-95 transition-transform" 
             onClick={() => setViewMode('home')}
+            title="plot - Home"
           >
-            <PlotLogo 
-              variant="full" 
-              size="sm" 
-              hoverGlow={true}
-            />
-            <div className="hidden sm:flex flex-col text-left justify-center border-l border-[#1F2030] pl-3 my-0.5">
-              <span className="text-[11px] text-[#7A798C] group-hover:text-[#A09EB8] font-sans font-normal leading-none tracking-tight transition-colors">
-                Less deciding. More watching.
-              </span>
-            </div>
+            <PlotLogo variant="full" size="sm" hoverGlow={true} />
           </div>
 
-          {/* Center: Navigation Links */}
-          <nav className="flex items-center gap-8 py-1" id="main-tabs-nav">
-            <button
-              onClick={() => setViewMode('home')}
-              className={`relative py-1 text-xs sm:text-sm font-medium transition-all cursor-pointer tracking-wide ${
-                viewMode === 'home' ? 'text-[#F5F5F3]' : 'text-[#7A798C] hover:text-[#F5F5F3]'
-              }`}
-            >
-              <span>Home</span>
-              {viewMode === 'home' && (
-                <motion.div
-                  layoutId="mainNavIndicator"
-                  className="absolute -bottom-2.5 left-0 right-0 h-[2px] bg-[#8E7BFF] shadow-[0_0_12px_#8E7BFF]"
-                  transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                />
-              )}
-            </button>
-            
-            <button
-              onClick={() => setViewMode('library')}
-              className={`relative py-1 text-xs sm:text-sm font-medium transition-all cursor-pointer tracking-wide ${
-                viewMode === 'library' ? 'text-[#F5F5F3]' : 'text-[#7A798C] hover:text-[#F5F5F3]'
-              }`}
-            >
-              <span>Your Plot</span>
-              {viewMode === 'library' && (
-                <motion.div
-                  layoutId="mainNavIndicator"
-                  className="absolute -bottom-2.5 left-0 right-0 h-[2px] bg-[#8E7BFF] shadow-[0_0_12px_#8E7BFF]"
-                  transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                />
-              )}
-            </button>
-
-            <button
-              onClick={() => setViewMode('profile')}
-              className={`relative py-1 text-xs sm:text-sm font-medium transition-all cursor-pointer tracking-wide ${
-                viewMode === 'profile' ? 'text-[#F5F5F3]' : 'text-[#7A798C] hover:text-[#F5F5F3]'
-              }`}
-            >
-              <span>Profile</span>
-              {viewMode === 'profile' && (
-                <motion.div
-                  layoutId="mainNavIndicator"
-                  className="absolute -bottom-2.5 left-0 right-0 h-[2px] bg-[#8E7BFF] shadow-[0_0_12px_#8E7BFF]"
-                  transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                />
-              )}
-            </button>
-          </nav>
-
-          {/* Right: Search, Reserve Seat & Ask plot Button */}
-          <div className="flex items-center gap-2.5 sm:gap-3 w-full md:w-auto justify-end">
-            <div className="w-full md:w-52 lg:w-60">
-              <GlobalSearch movies={movies} onAddMovie={handleAddSingleMovie} />
-            </div>
-
-            {/* Reserve Your Seat CTA */}
+          {/* Right Controls: Reserve Your Seat + Menu */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Reserve Your Seat Button */}
             <motion.button
-              whileHover={{ y: -2, scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              whileHover={{ scale: 1.02, y: -1 }}
+              whileTap={{ scale: 0.96 }}
               onClick={() => setViewMode('reserve')}
-              className="px-3 sm:px-4 py-2 rounded-full bg-[#12131C] hover:bg-[#1C1D2A] border border-[#7F72FF]/35 hover:border-[#7F72FF]/70 text-[#E0DCFF] hover:text-white text-xs font-medium tracking-wide flex items-center gap-2 cursor-pointer shadow-[0_2px_10px_rgba(0,0,0,0.2)] hover:shadow-[0_0_20px_rgba(127,114,255,0.3)] transition-all duration-[250ms] ease-out shrink-0"
-              title="Reserve Your Seat for Early Access"
+              className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[#12131C] hover:bg-[#1C1D2A] border border-[#7F72FF]/40 hover:border-[#7F72FF]/80 text-[#E0DCFF] hover:text-white text-xs font-medium tracking-wide flex items-center gap-1.5 sm:gap-2 cursor-pointer shadow-[0_2px_10px_rgba(0,0,0,0.3)] transition-all shrink-0"
+              title="Reserve Your Seat"
             >
-              <Ticket className="w-3.5 h-3.5 text-[#7F72FF]" />
-              <span className="hidden sm:inline">Reserve Your Seat</span>
-              <span className="sm:hidden">Reserve</span>
+              <Ticket className="w-3.5 h-3.5 text-[#8E7BFF]" />
+              <span className="text-xs font-medium">Reserve Your Seat</span>
             </motion.button>
 
-            <button
-              onClick={() => setIsAssistantOpen(true)}
-              className="px-3.5 sm:px-5 py-2 rounded-full bg-gradient-to-r from-[#5035E6] via-[#7F72FF] to-[#8E7BFF] hover:opacity-95 text-white text-xs font-semibold uppercase tracking-wider flex items-center gap-2 cursor-pointer shadow-[0_0_25px_rgba(127,114,255,0.45)] transition-all hover:scale-[1.02] active:scale-[0.98] shrink-0"
+            {/* Menu Button */}
+            <motion.button
+              whileHover={{ scale: 1.02, y: -1 }}
+              whileTap={{ scale: 0.96 }}
+              onClick={() => setIsMenuOpen(true)}
+              className="px-3.5 py-1.5 sm:py-2 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-white text-xs font-medium tracking-wide flex items-center gap-1.5 cursor-pointer transition-all shrink-0"
+              aria-label="Open Menu"
             >
-              <Sparkles className="w-3.5 h-3.5 fill-white text-white" />
-              <span className="hidden sm:inline">Ask plot</span>
-            </button>
+              <Menu className="w-4 h-4 text-[#A89CFF]" />
+              <span className="text-xs font-medium">Menu</span>
+            </motion.button>
           </div>
         </header>
+
+        {/* SLIDE-OVER MENU DRAWER */}
+        <AnimatePresence>
+          {isMenuOpen && (
+            <div className="fixed inset-0 z-50 flex justify-end font-sans">
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setIsMenuOpen(false)}
+                className="fixed inset-0 bg-black/80 backdrop-blur-md cursor-pointer"
+              />
+
+              {/* Drawer Container */}
+              <motion.div
+                initial={{ x: '100%' }}
+                animate={{ x: 0 }}
+                exit={{ x: '100%' }}
+                transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+                className="relative z-10 w-full max-w-xs sm:max-w-sm h-full bg-[#0C0D14] border-l border-white/10 p-6 flex flex-col justify-between shadow-2xl overflow-y-auto"
+              >
+                <div className="space-y-6">
+                  {/* Drawer Header */}
+                  <div className="flex items-center justify-between pb-4 border-b border-white/10">
+                    <div className="flex items-center gap-2">
+                      <PlotLogo variant="full" size="sm" />
+                    </div>
+                    <button
+                      onClick={() => setIsMenuOpen(false)}
+                      className="p-2 rounded-full bg-white/[0.06] hover:bg-white/[0.12] text-zinc-400 hover:text-white transition-colors cursor-pointer"
+                      aria-label="Close menu"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {/* Search Bar */}
+                  <div>
+                    <label className="text-[11px] font-sans font-medium uppercase tracking-wider text-zinc-400 mb-2 block">
+                      Search Movies
+                    </label>
+                    <GlobalSearch movies={movies} onAddMovie={handleAddSingleMovie} />
+                  </div>
+
+                  {/* Menu Nav Links */}
+                  <div className="space-y-1.5 pt-2">
+                    <button
+                      onClick={() => { setViewMode('home'); setIsMenuOpen(false); }}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs sm:text-sm font-medium transition-all cursor-pointer ${
+                        viewMode === 'home' 
+                          ? 'bg-[#7F72FF]/20 text-white border border-[#7F72FF]/40 shadow-[0_0_15px_rgba(127,114,255,0.2)]' 
+                          : 'text-zinc-400 hover:bg-white/[0.04] hover:text-white'
+                      }`}
+                    >
+                      <Compass className="w-4 h-4 text-[#8E7BFF]" />
+                      <span>Home</span>
+                    </button>
+
+                    <button
+                      onClick={() => { setViewMode('library'); setIsMenuOpen(false); }}
+                      className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs sm:text-sm font-medium transition-all cursor-pointer ${
+                        viewMode === 'library' 
+                          ? 'bg-[#7F72FF]/20 text-white border border-[#7F72FF]/40 shadow-[0_0_15px_rgba(127,114,255,0.2)]' 
+                          : 'text-zinc-400 hover:bg-white/[0.04] hover:text-white'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <Bookmark className="w-4 h-4 text-[#8E7BFF]" />
+                        <span>Your Plot</span>
+                      </div>
+                      {movies.length > 0 && (
+                        <span className="px-2 py-0.5 text-[11px] font-mono font-bold rounded-full bg-[#7F72FF]/30 text-[#D2C9FF]">
+                          {movies.length}
+                        </span>
+                      )}
+                    </button>
+
+                    <button
+                      onClick={() => { setIsAssistantOpen(true); setIsMenuOpen(false); }}
+                      className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs sm:text-sm font-medium text-zinc-400 hover:bg-white/[0.04] hover:text-white transition-all cursor-pointer"
+                    >
+                      <Sparkles className="w-4 h-4 text-[#8E7BFF]" />
+                      <span>Ask plot (AI Assistant)</span>
+                    </button>
+
+                    <button
+                      onClick={() => { setViewMode('profile'); setIsMenuOpen(false); }}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs sm:text-sm font-medium transition-all cursor-pointer ${
+                        viewMode === 'profile' 
+                          ? 'bg-[#7F72FF]/20 text-white border border-[#7F72FF]/40 shadow-[0_0_15px_rgba(127,114,255,0.2)]' 
+                          : 'text-zinc-400 hover:bg-white/[0.04] hover:text-white'
+                      }`}
+                    >
+                      <User className="w-4 h-4 text-[#8E7BFF]" />
+                      <span>Profile</span>
+                    </button>
+
+                    <button
+                      onClick={() => { setViewMode('reserve'); setIsMenuOpen(false); }}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs sm:text-sm font-medium transition-all cursor-pointer ${
+                        viewMode === 'reserve' 
+                          ? 'bg-[#7F72FF]/20 text-white border border-[#7F72FF]/40 shadow-[0_0_15px_rgba(127,114,255,0.2)]' 
+                          : 'text-zinc-400 hover:bg-white/[0.04] hover:text-white'
+                      }`}
+                    >
+                      <Ticket className="w-4 h-4 text-[#8E7BFF]" />
+                      <span>Reserve Your Seat</span>
+                    </button>
+
+                    <button
+                      onClick={() => { setIsPWAInstallOpen(true); setIsMenuOpen(false); }}
+                      className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs sm:text-sm font-medium text-[#7C8CFF] bg-[#7C8CFF]/10 hover:bg-[#7C8CFF]/20 border border-[#7C8CFF]/30 transition-all cursor-pointer mt-2"
+                    >
+                      <Smartphone className="w-4 h-4 text-[#7C8CFF]" />
+                      <span>Install plot App</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Footer */}
+                <div className="pt-6 border-t border-white/10 text-center">
+                  <p className="text-xs text-zinc-500 font-serif italic">
+                    plot &mdash; Less deciding. More watching.
+                  </p>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
 
         {/* Dynamic Display Area based on Selected Tab */}
         <AnimatePresence mode="wait">
@@ -551,6 +630,7 @@ export default function App() {
                 onChangeIdentity={setActiveIdentity}
                 userEmail={userEmail}
                 onUpdateEmail={setUserEmail}
+                onOpenPWAInstall={() => setIsPWAInstallOpen(true)}
               />
             </motion.div>
           )}
@@ -643,6 +723,83 @@ export default function App() {
         />
 
       </div>
+
+      {/* NATIVE iOS BOTTOM NAVIGATION BAR (Visible on Mobile) */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 bg-[#090A10]/90 backdrop-blur-2xl border-t border-white/[0.08] shadow-[0_-10px_35px_rgba(0,0,0,0.85)]">
+        <div className="flex items-center justify-around max-w-sm mx-auto relative">
+          
+          {/* 1. Home Tab */}
+          <motion.button
+            whileTap={{ scale: 0.92 }}
+            onClick={() => setViewMode('home')}
+            className={`flex flex-col items-center justify-center py-1.5 px-4 rounded-2xl transition-all cursor-pointer relative z-10 min-w-[72px] ${
+              viewMode === 'home' ? 'text-white' : 'text-[#7A798C] hover:text-[#C5C4D8]'
+            }`}
+          >
+            {viewMode === 'home' && (
+              <motion.div
+                layoutId="mobileActiveTabHighlight"
+                className="absolute inset-0 bg-[#7F72FF]/15 border border-[#7F72FF]/35 rounded-2xl shadow-[0_0_15px_rgba(127,114,255,0.25)]"
+                transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+              />
+            )}
+            <Compass className={`w-5 h-5 transition-transform ${viewMode === 'home' ? 'text-[#8E7BFF] scale-110' : ''}`} />
+            <span className={`text-[11px] font-sans mt-1 tracking-tight z-10 ${viewMode === 'home' ? 'font-semibold text-white' : 'font-normal text-[#7A798C]'}`}>
+              Home
+            </span>
+          </motion.button>
+
+          {/* 2. Your Plot Tab */}
+          <motion.button
+            whileTap={{ scale: 0.92 }}
+            onClick={() => setViewMode('library')}
+            className={`flex flex-col items-center justify-center py-1.5 px-4 rounded-2xl transition-all cursor-pointer relative z-10 min-w-[72px] ${
+              viewMode === 'library' ? 'text-white' : 'text-[#7A798C] hover:text-[#C5C4D8]'
+            }`}
+          >
+            {viewMode === 'library' && (
+              <motion.div
+                layoutId="mobileActiveTabHighlight"
+                className="absolute inset-0 bg-[#7F72FF]/15 border border-[#7F72FF]/35 rounded-2xl shadow-[0_0_15px_rgba(127,114,255,0.25)]"
+                transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+              />
+            )}
+            <div className="relative z-10">
+              <Bookmark className={`w-5 h-5 transition-transform ${viewMode === 'library' ? 'text-[#8E7BFF] scale-110' : ''}`} />
+              {movies.length > 0 && (
+                <span className="absolute -top-1 -right-2 bg-[#6E54FF] text-white text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-full border border-[#090A10] shadow-sm">
+                  {movies.length}
+                </span>
+              )}
+            </div>
+            <span className={`text-[11px] font-sans mt-1 tracking-tight z-10 ${viewMode === 'library' ? 'font-semibold text-white' : 'font-normal text-[#7A798C]'}`}>
+              Your Plot
+            </span>
+          </motion.button>
+
+          {/* 3. Profile Tab */}
+          <motion.button
+            whileTap={{ scale: 0.92 }}
+            onClick={() => setViewMode('profile')}
+            className={`flex flex-col items-center justify-center py-1.5 px-4 rounded-2xl transition-all cursor-pointer relative z-10 min-w-[72px] ${
+              viewMode === 'profile' ? 'text-white' : 'text-[#7A798C] hover:text-[#C5C4D8]'
+            }`}
+          >
+            {viewMode === 'profile' && (
+              <motion.div
+                layoutId="mobileActiveTabHighlight"
+                className="absolute inset-0 bg-[#7F72FF]/15 border border-[#7F72FF]/35 rounded-2xl shadow-[0_0_15px_rgba(127,114,255,0.25)]"
+                transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+              />
+            )}
+            <User className={`w-5 h-5 transition-transform z-10 ${viewMode === 'profile' ? 'text-[#8E7BFF] scale-110' : ''}`} />
+            <span className={`text-[11px] font-sans mt-1 tracking-tight z-10 ${viewMode === 'profile' ? 'font-semibold text-white' : 'font-normal text-[#7A798C]'}`}>
+              Profile
+            </span>
+          </motion.button>
+
+        </div>
+      </nav>
     </div>
   );
 }

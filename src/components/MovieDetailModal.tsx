@@ -200,21 +200,24 @@ export default function MovieDetailModal({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/80 backdrop-blur-md"
       id="movie-detail-modal"
     >
       
       {/* Click backdrop to close */}
       <div className="fixed inset-0 cursor-pointer" onClick={onClose} />
 
-      {/* Modal Card - Styled like a clean Apple Notes detail pane */}
+      {/* Modal Card - Styled like a clean Apple Notes detail pane & iOS Bottom Sheet */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.96, y: 12 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.96, y: 12 }}
-        transition={{ type: 'spring', damping: 24, stiffness: 220 }}
-        className="relative w-full max-w-xl bg-zinc-950 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col z-10 text-left font-sans text-zinc-100"
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 40 }}
+        transition={{ type: 'spring', damping: 28, stiffness: 280 }}
+        className="relative w-full max-w-xl bg-zinc-950 border-t sm:border border-zinc-800 rounded-t-3xl sm:rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto flex flex-col z-10 text-left font-sans text-zinc-100"
       >
+        {/* iOS Drag Handle Indicator */}
+        <div className="w-10 h-1 bg-white/20 rounded-full mx-auto mt-2.5 mb-1 sm:hidden shrink-0" />
+
         {/* Header Close Trigger */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-900">
           <div className="flex items-center gap-2">
