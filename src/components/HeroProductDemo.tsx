@@ -4,15 +4,11 @@
  */
 
 import React, { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import { 
   ArrowRight, 
-  Link as LinkIcon, 
-  Loader2, 
-  Sparkles, 
-  MoreHorizontal, 
-  Shield,
-  Clipboard
+  Clipboard,
+  ShieldCheck
 } from 'lucide-react';
 import { Movie } from '../types';
 import { PlotIcon } from './PlotLogo';
@@ -24,196 +20,23 @@ interface HeroProductDemoProps {
   autoFocusInput?: boolean;
 }
 
-interface DemoMovieCard {
-  id: string;
-  title: string;
-  displayTitle: string;
-  posterUrl: string;
-  backupPosterUrl: string;
-}
-
-// 12 DISTINCT LEGENDARY POPULAR MOVIES MATCHING REFERENCE DESIGN
-const CAROUSEL_MOVIES: DemoMovieCard[] = [
-  {
-    id: 'demo-1',
-    title: 'Blade Runner 2049',
-    displayTitle: 'BLADE RUNNER 2049',
-    posterUrl: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80',
-    backupPosterUrl: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80'
-  },
-  {
-    id: 'demo-2',
-    title: 'The Dark Knight',
-    displayTitle: 'THE DARK KNIGHT',
-    posterUrl: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=600&q=80',
-    backupPosterUrl: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=600&q=80'
-  },
-  {
-    id: 'demo-3',
-    title: 'Interstellar',
-    displayTitle: 'INTERSTELLAR',
-    posterUrl: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80',
-    backupPosterUrl: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80'
-  },
-  {
-    id: 'demo-4',
-    title: 'The Prestige',
-    displayTitle: 'THE PRESTIGE',
-    posterUrl: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=600&q=80',
-    backupPosterUrl: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=600&q=80'
-  },
-  {
-    id: 'demo-5',
-    title: 'The Matrix',
-    displayTitle: 'THE MATRIX',
-    posterUrl: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80',
-    backupPosterUrl: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80'
-  },
-  {
-    id: 'demo-6',
-    title: 'Spirited Away',
-    displayTitle: 'SPIRITED AWAY',
-    posterUrl: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80',
-    backupPosterUrl: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80'
-  },
-  {
-    id: 'demo-7',
-    title: 'Dune: Part Two',
-    displayTitle: 'DUNE: PART TWO',
-    posterUrl: 'https://images.unsplash.com/photo-1547483238-f400e65ccd56?auto=format&fit=crop&w=600&q=80',
-    backupPosterUrl: 'https://images.unsplash.com/photo-1547483238-f400e65ccd56?auto=format&fit=crop&w=600&q=80'
-  },
-  {
-    id: 'demo-8',
-    title: 'The Grand Budapest Hotel',
-    displayTitle: 'THE GRAND BUDAPEST',
-    posterUrl: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=80',
-    backupPosterUrl: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=80'
-  },
-  {
-    id: 'demo-9',
-    title: 'La La Land',
-    displayTitle: 'LA LA LAND',
-    posterUrl: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=600&q=80',
-    backupPosterUrl: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=600&q=80'
-  },
-  {
-    id: 'demo-10',
-    title: 'The Godfather',
-    displayTitle: 'THE GODFATHER',
-    posterUrl: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=600&q=80',
-    backupPosterUrl: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=600&q=80'
-  },
-  {
-    id: 'demo-11',
-    title: 'Oppenheimer',
-    displayTitle: 'OPPENHEIMER',
-    posterUrl: 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?auto=format&fit=crop&w=600&q=80',
-    backupPosterUrl: 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?auto=format&fit=crop&w=600&q=80'
-  },
-  {
-    id: 'demo-12',
-    title: 'Parasite',
-    displayTitle: 'PARASITE',
-    posterUrl: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=600&q=80',
-    backupPosterUrl: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=600&q=80'
-  }
-];
-
-// Quadrupled array for infinitely seamless, gapless looping
-const REEL_MOVIES = [
-  ...CAROUSEL_MOVIES, 
-  ...CAROUSEL_MOVIES, 
-  ...CAROUSEL_MOVIES, 
-  ...CAROUSEL_MOVIES
-];
-
 export default function HeroProductDemo({ onImportSubmit, autoFocusInput }: HeroProductDemoProps) {
   const [inputText, setInputText] = useState('');
   const [isExtractingReal, setIsExtractingReal] = useState(false);
   const [realError, setRealError] = useState<string | null>(null);
 
-  const [showTooltip, setShowTooltip] = useState(false);
-  const [hasInteracted, setHasInteracted] = useState(false);
-
-  // Smooth continuous rolling film reel state
-  const [scrollPos, setScrollPos] = useState(0);
-  const [containerCenter, setContainerCenter] = useState(600);
-
-  const scrollPosRef = useRef(0);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const animationFrameRef = useRef<number | null>(null);
-
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  // Sizing parameters
-  const CARD_WIDTH = 180; // px
-  const CARD_GAP = 16; // px
-  const ITEM_FULL_WIDTH = CARD_WIDTH + CARD_GAP; // 196px
-  const SINGLE_SET_WIDTH = CAROUSEL_MOVIES.length * ITEM_FULL_WIDTH; // 12 * 196 = 2352px
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (autoFocusInput) {
-      setShowTooltip(true);
       const timer = setTimeout(() => {
         inputRef.current?.focus();
-      }, 300);
+      }, 250);
       return () => clearTimeout(timer);
     }
   }, [autoFocusInput]);
 
-  const handleInteraction = () => {
-    if (!hasInteracted) {
-      setHasInteracted(true);
-      setShowTooltip(false);
-    }
-  };
-
-  // Track container width for precise center detection
-  useEffect(() => {
-    const updateCenter = () => {
-      if (containerRef.current) {
-        setContainerCenter(containerRef.current.offsetWidth / 2);
-      }
-    };
-    updateCenter();
-    window.addEventListener('resize', updateCenter);
-    return () => window.removeEventListener('resize', updateCenter);
-  }, []);
-
-  // Silky smooth RequestAnimationFrame hardware-accelerated movement loop
-  useEffect(() => {
-    let lastTime = performance.now();
-    const SPEED_PX_PER_SEC = SINGLE_SET_WIDTH / 40; 
-
-    const animate = (currentTime: number) => {
-      const delta = currentTime - lastTime;
-      lastTime = currentTime;
-
-      const pixelsToMove = (delta / 1000) * SPEED_PX_PER_SEC; 
-      let nextPos = scrollPosRef.current + pixelsToMove;
-
-      if (nextPos >= SINGLE_SET_WIDTH) {
-        nextPos = nextPos % SINGLE_SET_WIDTH;
-      }
-
-      scrollPosRef.current = nextPos;
-      setScrollPos(nextPos);
-
-      animationFrameRef.current = requestAnimationFrame(animate);
-    };
-
-    animationFrameRef.current = requestAnimationFrame(animate);
-
-    return () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
-    };
-  }, [SINGLE_SET_WIDTH]);
-
   const handlePasteClipboard = async () => {
-    handleInteraction();
     try {
       if (navigator.clipboard && navigator.clipboard.readText) {
         const text = await navigator.clipboard.readText();
@@ -228,9 +51,8 @@ export default function HeroProductDemo({ onImportSubmit, autoFocusInput }: Hero
     }
   };
 
-  const handleManualSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    handleInteraction();
     if (!inputText.trim() || isExtractingReal) return;
 
     if (onImportSubmit) {
@@ -248,424 +70,113 @@ export default function HeroProductDemo({ onImportSubmit, autoFocusInput }: Hero
   };
 
   return (
-    <div className="relative z-20 w-full max-w-7xl mx-auto px-2 sm:px-4 pt-4 sm:pt-8 pb-10 flex flex-col items-center select-none overflow-hidden">
+    <div className="relative z-20 w-full max-w-xl mx-auto px-4 py-4 sm:py-8 flex flex-col items-center justify-center text-center select-none font-sans">
       
-      {/* 1. FLOATING 3D TILTED BACKGROUND MOVIE POSTERS (Left & Right Depth with Subtle Parallax Float) */}
-      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-        {/* Left Tilted Poster 1: Interstellar */}
-        <motion.div 
-          animate={{
-            y: [-10, 8, -10],
-            rotate: [-16, -14, -16],
-          }}
-          transition={{
-            duration: 12,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-          className="absolute top-[8%] -left-[20px] sm:-left-[30px] w-48 sm:w-60 md:w-72 aspect-[2/3] rounded-2xl overflow-hidden border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.8)] opacity-35 blur-[0.5px]"
-        >
-          <img 
-            src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80" 
-            alt="Interstellar"
-            className="w-full h-full object-cover filter brightness-75 contrast-110"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-4">
-            <span className="font-serif italic text-sm text-white/90 tracking-widest uppercase">INTERSTELLAR</span>
-          </div>
-        </motion.div>
-
-        {/* Left Tilted Poster 2: Blade Runner 2049 */}
-        <motion.div 
-          animate={{
-            y: [6, -12, 6],
-            rotate: [-10, -8, -10],
-          }}
-          transition={{
-            duration: 15,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-          className="absolute top-[42%] -left-[30px] sm:-left-[45px] w-44 sm:w-56 md:w-64 aspect-[2/3] rounded-2xl overflow-hidden border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.8)] opacity-30 blur-[0.5px]"
-        >
-          <img 
-            src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80" 
-            alt="Blade Runner 2049"
-            className="w-full h-full object-cover filter brightness-75 contrast-110"
-          />
-        </motion.div>
-
-        {/* Right Tilted Poster 1: The Godfather */}
-        <motion.div 
-          animate={{
-            y: [-8, 10, -8],
-            rotate: [14, 16, 14],
-          }}
-          transition={{
-            duration: 14,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-          className="absolute top-[8%] -right-[20px] sm:-right-[30px] w-48 sm:w-60 md:w-72 aspect-[2/3] rounded-2xl overflow-hidden border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.8)] opacity-35 blur-[0.5px]"
-        >
-          <img 
-            src="https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=600&q=80" 
-            alt="The Godfather"
-            className="w-full h-full object-cover filter brightness-75 contrast-110"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-4">
-            <span className="font-serif italic text-sm text-white/90 tracking-widest uppercase">THE GODFATHER</span>
-          </div>
-        </motion.div>
-
-        {/* Right Tilted Poster 2: Spirited Away */}
-        <motion.div 
-          animate={{
-            y: [10, -8, 10],
-            rotate: [16, 13, 16],
-          }}
-          transition={{
-            duration: 16,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-          className="absolute top-[32%] -right-[30px] sm:-right-[45px] w-48 sm:w-60 md:w-72 aspect-[2/3] rounded-2xl overflow-hidden border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.8)] opacity-40 blur-[0.5px]"
-        >
-          <img 
-            src="https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80" 
-            alt="Spirited Away"
-            className="w-full h-full object-cover filter brightness-75 contrast-110"
-          />
-          <div className="absolute inset-x-0 top-3 px-4">
-            <span className="font-serif italic text-sm text-white/90 tracking-widest uppercase">SPIRITED AWAY</span>
-          </div>
-        </motion.div>
-      </div>
-
-      {/* 2. FAINT PROJECTOR PURPLE BLOOM GLOW */}
-      <div className="absolute top-[22%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] sm:w-[680px] h-[300px] bg-radial from-[#8E7BFF]/15 via-[#8E7BFF]/03 to-transparent blur-3xl pointer-events-none rounded-full z-0" />
-
-      {/* 3. HERO CENTER CONTENT BLOCK */}
-      <div className="relative z-20 text-center flex flex-col items-center max-w-3xl mx-auto pt-1 sm:pt-4">
+      {/* 1. Headline */}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        className="space-y-2 max-w-lg mx-auto"
+      >
+        <h1 className="text-3xl sm:text-5xl font-display font-light italic text-[#F8FAFF] tracking-tight leading-[1.1]">
+          Every recommendation<br />
+          <span className="not-italic font-normal text-[#7C8CFF]">deserves a place.</span>
+        </h1>
         
-        {/* Small Premium Eyebrow Label */}
-        <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-[#0E0F17]/90 border border-[#2B2748] text-[#A89CFF] text-[10px] sm:text-[11px] font-sans font-medium uppercase tracking-widest shadow-inner mb-3 sm:mb-5 backdrop-blur-md">
-          <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#A89CFF]" />
-          <span>✨ AI-Powered Movie Extraction</span>
+        <p className="text-xs sm:text-sm text-[#A8B3CF] font-normal leading-relaxed max-w-md mx-auto pt-0.5">
+          Save recommendations from anywhere before you forget them.
+        </p>
+      </motion.div>
+
+      {/* 2. Extraction Form */}
+      <motion.form 
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+        onSubmit={handleSubmit} 
+        className="w-full mt-5 sm:mt-6 space-y-3.5"
+      >
+        {/* Large Visually Clean Multiline Input */}
+        <div className="relative bg-[#0D111D] border border-white/15 focus-within:border-[#7C8CFF] rounded-2xl sm:rounded-3xl p-4 sm:p-5 transition-all duration-300 shadow-2xl shadow-[#7C8CFF]/10 backdrop-blur-xl group text-left">
+          <textarea
+            ref={inputRef}
+            rows={4}
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                e.preventDefault();
+                handleSubmit(e);
+              }
+            }}
+            placeholder={`Paste your Instagram Reel,\nTikTok,\nYouTube,\nor Letterboxd link.`}
+            disabled={isExtractingReal}
+            className="w-full bg-transparent text-sm sm:text-base text-[#F8FAFF] placeholder-[#5A6582] focus:outline-none border-0 font-sans leading-relaxed tracking-wide resize-none"
+          />
         </div>
 
-        {/* Main Serif Headline */}
-        <h1 className="text-[2.2rem] sm:text-5xl md:text-[4.25rem] font-serif italic font-normal tracking-tight text-[#F5F5F7] leading-[1.08] drop-shadow-[0_12px_40px_rgba(0,0,0,0.9)]">
-          Every recommendation<br />
-          <span className="text-[#8E7BFF] drop-shadow-[0_0_35px_rgba(142,123,255,0.45)]">
-            deserves a place.
-          </span>
-        </h1>
+        {/* Two Large Side-by-Side Equal Weight Buttons (Min height 52px, 16px gap) */}
+        <div className="grid grid-cols-2 gap-4 pt-1">
+          {/* Button 1: Paste */}
+          <motion.button
+            type="button"
+            whileTap={{ scale: 0.97 }}
+            onClick={handlePasteClipboard}
+            disabled={isExtractingReal}
+            className="w-full min-h-[52px] px-5 py-3.5 rounded-2xl bg-[#161B2E] hover:bg-[#1E253E] border border-[#7C8CFF]/35 hover:border-[#7C8CFF]/60 text-[#F8FAFF] text-sm sm:text-base font-semibold flex items-center justify-center gap-2.5 transition-all cursor-pointer shadow-md active:scale-98"
+          >
+            <Clipboard className="w-4 h-4 sm:w-5 sm:h-5 text-[#7C8CFF]" />
+            <span>Paste</span>
+          </motion.button>
 
-        {/* Subtitle */}
-        <p className="mt-2.5 sm:mt-4 text-xs sm:text-base md:text-lg text-[#9D9DA8] max-w-md sm:max-w-lg mx-auto font-sans font-normal leading-relaxed px-2">
-          Save movies from Instagram Reels, TikToks, YouTube,<br className="hidden sm:inline" />
-          and friends—so they&apos;re waiting when you&apos;re ready to watch.
-        </p>
-
-        {/* Extraction Capture Bar - One-Handed Hero Target */}
-        <form onSubmit={handleManualSubmit} className="w-full max-w-xl mt-4 sm:mt-6 relative px-1 sm:px-0">
-          
-          {/* Floating Tooltip: Paste your first Reel */}
-          <AnimatePresence>
-            {showTooltip && !hasInteracted && (
-              <motion.div
-                initial={{ opacity: 0, y: 6, scale: 0.94 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -6, scale: 0.94 }}
-                transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                className="absolute -top-10 sm:-top-12 left-1/2 -translate-x-1/2 z-40 flex items-center space-x-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-[#0E0F18] border border-[#8E7BFF]/70 text-indigo-100 text-[11px] sm:text-xs font-sans font-medium shadow-[0_10px_30px_rgba(142,123,255,0.4)] backdrop-blur-xl pointer-events-none whitespace-nowrap"
-              >
-                <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#8E7BFF] animate-ping" />
-                <span>Paste your first Reel.</span>
-                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 bg-[#0E0F18] border-r border-b border-[#8E7BFF]/70" />
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Hero Input Box with 54px+ height and generous touch targets */}
-          <div
-            className={`relative flex items-center gap-2 sm:gap-3 bg-[#0B0C11]/95 border rounded-2xl sm:rounded-3xl p-1.5 sm:p-2 min-h-[54px] sm:min-h-[58px] transition-all duration-500 shadow-[0_20px_60px_rgba(0,0,0,0.95)] backdrop-blur-xl ${
-              showTooltip && !hasInteracted
-                ? 'border-[#8E7BFF] shadow-[0_0_35px_rgba(142,123,255,0.6)] animate-pulse'
-                : 'border-[#2D2A4A] focus-within:border-[#8E7BFF] focus-within:shadow-[0_0_25px_rgba(142,123,255,0.35)]'
+          {/* Button 2: Extract */}
+          <motion.button
+            type="submit"
+            whileTap={{ scale: 0.97 }}
+            disabled={isExtractingReal || !inputText.trim()}
+            className={`w-full min-h-[52px] px-5 py-3.5 rounded-2xl text-sm sm:text-base font-bold flex items-center justify-center gap-2.5 transition-all cursor-pointer shadow-lg ${
+              inputText.trim() && !isExtractingReal
+                ? 'bg-[#7C8CFF] hover:bg-[#94A2FF] text-[#0A0F1E] shadow-[#7C8CFF]/30'
+                : 'bg-[#7C8CFF]/80 hover:bg-[#7C8CFF] text-[#0A0F1E]'
             }`}
           >
-            <div className="pl-2.5 sm:pl-3 text-[#8E7BFF] shrink-0">
-              <LinkIcon className="w-4 h-4 sm:w-5 sm:h-5" />
-            </div>
+            {isExtractingReal ? (
+              <>
+                <PlotIcon className="w-5 h-5 text-[#0A0F1E]" showBg={false} animate="breathe" />
+                <span>Extracting...</span>
+              </>
+            ) : (
+              <>
+                <span>Extract</span>
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
+              </>
+            )}
+          </motion.button>
+        </div>
 
-            <input
-              ref={inputRef}
-              type="text"
-              value={inputText}
-              onChange={(e) => {
-                handleInteraction();
-                setInputText(e.target.value);
-              }}
-              onFocus={handleInteraction}
-              onClick={handleInteraction}
-              placeholder="Paste Reel, TikTok, or YouTube link"
-              disabled={isExtractingReal}
-              className="w-full bg-transparent px-1 py-2 text-xs sm:text-base text-[#F5F5F7] placeholder-[#605F73] focus:outline-none border-0 font-sans tracking-wide min-h-[44px]"
-            />
-
-            {/* Quick One-Tap Clipboard Paste Button */}
-            <motion.button
-              type="button"
-              whileTap={{ scale: 0.92 }}
-              onClick={handlePasteClipboard}
-              disabled={isExtractingReal}
-              className="px-2.5 py-2 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] border border-white/10 text-xs font-medium text-[#C8C5EA] hover:text-white flex items-center gap-1.5 shrink-0 transition-all cursor-pointer min-h-[40px] sm:min-h-[44px]"
-              title="Paste from Clipboard"
-            >
-              <Clipboard className="w-3.5 h-3.5 text-[#8E7BFF]" />
-              <span className="text-[11px] sm:text-xs font-semibold">Paste</span>
-            </motion.button>
-
-            {/* Main Hero Extract Button */}
-            <motion.button
-              type="submit"
-              whileTap={{ scale: 0.94 }}
-              disabled={isExtractingReal}
-              onClick={handleInteraction}
-              className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 sm:gap-2 shrink-0 transition-all duration-300 min-h-[40px] sm:min-h-[44px] cursor-pointer ${
-                inputText.trim() && !isExtractingReal
-                  ? 'bg-gradient-to-r from-[#5035E6] via-[#6E54FF] to-[#8E7BFF] text-white shadow-[0_0_28px_rgba(110,84,255,0.6)] hover:scale-[1.02] active:scale-[0.98]'
-                  : 'bg-gradient-to-r from-[#5035E6] to-[#7F72FF] text-white shadow-[0_0_20px_rgba(110,84,255,0.4)]'
-              }`}
-            >
-              {isExtractingReal ? (
-                <>
-                  <PlotIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" showBg={false} animate="breathe" />
-                  <span className="font-semibold">Extracting...</span>
-                </>
-              ) : (
-                <>
-                  <span className="font-bold">Extract</span>
-                  <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                </>
-              )}
-            </motion.button>
-          </div>
-
-          {/* Quick 1-Tap Sample Link Chips */}
-          <div className="flex items-center justify-center gap-1.5 sm:gap-2 mt-3 flex-wrap">
-            <span className="text-[10px] uppercase font-mono tracking-wider text-[#605F73]">Quick sample:</span>
-            <motion.button
-              type="button"
-              whileTap={{ scale: 0.93 }}
-              onClick={() => {
-                setInputText('https://www.instagram.com/reel/C3x9pL4M_9x/');
-                handleInteraction();
-              }}
-              className="text-[11px] font-sans px-3 py-1.5 rounded-full bg-[#12131F] border border-[#2B2945] text-[#A59DF5] hover:text-white hover:border-[#8E7BFF] transition-all cursor-pointer active:scale-95 min-h-[36px]"
-            >
-              🎬 Instagram Reel
-            </motion.button>
-            <motion.button
-              type="button"
-              whileTap={{ scale: 0.93 }}
-              onClick={() => {
-                setInputText('https://www.tiktok.com/@movies/video/7234567890123456');
-                handleInteraction();
-              }}
-              className="text-[11px] font-sans px-3 py-1.5 rounded-full bg-[#12131F] border border-[#2B2945] text-[#A59DF5] hover:text-white hover:border-[#8E7BFF] transition-all cursor-pointer active:scale-95 min-h-[36px]"
-            >
-              🎵 TikTok
-            </motion.button>
-            <motion.button
-              type="button"
-              whileTap={{ scale: 0.93 }}
-              onClick={() => {
-                setInputText('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
-                handleInteraction();
-              }}
-              className="text-[11px] font-sans px-3 py-1.5 rounded-full bg-[#12131F] border border-[#2B2945] text-[#A59DF5] hover:text-white hover:border-[#8E7BFF] transition-all cursor-pointer active:scale-95 min-h-[36px]"
-            >
-              📺 YouTube
-            </motion.button>
-          </div>
-        </form>
-
+        {/* Real Extraction Error Banner */}
         {realError && (
-          <div className="mt-2.5 text-xs text-red-300 bg-red-950/40 border border-red-900/40 p-2.5 rounded-xl text-left backdrop-blur-md">
+          <div className="mt-3 text-xs text-red-300 bg-red-950/60 border border-red-800/60 p-3 rounded-xl text-left backdrop-blur-md">
             {realError}
           </div>
         )}
+      </motion.form>
 
-        {/* or share from divider */}
-        <div className="flex items-center justify-center gap-4 w-full max-w-xs mt-6 mb-4 text-xs font-sans text-[#5A596B]">
-          <div className="h-[1px] flex-1 bg-[#1C1B28]" />
-          <span>or share from</span>
-          <div className="h-[1px] flex-1 bg-[#1C1B28]" />
-        </div>
-
-        {/* Social Share Platform Circle Buttons */}
-        <div className="flex items-center justify-center gap-3 sm:gap-4 my-1">
-          {/* Instagram Circle */}
-          <motion.div
-            whileTap={{ scale: 0.88 }}
-            onClick={() => {
-              setInputText('https://www.instagram.com/reel/C3x9pL4M_9x/');
-              handleInteraction();
-            }}
-            className="w-10 h-10 rounded-full bg-[#111019] border border-[#252338] flex items-center justify-center text-white hover:border-[#8E7BFF]/50 transition-all cursor-pointer shadow-md active:scale-90"
-          >
-            <svg className="w-4 h-4 text-pink-500 fill-current" viewBox="0 0 24 24">
-              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-            </svg>
-          </motion.div>
-
-          <span className="w-1 h-1 rounded-full bg-[#3B3852]" />
-
-          {/* TikTok Circle */}
-          <motion.div
-            whileTap={{ scale: 0.88 }}
-            onClick={() => {
-              setInputText('https://www.tiktok.com/@movies/video/7234567890123456');
-              handleInteraction();
-            }}
-            className="w-10 h-10 rounded-full bg-[#111019] border border-[#252338] flex items-center justify-center text-white hover:border-[#8E7BFF]/50 transition-all cursor-pointer shadow-md active:scale-90"
-          >
-            <svg className="w-4 h-4 text-white fill-current" viewBox="0 0 24 24">
-              <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 1 1-5.2-1.74 2.89 2.89 0 0 1 2.31-2.22V8.2a6.34 6.34 0 0 0-5.11 6.2 6.34 6.34 0 0 0 10.82 4.48c1.65-1.65 2.63-3.9 2.63-6.42V8.92a8.28 8.28 0 0 0 4.77 1.52V7a4.84 4.84 0 0 1-3-.31z"/>
-            </svg>
-          </motion.div>
-
-          <span className="w-1 h-1 rounded-full bg-[#3B3852]" />
-
-          {/* YouTube Circle */}
-          <motion.div
-            whileTap={{ scale: 0.88 }}
-            onClick={() => {
-              setInputText('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
-              handleInteraction();
-            }}
-            className="w-10 h-10 rounded-full bg-[#111019] border border-[#252338] flex items-center justify-center text-white hover:border-[#8E7BFF]/50 transition-all cursor-pointer shadow-md active:scale-90"
-          >
-            <svg className="w-4 h-4 text-red-500 fill-current" viewBox="0 0 24 24">
-              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-            </svg>
-          </motion.div>
-
-          <span className="w-1 h-1 rounded-full bg-[#3B3852]" />
-
-          {/* More Circle */}
-          <motion.div
-            whileTap={{ scale: 0.88 }}
-            onClick={() => {
-              setInputText('https://www.instagram.com/reel/C3x9pL4M_9x/');
-              handleInteraction();
-            }}
-            className="w-10 h-10 rounded-full bg-[#111019] border border-[#252338] flex items-center justify-center text-[#7A798C] hover:text-white hover:border-[#8E7BFF]/50 transition-all cursor-pointer shadow-md active:scale-90"
-          >
-            <MoreHorizontal className="w-4 h-4" />
-          </motion.div>
-        </div>
-
-        {/* Works across all your favorite apps */}
-        <div className="flex items-center justify-center gap-1.5 mt-3 text-xs text-[#7A798C] font-sans italic relative z-30">
-          <Shield className="w-3.5 h-3.5 text-[#8E7BFF]" />
-          <span>Works across all your favorite apps</span>
-        </div>
-
-      </div>
-
-      {/* 4. CINEMATIC ROLLING FILM REEL (Translucent Continuous Curved 35mm Projector Strip Ambient Background) */}
-      <div 
-        className="relative z-10 w-full -mt-14 sm:-mt-18 select-none pointer-events-none opacity-35 mix-blend-screen"
+      {/* 3. Small Supporting Content */}
+      <motion.div 
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+        className="mt-8"
       >
-        {/* Perspective Wrapper for Curved 3D Film Strip */}
-        <div 
-          ref={containerRef}
-          className="relative w-full overflow-hidden py-3 sm:py-4 bg-transparent"
-          style={{ perspective: '1200px' }}
-        >
-          {/* Left Vignette Edge Fade */}
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-24 sm:w-40 bg-gradient-to-r from-[#050505] via-[#050505]/90 to-transparent z-40" />
-          
-          {/* Right Vignette Edge Fade */}
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-24 sm:w-40 bg-gradient-to-l from-[#050505] via-[#050505]/90 to-transparent z-40" />
-
-          {/* Atmospheric Ambient Backlight behind Center of Reel */}
-          <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-28 bg-[#8E7BFF]/10 blur-2xl rounded-full z-0" />
-
-          {/* Continuous Infinite Rolling Motion Track */}
-          <div 
-            className="flex items-center gap-3 py-2 will-change-transform"
-            style={{
-              transform: `translate3d(-${scrollPos}px, 0, 0)`,
-              transformStyle: 'preserve-3d'
-            }}
-          >
-            {REEL_MOVIES.map((movie, idx) => {
-              const cardLeftX = idx * ITEM_FULL_WIDTH - scrollPos;
-              const cardCenterX = cardLeftX + CARD_WIDTH / 2;
-              const distToCenter = Math.abs(cardCenterX - containerCenter);
-              
-              const normDist = Math.min(1, distToCenter / Math.max(containerCenter, 400));
-              const arcY = Math.pow(normDist, 2) * 10;
-
-              return (
-                <div
-                  key={`${movie.id}-${idx}`}
-                  style={{
-                    transform: `translateY(${arcY}px)`,
-                    transformStyle: 'preserve-3d',
-                  }}
-                  className="relative w-28 sm:w-36 flex-shrink-0 rounded-xl overflow-hidden bg-[#0D0E17]/60 border border-white/10 shadow-md z-10 opacity-70"
-                >
-                  {/* 35mm Sprocket Perforations Top Header Bar */}
-                  <div className="w-full bg-[#07080E]/80 py-0.5 px-1.5 border-b border-white/10 flex justify-between items-center z-20">
-                    <div className="w-2 h-1 rounded-[1px] bg-[#161826] border border-white/10" />
-                    <div className="w-2 h-1 rounded-[1px] bg-[#161826] border border-white/10" />
-                    <div className="w-2 h-1 rounded-[1px] bg-[#161826] border border-white/10" />
-                    <div className="w-2 h-1 rounded-[1px] bg-[#161826] border border-white/10" />
-                  </div>
-
-                  {/* Poster Image Area */}
-                  <div className="relative aspect-[2/3] w-full overflow-hidden bg-black/40">
-                    <img 
-                      src={movie.posterUrl} 
-                      alt={movie.title}
-                      referrerPolicy="no-referrer"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        if (target.src !== movie.backupPosterUrl) {
-                          target.src = movie.backupPosterUrl;
-                        }
-                      }}
-                      className="w-full h-full object-cover filter brightness-90 contrast-105 opacity-80"
-                    />
-
-                    {/* Poster Bottom Title Overlay */}
-                    <div className="absolute inset-x-0 bottom-0 pt-6 pb-1.5 px-2 bg-gradient-to-t from-black via-black/70 to-transparent flex items-end justify-center text-center">
-                      <span className="font-sans font-semibold text-[9px] sm:text-[10px] tracking-wider uppercase drop-shadow-md text-zinc-300 truncate">
-                        {movie.displayTitle}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* 35mm Sprocket Perforations Bottom Footer Bar */}
-                  <div className="w-full bg-[#07080E]/80 py-0.5 px-1.5 border-t border-white/10 flex justify-between items-center z-20">
-                    <div className="w-2 h-1 rounded-[1px] bg-[#161826] border border-white/10" />
-                    <div className="w-2 h-1 rounded-[1px] bg-[#161826] border border-white/10" />
-                    <div className="w-2 h-1 rounded-[1px] bg-[#161826] border border-white/10" />
-                    <div className="w-2 h-1 rounded-[1px] bg-[#161826] border border-white/10" />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+        <div className="flex items-center justify-center gap-2 text-xs text-[#5A6582] font-sans">
+          <ShieldCheck className="w-3.5 h-3.5 text-[#7C8CFF]" />
+          <span>Auto-extracts movie details, posters, and streaming availability.</span>
         </div>
-      </div>
+      </motion.div>
 
     </div>
   );
 }
+

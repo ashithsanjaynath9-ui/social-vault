@@ -500,13 +500,6 @@ export default function App() {
                       )}
                     </button>
 
-                    <button
-                      onClick={() => { setIsAssistantOpen(true); setIsMenuOpen(false); }}
-                      className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs sm:text-sm font-medium text-zinc-400 hover:bg-white/[0.04] hover:text-white transition-all cursor-pointer"
-                    >
-                      <Sparkles className="w-4 h-4 text-[#8E7BFF]" />
-                      <span>Ask plot (AI Assistant)</span>
-                    </button>
 
                     <button
                       onClick={() => { setViewMode('profile'); setIsMenuOpen(false); }}
